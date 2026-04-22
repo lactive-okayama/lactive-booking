@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lactive｜ご予約</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ───────────────────────────────
+       変数・リセット
+    ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange:        #FF8C42;
+      --orange-light:  #FFE0C5;
+      --orange-pale:   #FFF5ED;
+      --orange-dark:   #E06010;
+      --orange-deep:   #B84800;
+      --blue:          #4A82A6;
+      --blue-light:    #DFF0FA;
+      --white:         #FFFFFF;
+      --bg:            #FFFAF5;
+      --text:          #2E1E0E;
+      --text-light:    #8A6040;
+      --border:        #EED4B0;
+      --danger:        #D94040;
+      --danger-bg:     #FDEAEA;
+      --success:       #2E7D50;
+      --success-bg:    #E5F5EC;
+      --success-bd:    #9ACDB0;
+      --shadow:        0 4px 20px rgba(0,0,0,0.08);
+      --shadow-sm:     0 2px 8px rgba(0,0,0,0.06);
+      --radius:        14px;
+      --radius-sm:     8px;
+    }
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ───────────────────────────────
+       ヘッダー
+    ─────────────────────────────── */
+    header {
+      background: var(--white);
+      border-bottom: 2px solid var(--orange-light);
+      padding: 0 20px;
+      position: sticky; top: 0; z-index: 200;
+      box-shadow: 0 2px 10px rgba(255,140,66,.12);
+    }
+    .header-inner {
+      max-width: 780px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 62px;
+    }
+    .logo { cursor: pointer; }
+    .logo-name { font-size: 1.45rem; font-weight: 700; color: var(--orange-deep); letter-spacing: .08em; }
+    .logo-sub  { font-size: .72rem; color: var(--text-light); letter-spacing: .1em; }
+
+    /* ───────────────────────────────
+       メイン・ページ管理
+    ─────────────────────────────── */
+    main { max-width: 780px; margin: 0 auto; padding: 28px 18px 72px; }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ───────────────────────────────
+       ステップバー
+    ─────────────────────────────── */
+    #steps-container { margin-bottom: 24px; }
+    .steps-bar {
+      display: flex; align-items: flex-start;
+      justify-content: center; gap: 0;
+    }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .step-circle {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .62rem; font-weight: 700; line-height: 1.2;
+      text-align: center; flex-shrink: 0;
+    }
+    .step-circle.active  { background: var(--orange-deep); color: #fff; box-shadow: 0 0 0 3px rgba(255,140,66,.25); }
+    .step-circle.done    { background: var(--orange); color: #fff; }
+    .step-circle.pending { background: var(--border); color: var(--text-light); }
+    .step-text { font-size: .65rem; color: var(--text-light); text-align: center; max-width: 52px; }
+    .step-text.active-text { color: var(--orange-deep); font-weight: 700; }
+    .step-line { flex: 1; height: 2px; background: var(--border); min-width: 18px; max-width: 60px; margin-top: 19px; }
+    .step-line.done { background: var(--orange); }
+
+    /* ───────────────────────────────
+       セクションヘッダー
+    ─────────────────────────────── */
+    .section-block { margin-bottom: 32px; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-bottom: 14px;
+    }
+    .badge-tag {
+      display: inline-block; font-size: .72rem; font-weight: 700;
+      padding: 3px 12px; border-radius: 20px;
+    }
+    .badge-first  { background: var(--orange); color: #fff; }
+    .badge-member { background: var(--blue); color: #fff; }
+    .section-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+    /* ───────────────────────────────
+       メニューカード
+    ─────────────────────────────── */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .menu-grid { grid-template-columns: 1fr; } }
+    .menu-grid.single-col { grid-template-columns: 1fr; }
+
+    .menu-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 20px 18px; cursor: pointer;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+      box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .menu-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%; background: var(--orange);
+    }
+    .menu-card.member-card::before { background: var(--blue); }
+    .menu-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+
+    .card-top { display: flex; align-items: center; justify-content: space-between; }
+    .card-type-badge {
+      font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+    }
+    .first-badge  { background: var(--orange-light); color: var(--orange-dark); }
+    .member-badge { background: var(--blue-light); color: var(--blue); }
+    .card-arrow { color: var(--border); font-size: 1.2rem; }
+    .menu-card:hover .card-arrow { color: var(--orange); }
+    .menu-card.member-card:hover .card-arrow { color: var(--blue); }
+
+    .card-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .card-duration { font-size: .82rem; color: var(--text-light); }
+    .card-price { font-size: 1.1rem; font-weight: 700; color: var(--orange-dark); margin-top: 2px; }
+
+    /* ───────────────────────────────
+       カード（白背景ボックス）
+    ─────────────────────────────── */
+    .card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 28px; box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 480px) { .card { padding: 18px 14px; } }
+
+    /* ───────────────────────────────
+       ページタイトル
+    ─────────────────────────────── */
+    .page-title { text-align: center; margin-bottom: 24px; }
+    .page-title h2 { font-size: 1.25rem; font-weight: 700; color: var(--orange-deep); margin-bottom: 5px; }
+    .page-title p  { font-size: .86rem; color: var(--text-light); }
+
+    /* ───────────────────────────────
+       フォーム
+    ─────────────────────────────── */
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+      display: block; font-size: .86rem; font-weight: 500;
+      color: var(--text); margin-bottom: 6px;
+    }
+    .req { color: var(--danger); font-size: .78rem; margin-left: 3px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: .96rem; font-family: inherit; color: var(--text);
+      background: var(--white); outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255,140,66,.18);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 460px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ラジオ選択グループ */
+    .radio-group { display: flex; flex-direction: column; gap: 8px; }
+    .radio-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); cursor: pointer;
+      transition: border-color .18s, background .18s;
+    }
+    .radio-item:hover { border-color: var(--orange); background: var(--orange-pale); }
+    .radio-item input[type=radio] { accent-color: var(--orange); width: 16px; height: 16px; flex-shrink: 0; }
+    .radio-item.selected { border-color: var(--orange); background: var(--orange-pale); }
+    .radio-label { font-size: .9rem; color: var(--text); flex: 1; }
+
+    /* 注意事項リスト */
+    .notice-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+    .notice-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 16px; background: var(--orange-pale);
+      border-left: 3px solid var(--orange); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: .9rem; line-height: 1.6;
+    }
+    .notice-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ───────────────────────────────
+       ボタン
+    ─────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 13px 28px; border: none; border-radius: 40px;
+      font-size: .96rem; font-family: inherit; font-weight: 700;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+      color: #fff; box-shadow: 0 4px 14px rgba(255,140,66,.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(255,140,66,.5); }
+    .btn-secondary {
+      background: var(--white); color: var(--text-light);
+      border: 1.5px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--orange); color: var(--orange-deep); }
+    .btn-blue {
+      background: linear-gradient(135deg, var(--blue), #3A6A8A);
+      color: #fff; box-shadow: 0 4px 14px rgba(74,130,166,.4);
+    }
+    .btn-blue:hover { transform: translateY(-2px); }
+    .btn-danger {
+      background: var(--danger-bg); color: var(--danger);
+      border: 1.5px solid #F0A0A0; font-size: .8rem; padding: 7px 14px;
+      border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
+    }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+    .btn-full  { width: 100%; }
+    .btn-actions { display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
+    .btn-actions .btn { flex: 1; min-width: 110px; }
+
+    /* ───────────────────────────────
+       アラート
+    ─────────────────────────────── */
+    .alert {
+      padding: 11px 15px; border-radius: var(--radius-sm);
+      font-size: .86rem; margin-bottom: 16px; display: none;
+    }
+    .alert.show  { display: block; }
+    .alert-error   { background: var(--danger-bg);  color: var(--danger); border: 1px solid #F0A0A0; }
+    .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-bd); }
+    .alert-info    { background: var(--blue-light);  color: var(--blue);   border: 1px solid #90C8F0; }
+
+    /* ───────────────────────────────
+       顧客認証画面
+    ─────────────────────────────── */
+    .auth-choice { display: flex; flex-direction: column; gap: 14px; }
+    .auth-option {
+      padding: 20px; border: 2px solid var(--border); border-radius: var(--radius);
+      cursor: pointer; transition: all .2s; background: var(--white);
+    }
+    .auth-option:hover { border-color: var(--orange); background: var(--orange-pale); }
+    .auth-option-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .auth-option-sub   { font-size: .82rem; color: var(--text-light); }
+
+    /* 顧客情報カード */
+    .customer-card {
+      background: var(--orange-pale); border: 2px solid var(--orange-light);
+      border-radius: var(--radius); padding: 18px 20px; margin: 16px 0;
+    }
+    .customer-card-title { font-size: .78rem; color: var(--text-light); margin-bottom: 10px; }
+    .customer-info-row   { display: flex; gap: 8px; margin-bottom: 5px; font-size: .9rem; }
+    .customer-info-label { color: var(--text-light); min-width: 90px; font-size: .82rem; }
+    .customer-info-val   { color: var(--text); font-weight: 500; }
+
+    /* 顧客番号バッジ */
+    .customer-id-display {
+      text-align: center; padding: 20px;
+      background: var(--success-bg); border: 2px solid var(--success-bd);
+      border-radius: var(--radius); margin: 16px 0;
+    }
+    .customer-id-label { font-size: .84rem; color: var(--success); margin-bottom: 6px; }
+    .customer-id-num   { font-size: 2.5rem; font-weight: 700; color: var(--success); letter-spacing: .2em; }
+    .customer-id-note  { font-size: .8rem; color: var(--success); margin-top: 6px; }
+
+    /* 3桁入力 */
+    .id-input-wrap { text-align: center; padding: 12px 0 6px; }
+    .id-input {
+      width: 130px; text-align: center; letter-spacing: .5em;
+      font-size: 1.6rem; font-weight: 700; padding: 12px 8px;
+      border: 2px solid var(--border); border-radius: var(--radius-sm);
+      display: inline-block; font-family: inherit;
+    }
+    .id-input:focus { border-color: var(--orange); outline: none; box-shadow: 0 0 0 3px rgba(255,140,66,.18); }
+
+    /* ───────────────────────────────
+       完了画面
+    ─────────────────────────────── */
+    .done-icon {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange-light), var(--orange));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem; margin: 0 auto 18px;
+    }
+    .done-title { text-align: center; font-size: 1.3rem; font-weight: 700; color: var(--orange-deep); margin-bottom: 8px; }
+    .done-msg   { text-align: center; font-size: .92rem; color: var(--text-light); margin-bottom: 24px; line-height: 1.8; }
+    .done-table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+    .done-table td {
+      padding: 10px 13px; font-size: .88rem;
+      border-bottom: 1px solid var(--orange-light);
+    }
+    .done-table tr:last-child td { border-bottom: none; }
+    .done-table td:first-child { color: var(--text-light); width: 35%; font-weight: 500; }
+    .done-table td:last-child  { color: var(--text); font-weight: 500; }
+
+    /* ───────────────────────────────
+       管理画面
+    ─────────────────────────────── */
+    .admin-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 22px; }
+    .tab-btn {
+      padding: 10px 22px; border: none; background: none; cursor: pointer;
+      font-size: .9rem; font-family: inherit; font-weight: 500;
+      color: var(--text-light); border-bottom: 3px solid transparent; margin-bottom: -2px;
+      transition: all .18s;
+    }
+    .tab-btn.active { color: var(--orange-deep); border-bottom-color: var(--orange); font-weight: 700; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-bar input, .filter-bar select {
+      padding: 8px 11px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: .84rem; font-family: inherit; color: var(--text); outline: none;
+    }
+    .filter-bar input { flex: 1; min-width: 130px; }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--orange); }
+
+    .list-scroll { max-height: 58vh; overflow-y: auto; padding-right: 2px; }
+    .list-scroll::-webkit-scrollbar { width: 5px; }
+    .list-scroll::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 4px; }
+
+    .admin-item {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      margin-bottom: 11px; display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 12px;
+      transition: border-color .18s;
+    }
+    .admin-item:hover { border-color: var(--orange); }
+    .admin-info { flex: 1; min-width: 0; }
+    .admin-name { font-size: .98rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .admin-tag  {
+      display: inline-block; background: var(--orange-light); color: var(--orange-dark);
+      font-size: .7rem; font-weight: 700; padding: 2px 9px;
+      border-radius: 20px; margin-bottom: 7px;
+    }
+    .admin-tag.blue-tag { background: var(--blue-light); color: var(--blue); }
+    .admin-meta { font-size: .8rem; color: var(--text-light); line-height: 1.9; }
+    .admin-meta span { margin-right: 12px; }
+    .admin-memo { font-size: .78rem; color: var(--text-light); margin-top: 7px; padding: 7px 11px; background: var(--bg); border-radius: var(--radius-sm); }
+    .admin-q { margin-top: 8px; }
+    .admin-q-toggle {
+      font-size: .76rem; color: var(--orange-dark); cursor: pointer;
+      text-decoration: underline; user-select: none;
+    }
+    .admin-q-body { display: none; margin-top: 6px; font-size: .78rem; color: var(--text-light);
+      padding: 8px 11px; background: #FFF8F0; border-radius: var(--radius-sm); line-height: 1.8; }
+    .admin-q-body.open { display: block; }
+
+    .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .admin-header h2 { font-size: 1.15rem; font-weight: 700; color: var(--orange-deep); }
+    .count-badge { background: var(--orange-light); color: var(--orange-dark); font-size: .78rem; font-weight: 700; padding: 3px 11px; border-radius: 20px; }
+
+    .empty-state { text-align: center; padding: 44px 20px; color: var(--text-light); }
+    .empty-state .ei { font-size: 2.6rem; margin-bottom: 10px; opacity: .35; }
+    .empty-state p { font-size: .88rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo" onclick="navigateTo('page-top')">
+      <div class="logo-name">Lactive</div>
+      <div class="logo-sub">整体院｜ご予約</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="steps-container"></div>
+
+  <!-- ▼ トップ（メニュー選択） -->
+  <div id="page-top" class="page active">
+    <div class="section-block">
+      <div class="section-label">
+        <span class="badge-tag badge-first">初回の方</span>
+        <span class="section-title">はじめてのご予約</span>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-card" onclick="startFirstFlow('first-seitai')">
+          <div class="card-top">
+            <span class="card-type-badge first-badge">初回体験</span>
+            <span class="card-arrow">›</span>
+          </div>
+          <div class="card-name">初回整体体験</div>
+          <div class="card-duration">90分</div>
+          <div class="card-price">¥1,980</div>
+        </div>
+        <div class="menu-card" onclick="startFirstFlow('first-pilates')">
+          <div class="card-top">
+            <span class="card-type-badge first-badge">初回体験</span>
+            <span class="card-arrow">›</span>
+          </div>
+          <div class="card-name">初回ピラティス体験</div>
+          <div class="card-duration">60分</div>
+          <div class="card-price">¥1,980</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-block">
+      <div class="section-label">
+        <span class="badge-tag badge-member">会員の方</span>
+        <span class="section-title">会員メニュー</span>
+      </div>
+      <div class="menu-grid single-col">
+        <div class="menu-card member-card" onclick="startMemberFlow('整体（運動療法）30分')">
+          <div class="card-top">
+            <span class="card-type-badge member-badge">会員</span>
+            <span class="card-arrow">›</span>
+          </div>
+          <div class="card-name">整体（運動療法）</div>
+          <div class="card-duration">30分</div>
+        </div>
+        <div class="menu-card member-card" onclick="startMemberFlow('マシンピラティス 40分')">
+          <div class="card-top">
+            <span class="card-type-badge member-badge">会員</span>
+            <span class="card-arrow">›</span>
+          </div>
+          <div class="card-name">マシンピラティス</div>
+          <div class="card-duration">40分</div>
+        </div>
+        <div class="menu-card member-card" onclick="startMemberFlow('マットピラティス 40分')">
+          <div class="card-top">
+            <span class="card-type-badge member-badge">会員</span>
+            <span class="card-arrow">›</span>
+          </div>
+          <div class="card-name">マットピラティス</div>
+          <div class="card-duration">40分</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-top -->
+
+  <!-- ▼ 注意事項（STEP1：初回共通） -->
+  <div id="page-notice" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>ご予約前にご確認ください</h2>
+        <p>以下の注意事項をお読みのうえ、同意して次へお進みください</p>
+      </div>
+      <ul class="notice-list">
+        <li class="notice-item"><span class="notice-icon">🧦</span>五本指ソックスの着用をお願いします</li>
+        <li class="notice-item"><span class="notice-icon">🅿️</span>駐車場は2番をご利用ください</li>
+        <li class="notice-item"><span class="notice-icon">📞</span>場所がわからない場合はお電話でお問い合わせください</li>
+        <li class="notice-item"><span class="notice-icon">⏰</span>遅刻・キャンセルの際は必ずご連絡ください</li>
+      </ul>
+      <div class="btn-actions">
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+        <button class="btn btn-primary" onclick="noticeAgree()">同意して次へ →</button>
+      </div>
+    </div>
+  </div><!-- /page-notice -->
+
+  <!-- ▼ 問診票（STEP2：初回整体のみ） -->
+  <div id="page-questionnaire" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>問診票</h2>
+        <p>施術の参考にさせていただきます。できる範囲でご記入ください。</p>
+      </div>
+      <div id="q-alert" class="alert alert-error"></div>
+
+      <div class="form-group">
+        <label>1. 現在困っている身体の症状を教えてください<span class="req">*</span></label>
+        <textarea id="q1" placeholder="例：腰が痛い、肩こりがひどい など"></textarea>
+      </div>
+      <div class="form-group">
+        <label>2. その症状で整体・接骨院・病院に行ったことはありますか？<span class="req">*</span></label>
+        <div class="radio-group" id="q2-group">
+          <label class="radio-item"><input type="radio" name="q2" value="はい"><span class="radio-label">はい</span></label>
+          <label class="radio-item"><input type="radio" name="q2" value="いいえ"><span class="radio-label">いいえ</span></label>
+          <label class="radio-item"><input type="radio" name="q2" value="以前行っていた"><span class="radio-label">以前行っていた</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>3. その症状はいつ頃から出始めましたか？<span class="req">*</span></label>
+        <input type="text" id="q3" placeholder="例：3ヶ月前、1年前 など">
+      </div>
+      <div class="form-group">
+        <label>4. 施術中、身体を動かしていただくことがありますが問題ありませんか？<span class="req">*</span></label>
+        <div class="radio-group" id="q4-group">
+          <label class="radio-item"><input type="radio" name="q4" value="問題ない"><span class="radio-label">問題ない</span></label>
+          <label class="radio-item"><input type="radio" name="q4" value="少し不安"><span class="radio-label">少し不安</span></label>
+          <label class="radio-item"><input type="radio" name="q4" value="詳しく聞きたい"><span class="radio-label">詳しく聞きたい</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>5. 現在の症状で日常生活はどの程度困っていますか？<span class="req">*</span></label>
+        <div class="radio-group" id="q5-group">
+          <label class="radio-item"><input type="radio" name="q5" value="かなり困っている"><span class="radio-label">かなり困っている</span></label>
+          <label class="radio-item"><input type="radio" name="q5" value="少し困っている"><span class="radio-label">少し困っている</span></label>
+          <label class="radio-item"><input type="radio" name="q5" value="なんとかなっている"><span class="radio-label">なんとかなっている</span></label>
+        </div>
+      </div>
+      <div class="btn-actions">
+        <button class="btn btn-secondary" onclick="navigateTo('page-notice')">← 戻る</button>
+        <button class="btn btn-primary" onclick="submitQuestionnaire()">次へ →</button>
+      </div>
+    </div>
+  </div><!-- /page-questionnaire -->
+
+  <!-- ▼ 個人情報（初回共通） -->
+  <div id="page-personal" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>お客様情報の入力</h2>
+        <p>ご予約に必要な情報をご入力ください</p>
+      </div>
+      <div id="personal-alert" class="alert alert-error"></div>
+      <div class="form-group">
+        <label>お名前<span class="req">*</span></label>
+        <input type="text" id="p-name" placeholder="山田 花子">
+      </div>
+      <div class="form-group">
+        <label>電話番号<span class="req">*</span></label>
+        <input type="tel" id="p-phone" placeholder="090-0000-0000">
+      </div>
+      <div class="form-group">
+        <label>メールアドレス<span class="req">*</span></label>
+        <input type="email" id="p-email" placeholder="example@email.com">
+      </div>
+      <div class="btn-actions">
+        <button class="btn btn-secondary" id="personal-back-btn" onclick="personalBack()">← 戻る</button>
+        <button class="btn btn-primary" onclick="submitPersonal()">次へ →</button>
+      </div>
+    </div>
+  </div><!-- /page-personal -->
+
+  <!-- ▼ 会員認証：方法選択 -->
+  <div id="page-member-auth" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>ご予約方法の選択</h2>
+        <p id="member-auth-menu-label"></p>
+      </div>
+      <div class="auth-choice">
+        <div class="auth-option" onclick="navigateTo('page-member-login')">
+          <div class="auth-option-title">🔑 顧客番号をお持ちの方</div>
+          <div class="auth-option-sub">3桁の顧客番号でログインして予約します</div>
+        </div>
+        <div class="auth-option" onclick="navigateTo('page-member-register')">
+          <div class="auth-option-title">📝 新規登録（初回以外で初めてお使いの方）</div>
+          <div class="auth-option-sub">情報をご登録いただき、顧客番号を発行します</div>
+        </div>
+      </div>
+      <div class="btn-actions">
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+      </div>
+    </div>
+  </div><!-- /page-member-auth -->
+
+  <!-- ▼ 会員ログイン -->
+  <div id="page-member-login" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>顧客番号でログイン</h2>
+        <p>3桁の顧客番号を入力してください</p>
+      </div>
+      <div id="login-alert" class="alert alert-error"></div>
+
+      <!-- 入力状態 -->
+      <div id="login-form-section">
+        <div class="id-input-wrap">
+          <input type="text" class="id-input" id="member-id-input"
+                 maxlength="3" placeholder="000" autocomplete="off" inputmode="numeric"
+                 onkeydown="if(event.key==='Enter') verifyMemberId()">
+        </div>
+        <div class="btn-actions">
+          <button class="btn btn-secondary" onclick="navigateTo('page-member-auth')">← 戻る</button>
+          <button class="btn btn-primary" onclick="verifyMemberId()">確認する</button>
+        </div>
+      </div>
+
+      <!-- 確認状態 -->
+      <div id="login-confirm-section" style="display:none;">
+        <div class="customer-card">
+          <div class="customer-card-title">以下のお客様情報でよろしいですか？</div>
+          <div class="customer-info-row"><span class="customer-info-label">顧客番号</span><span class="customer-info-val" id="lc-id"></span></div>
+          <div class="customer-info-row"><span class="customer-info-label">お名前</span><span class="customer-info-val" id="lc-name"></span></div>
+          <div class="customer-info-row"><span class="customer-info-label">電話番号</span><span class="customer-info-val" id="lc-phone"></span></div>
+          <div class="customer-info-row"><span class="customer-info-label">メール</span><span class="customer-info-val" id="lc-email"></span></div>
+        </div>
+        <div class="btn-actions">
+          <button class="btn btn-secondary" onclick="resetMemberLogin()">違う番号を試す</button>
+          <button class="btn btn-primary" onclick="loginConfirm()">この情報で予約する →</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-member-login -->
+
+  <!-- ▼ 会員新規登録 -->
+  <div id="page-member-register" class="page">
+    <div class="card">
+      <!-- 登録フォーム -->
+      <div id="register-form-section">
+        <div class="page-title">
+          <h2>新規登録</h2>
+          <p>情報を入力すると顧客番号が発行されます</p>
+        </div>
+        <div id="register-alert" class="alert alert-error"></div>
+        <div class="form-group">
+          <label>お名前<span class="req">*</span></label>
+          <input type="text" id="r-name" placeholder="山田 花子">
+        </div>
+        <div class="form-group">
+          <label>電話番号<span class="req">*</span></label>
+          <input type="tel" id="r-phone" placeholder="090-0000-0000">
+        </div>
+        <div class="form-group">
+          <label>メールアドレス<span class="req">*</span></label>
+          <input type="email" id="r-email" placeholder="example@email.com">
+        </div>
+        <div class="btn-actions">
+          <button class="btn btn-secondary" onclick="navigateTo('page-member-auth')">← 戻る</button>
+          <button class="btn btn-primary" onclick="submitRegister()">登録して次へ →</button>
+        </div>
+      </div>
+
+      <!-- 登録完了 → 番号表示 -->
+      <div id="register-done-section" style="display:none;">
+        <div class="page-title">
+          <h2>顧客番号が発行されました</h2>
+        </div>
+        <div class="customer-id-display">
+          <div class="customer-id-label">あなたの顧客番号</div>
+          <div class="customer-id-num" id="issued-id">---</div>
+          <div class="customer-id-note">次回からこの番号でログインできます。<br>必ずお控えください。</div>
+        </div>
+        <div class="btn-actions" style="justify-content:center;">
+          <button class="btn btn-primary" style="min-width:180px;" onclick="navigateTo('page-datetime')">日時を選ぶ →</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-member-register -->
+
+  <!-- ▼ 日時選択（共通） -->
+  <div id="page-datetime" class="page">
+    <div class="card">
+      <div id="datetime-newid-notice" class="alert alert-info" style="display:none;"></div>
+      <div class="page-title">
+        <h2>希望日時の選択</h2>
+        <p id="datetime-menu-label"></p>
+      </div>
+      <div id="datetime-alert" class="alert alert-error"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>希望日<span class="req">*</span></label>
+          <input type="date" id="dt-date">
+        </div>
+        <div class="form-group">
+          <label>希望時間<span class="req">*</span></label>
+          <select id="dt-time">
+            <option value="">選択してください</option>
+            <option>10:00</option>
+            <option>11:00</option>
+            <option>12:00</option>
+            <option>14:00</option>
+            <option>15:00</option>
+            <option>16:00</option>
+            <option>17:00</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>メモ・ご要望（任意）</label>
+        <textarea id="dt-memo" placeholder="気になること、ご要望などがあればご記入ください"></textarea>
+      </div>
+      <div class="btn-actions">
+        <button class="btn btn-secondary" id="dt-back-btn" onclick="datetimeBack()">← 戻る</button>
+        <button class="btn btn-primary" onclick="submitBooking()">予約を確定する ✓</button>
+      </div>
+    </div>
+  </div><!-- /page-datetime -->
+
+  <!-- ▼ 予約完了 -->
+  <div id="page-done" class="page">
+    <div class="card" style="text-align:center; padding:40px 28px;">
+      <div class="done-icon">🌿</div>
+      <div class="done-title">ご予約ありがとうございます</div>
+      <div class="done-msg">当日お会いできるのを楽しみにしています！</div>
+      <table class="done-table">
+        <tr><td>お名前</td><td id="dn-name"></td></tr>
+        <tr><td>メニュー</td><td id="dn-menu"></td></tr>
+        <tr><td>希望日時</td><td id="dn-dt"></td></tr>
+        <tr id="dn-id-row" style="display:none;"><td>顧客番号</td><td id="dn-id"></td></tr>
+        <tr id="dn-memo-row" style="display:none;"><td>ご要望</td><td id="dn-memo"></td></tr>
+      </table>
+      <p style="font-size:.8rem;color:var(--text-light);margin-top:16px;line-height:1.8;">
+        ご不明な点はお電話にてお問い合わせください。
+      </p>
+      <button class="btn btn-primary" style="margin-top:22px;" onclick="navigateTo('page-top')">トップに戻る</button>
+    </div>
+  </div><!-- /page-done -->
+
+  <!-- ▼ 管理ログイン -->
+  <div id="page-admin-login" class="page">
+    <div style="max-width:380px;margin:0 auto;">
+      <div class="page-title">
+        <h2>管理画面ログイン</h2>
+        <p>管理者パスワードを入力してください</p>
+      </div>
+      <div class="card">
+        <div id="admin-login-alert" class="alert alert-error">パスワードが正しくありません。</div>
+        <div class="form-group">
+          <label>パスワード</label>
+          <input type="password" id="admin-pw" placeholder="パスワードを入力"
+                 onkeydown="if(event.key==='Enter') adminLogin()">
+        </div>
+        <div class="btn-actions">
+          <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+          <button class="btn btn-primary" onclick="adminLogin()">ログイン</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-admin-login -->
+
+  <!-- ▼ 管理ダッシュボード -->
+  <div id="page-admin" class="page">
+    <div class="admin-header">
+      <h2>管理画面</h2>
+      <button class="btn btn-secondary" style="padding:7px 16px;font-size:.84rem;border-radius:var(--radius-sm);"
+              onclick="adminLogout()">ログアウト</button>
+    </div>
+
+    <div class="admin-tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-bookings', this)">予約一覧</button>
+      <button class="tab-btn"        onclick="switchTab('tab-customers', this)">顧客一覧</button>
+    </div>
+
+    <!-- 予約一覧タブ -->
+    <div id="tab-bookings" class="tab-panel active">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <span class="count-badge" id="booking-count">0件</span>
+        <div class="filter-bar" style="margin:0;flex:1;">
+          <input type="text" id="bf-name" placeholder="名前で検索" oninput="renderBookings()">
+          <select id="bf-menu" onchange="renderBookings()">
+            <option value="">すべてのメニュー</option>
+            <option>初回整体体験 90分</option>
+            <option>初回ピラティス体験 60分</option>
+            <option>整体（運動療法）30分</option>
+            <option>マシンピラティス 40分</option>
+            <option>マットピラティス 40分</option>
+          </select>
+        </div>
+      </div>
+      <div class="list-scroll">
+        <div id="booking-list"></div>
+      </div>
+    </div>
+
+    <!-- 顧客一覧タブ -->
+    <div id="tab-customers" class="tab-panel">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+        <span class="count-badge" id="customer-count">0件</span>
+        <div class="filter-bar" style="margin:0;flex:1;">
+          <input type="text" id="cf-name" placeholder="名前・電話番号で検索" oninput="renderCustomers()">
+        </div>
+      </div>
+      <div class="list-scroll">
+        <div id="customer-list"></div>
+      </div>
+    </div>
+  </div><!-- /page-admin -->
+
+</main>
+
+<script>
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 定数（変更可能）
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const ADMIN_PASSWORD = 'admin1234';
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  // フロー設定
+  const FLOW_CONFIG = {
+    'first-seitai': {
+      steps: [
+        { label: 'STEP\n1', desc: '注意事項' },
+        { label: 'STEP\n2', desc: '問診票' },
+        { label: 'STEP\n3', desc: '個人情報' },
+        { label: 'STEP\n4', desc: '日時選択' }
+      ],
+      pageStep: {
+        'page-notice': 0, 'page-questionnaire': 1,
+        'page-personal': 2, 'page-datetime': 3
+      }
+    },
+    'first-pilates': {
+      steps: [
+        { label: 'STEP\n1', desc: '注意事項' },
+        { label: 'STEP\n2', desc: '個人情報' },
+        { label: 'STEP\n3', desc: '日時選択' }
+      ],
+      pageStep: {
+        'page-notice': 0, 'page-personal': 1, 'page-datetime': 2
+      }
+    },
+    'member': {
+      steps: [
+        { label: 'STEP\n1', desc: '認証' },
+        { label: 'STEP\n2', desc: '日時選択' }
+      ],
+      pageStep: {
+        'page-member-auth': 0, 'page-member-login': 0,
+        'page-member-register': 0, 'page-datetime': 1
+      }
+    }
+  };
+
+  // アプリ状態
+  let ST = {
+    flow:           '',    // 'first-seitai' | 'first-pilates' | 'member'
+    menu:           '',
+    questionnaire:  {},
+    personal:       { name: '', phone: '', email: '' },
+    customer:       null,  // 既存顧客オブジェクト
+    isNewCustomer:  false,
+    newCustomerId:  '',
+  };
+
+  // ─────────────────────────────────────────
+  // ナビゲーション
+  // ─────────────────────────────────────────
+  function navigateTo(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    renderSteps(pageId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderSteps(pageId) {
+    const container = document.getElementById('steps-container');
+    const noStepPages = ['page-top', 'page-done', 'page-admin-login', 'page-admin'];
+    if (!ST.flow || noStepPages.includes(pageId)) { container.innerHTML = ''; return; }
+
+    const cfg = FLOW_CONFIG[ST.flow];
+    if (!cfg) { container.innerHTML = ''; return; }
+
+    const activeIdx = cfg.pageStep[pageId] ?? -1;
+    if (activeIdx === -1) { container.innerHTML = ''; return; }
+
+    let html = '<div class="steps-bar">';
+    cfg.steps.forEach((s, i) => {
+      const cls = i < activeIdx ? 'done' : i === activeIdx ? 'active' : 'pending';
+      const lbl = cls === 'done' ? '✓' : s.label;
+      html += `
+        <div class="step-item">
+          <div class="step-circle ${cls}" style="white-space:pre-line;">${lbl}</div>
+          <div class="step-text${cls === 'active' ? ' active-text' : ''}">${s.desc}</div>
+        </div>`;
+      if (i < cfg.steps.length - 1) {
+        html += `<div class="step-line${i < activeIdx ? ' done' : ''}"></div>`;
+      }
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  // ─────────────────────────────────────────
+  // 初回フロー
+  // ─────────────────────────────────────────
+  function startFirstFlow(flow) {
+    ST = {
+      flow, menu: flow === 'first-seitai' ? '初回整体体験 90分' : '初回ピラティス体験 60分',
+      questionnaire: {}, personal: { name: '', phone: '', email: '' },
+      customer: null, isNewCustomer: false, newCustomerId: ''
+    };
+    navigateTo('page-notice');
+  }
+
+  function noticeAgree() {
+    if (ST.flow === 'first-seitai') {
+      navigateTo('page-questionnaire');
+    } else {
+      navigateTo('page-personal');
+    }
+  }
+
+  // 問診票
+  function submitQuestionnaire() {
+    const q1 = document.getElementById('q1').value.trim();
+    const q2 = document.querySelector('input[name="q2"]:checked')?.value || '';
+    const q3 = document.getElementById('q3').value.trim();
+    const q4 = document.querySelector('input[name="q4"]:checked')?.value || '';
+    const q5 = document.querySelector('input[name="q5"]:checked')?.value || '';
+
+    if (!q1 || !q2 || !q3 || !q4 || !q5) {
+      showAlert('q-alert', 'すべての項目にご回答ください。');
+      return;
+    }
+    hideAlert('q-alert');
+    ST.questionnaire = { q1, q2, q3, q4, q5 };
+    navigateTo('page-personal');
+  }
+
+  // 個人情報（初回）
+  function personalBack() {
+    if (ST.flow === 'first-seitai') navigateTo('page-questionnaire');
+    else navigateTo('page-notice');
+  }
+
+  function submitPersonal() {
+    const name  = document.getElementById('p-name').value.trim();
+    const phone = document.getElementById('p-phone').value.trim();
+    const email = document.getElementById('p-email').value.trim();
+    if (!name)  { showAlert('personal-alert', 'お名前を入力してください。'); return; }
+    if (!phone) { showAlert('personal-alert', '電話番号を入力してください。'); return; }
+    if (!email) { showAlert('personal-alert', 'メールアドレスを入力してください。'); return; }
+    hideAlert('personal-alert');
+    ST.personal = { name, phone, email };
+    setupDatetime();
+    navigateTo('page-datetime');
+  }
+
+  // ─────────────────────────────────────────
+  // 会員フロー
+  // ─────────────────────────────────────────
+  function startMemberFlow(menuName) {
+    ST = {
+      flow: 'member', menu: menuName,
+      questionnaire: {}, personal: { name: '', phone: '', email: '' },
+      customer: null, isNewCustomer: false, newCustomerId: ''
+    };
+    document.getElementById('member-auth-menu-label').textContent =
+      `メニュー：${menuName}`;
+    navigateTo('page-member-auth');
+  }
+
+  // 顧客番号ログイン
+  function verifyMemberId() {
+    const raw = document.getElementById('member-id-input').value.trim();
+    if (!raw || raw.length > 3) { showAlert('login-alert', '3桁の顧客番号を入力してください。'); return; }
+    const id = raw.padStart(3, '0');
+    const customer = findCustomer(id);
+    if (!customer) {
+      showAlert('login-alert', '顧客番号が見つかりません。番号をご確認のうえ、もう一度お試しください。');
+      return;
+    }
+    hideAlert('login-alert');
+    ST.customer = customer;
+    // 確認表示
+    document.getElementById('lc-id').textContent    = customer.id;
+    document.getElementById('lc-name').textContent  = customer.name;
+    document.getElementById('lc-phone').textContent = customer.phone;
+    document.getElementById('lc-email').textContent = customer.email;
+    document.getElementById('login-form-section').style.display    = 'none';
+    document.getElementById('login-confirm-section').style.display = 'block';
+  }
+
+  function resetMemberLogin() {
+    document.getElementById('member-id-input').value = '';
+    document.getElementById('login-form-section').style.display    = 'block';
+    document.getElementById('login-confirm-section').style.display = 'none';
+    hideAlert('login-alert');
+  }
+
+  function loginConfirm() {
+    ST.personal = {
+      name: ST.customer.name, phone: ST.customer.phone, email: ST.customer.email
+    };
+    setupDatetime();
+    navigateTo('page-datetime');
+  }
+
+  // 新規登録
+  function submitRegister() {
+    const name  = document.getElementById('r-name').value.trim();
+    const phone = document.getElementById('r-phone').value.trim();
+    const email = document.getElementById('r-email').value.trim();
+    if (!name)  { showAlert('register-alert', 'お名前を入力してください。'); return; }
+    if (!phone) { showAlert('register-alert', '電話番号を入力してください。'); return; }
+    if (!email) { showAlert('register-alert', 'メールアドレスを入力してください。'); return; }
+    hideAlert('register-alert');
+
+    const newId = generateCustomerId();
+    ST.isNewCustomer = true;
+    ST.newCustomerId = newId;
+    ST.personal = { name, phone, email };
+
+    document.getElementById('issued-id').textContent = newId;
+    document.getElementById('register-form-section').style.display = 'none';
+    document.getElementById('register-done-section').style.display = 'block';
+    renderSteps('page-member-register');
+  }
+
+  // ─────────────────────────────────────────
+  // 日時選択
+  // ─────────────────────────────────────────
+  function setupDatetime() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm   = String(today.getMonth() + 1).padStart(2, '0');
+    const dd   = String(today.getDate()).padStart(2, '0');
+    document.getElementById('dt-date').min   = `${yyyy}-${mm}-${dd}`;
+    document.getElementById('dt-date').value = '';
+    document.getElementById('dt-time').value = '';
+    document.getElementById('dt-memo').value = '';
+    hideAlert('datetime-alert');
+
+    document.getElementById('datetime-menu-label').textContent = `メニュー：${ST.menu}`;
+
+    const noticeEl = document.getElementById('datetime-newid-notice');
+    if (ST.isNewCustomer) {
+      noticeEl.textContent = `顧客番号【${ST.newCustomerId}】が発行されました。次回からこの番号でログインできます。`;
+      noticeEl.style.display = 'block';
+    } else {
+      noticeEl.style.display = 'none';
+    }
+  }
+
+  function datetimeBack() {
+    if (ST.flow === 'member') {
+      if (ST.isNewCustomer) {
+        document.getElementById('register-form-section').style.display = 'block';
+        document.getElementById('register-done-section').style.display = 'none';
+        navigateTo('page-member-register');
+      } else {
+        navigateTo('page-member-login');
+      }
+    } else {
+      navigateTo('page-personal');
+    }
+  }
+
+  function submitBooking() {
+    const date = document.getElementById('dt-date').value;
+    const time = document.getElementById('dt-time').value;
+    const memo = document.getElementById('dt-memo').value.trim();
+
+    if (!date) { showAlert('datetime-alert', '希望日を選択してください。'); return; }
+    if (!time) { showAlert('datetime-alert', '希望時間を選択してください。'); return; }
+
+    // 新規会員を保存
+    if (ST.isNewCustomer) {
+      saveCustomer({
+        id: ST.newCustomerId,
+        name:  ST.personal.name,
+        phone: ST.personal.phone,
+        email: ST.personal.email
+      });
+    }
+
+    // 予約を保存
+    const booking = {
+      id: Date.now(),
+      menu:   ST.menu,
+      name:   ST.personal.name,
+      phone:  ST.personal.phone,
+      email:  ST.personal.email,
+      customerId: ST.customer?.id || (ST.isNewCustomer ? ST.newCustomerId : ''),
+      date, time, memo,
+      questionnaire: ST.questionnaire,
+      createdAt: new Date().toISOString()
+    };
+    saveBooking(booking);
+
+    // 完了画面
+    document.getElementById('dn-name').textContent = ST.personal.name;
+    document.getElementById('dn-menu').textContent = ST.menu;
+    document.getElementById('dn-dt').textContent   = `${formatDate(date)} ${time}`;
+    const idRow = document.getElementById('dn-id-row');
+    const custId = booking.customerId;
+    if (custId) {
+      document.getElementById('dn-id').textContent = custId;
+      idRow.style.display = '';
+    } else {
+      idRow.style.display = 'none';
+    }
+    const memoRow = document.getElementById('dn-memo-row');
+    if (memo) {
+      document.getElementById('dn-memo').textContent = memo;
+      memoRow.style.display = '';
+    } else {
+      memoRow.style.display = 'none';
+    }
+
+    navigateTo('page-done');
+  }
+
+  // ─────────────────────────────────────────
+  // 管理画面
+  // ─────────────────────────────────────────
+  function adminLogin() {
+    const pw = document.getElementById('admin-pw').value;
+    if (pw === ADMIN_PASSWORD) {
+      document.getElementById('admin-pw').value = '';
+      hideAlert('admin-login-alert');
+      renderBookings();
+      renderCustomers();
+      navigateTo('page-admin');
+    } else {
+      showAlert('admin-login-alert');
+      document.getElementById('admin-pw').value = '';
+      document.getElementById('admin-pw').focus();
+    }
+  }
+
+  function adminLogout() { navigateTo('page-top'); }
+
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+    if (tabId === 'tab-bookings')  renderBookings();
+    if (tabId === 'tab-customers') renderCustomers();
+  }
+
+  function renderBookings() {
+    const fName = document.getElementById('bf-name').value.toLowerCase();
+    const fMenu = document.getElementById('bf-menu').value;
+    let list = getBookings();
+    if (fName) list = list.filter(b => b.name.toLowerCase().includes(fName) || (b.customerId||'').includes(fName));
+    if (fMenu) list = list.filter(b => b.menu === fMenu);
+    list.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.time < b.time ? -1 : 1);
+
+    document.getElementById('booking-count').textContent = `${list.length}件`;
+    const container = document.getElementById('booking-list');
+    if (!list.length) { container.innerHTML = emptyState('📋', '予約がありません'); return; }
+
+    container.innerHTML = list.map(b => {
+      const isFirst = b.menu.startsWith('初回');
+      const tagCls  = isFirst ? '' : ' blue-tag';
+      const qHtml   = b.questionnaire?.q1 ? `
+        <div class="admin-q">
+          <span class="admin-q-toggle" onclick="toggleQ(this)">▶ 問診内容を見る</span>
+          <div class="admin-q-body">
+            <div>① 症状：${esc(b.questionnaire.q1)}</div>
+            <div>② 受診歴：${esc(b.questionnaire.q2)}</div>
+            <div>③ 発症時期：${esc(b.questionnaire.q3)}</div>
+            <div>④ 動作可否：${esc(b.questionnaire.q4)}</div>
+            <div>⑤ 日常生活の影響：${esc(b.questionnaire.q5)}</div>
+          </div>
+        </div>` : '';
+      return `
+        <div class="admin-item">
+          <div class="admin-info">
+            <div class="admin-name">${esc(b.name)}</div>
+            <span class="admin-tag${tagCls}">${esc(b.menu)}</span>
+            <div class="admin-meta">
+              <span>📅 ${formatDate(b.date)} ${esc(b.time)}</span>
+              <span>📞 ${esc(b.phone)}</span>
+              ${b.customerId ? `<span>🔑 No.${esc(b.customerId)}</span>` : ''}
+            </div>
+            ${b.memo ? `<div class="admin-memo">📝 ${esc(b.memo)}</div>` : ''}
+            ${qHtml}
+          </div>
+          <button class="btn-danger" onclick="deleteBookingConfirm(${b.id}, '${esc(b.name).replace(/'/g,'\\u0027')}')">削除</button>
+        </div>`;
+    }).join('');
+  }
+
+  function renderCustomers() {
+    const fName = document.getElementById('cf-name').value.toLowerCase();
+    let list = getCustomers();
+    if (fName) list = list.filter(c =>
+      c.name.toLowerCase().includes(fName) || c.phone.includes(fName) || c.id.includes(fName)
+    );
+    list.sort((a, b) => a.id.localeCompare(b.id));
+
+    document.getElementById('customer-count').textContent = `${list.length}件`;
+    const container = document.getElementById('customer-list');
+    if (!list.length) { container.innerHTML = emptyState('👤', '顧客が登録されていません'); return; }
+
+    container.innerHTML = list.map(c => `
+      <div class="admin-item">
+        <div class="admin-info">
+          <div class="admin-name">${esc(c.name)}</div>
+          <span class="admin-tag blue-tag">No.${esc(c.id)}</span>
+          <div class="admin-meta">
+            <span>📞 ${esc(c.phone)}</span>
+            <span>✉️ ${esc(c.email)}</span>
+          </div>
+        </div>
+        <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
+      </div>`).join('');
+  }
+
+  function toggleQ(el) {
+    const body = el.nextElementSibling;
+    const open = body.classList.toggle('open');
+    el.textContent = open ? '▼ 問診内容を閉じる' : '▶ 問診内容を見る';
+  }
+
+  function deleteBookingConfirm(id, name) {
+    if (confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) {
+      const list = getBookings().filter(b => b.id !== id);
+      localStorage.setItem('lactive_bookings', JSON.stringify(list));
+      renderBookings();
+    }
+  }
+
+  function deleteCustomerConfirm(id, name) {
+    if (confirm(`顧客No.${id}「${name}」を削除しますか？\n削除するとこの顧客番号でのログインができなくなります。`)) {
+      const list = getCustomers().filter(c => c.id !== id);
+      localStorage.setItem('lactive_customers', JSON.stringify(list));
+      renderCustomers();
+    }
+  }
+
+  // ─────────────────────────────────────────
+  // localStorage
+  // ─────────────────────────────────────────
+  function getBookings()  { try { return JSON.parse(localStorage.getItem('lactive_bookings')  || '[]'); } catch { return []; } }
+  function getCustomers() { try { return JSON.parse(localStorage.getItem('lactive_customers') || '[]'); } catch { return []; } }
+  function saveBooking(b)  { const l = getBookings();  l.push(b); localStorage.setItem('lactive_bookings',  JSON.stringify(l)); }
+  function saveCustomer(c) { const l = getCustomers(); l.push(c); localStorage.setItem('lactive_customers', JSON.stringify(l)); }
+  function findCustomer(id) { return getCustomers().find(c => c.id === id); }
+
+  function generateCustomerId() {
+    const existing = getCustomers().map(c => c.id);
+    let id;
+    let tries = 0;
+    do {
+      id = String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
+      tries++;
+    } while (existing.includes(id) && tries < 2000);
+    return id;
+  }
+
+  // ─────────────────────────────────────────
+  // ユーティリティ
+  // ─────────────────────────────────────────
+  function formatDate(s) {
+    if (!s) return '';
+    const [y, m, d] = s.split('-');
+    return `${y}年${parseInt(m)}月${parseInt(d)}日`;
+  }
+  function showAlert(id, msg) {
+    const el = document.getElementById(id);
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  function hideAlert(id) { document.getElementById(id).classList.remove('show'); }
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function emptyState(icon, msg) {
+    return `<div class="empty-state"><div class="ei">${icon}</div><p>${msg}</p></div>`;
+  }
+
+  // ラジオボタンにselectedクラスを付与
+  document.querySelectorAll('.radio-group').forEach(g => {
+    g.querySelectorAll('input[type=radio]').forEach(r => {
+      r.addEventListener('change', () => {
+        g.querySelectorAll('.radio-item').forEach(i => i.classList.remove('selected'));
+        r.closest('.radio-item').classList.add('selected');
+      });
+    });
+  });
+
+  // ─────────────────────────────────────────
+  // 初期化
+  // ─────────────────────────────────────────
+  (function init() {
+    if (window.location.search.includes('admin')) {
+      navigateTo('page-admin-login');
+    } else {
+      navigateTo('page-top');
+    }
+  })();
+</script>
+</body>
+</html>
