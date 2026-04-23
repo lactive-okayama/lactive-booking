@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lactive｜ご予約</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase CDN（UMD ビルド：window.supabase を確実に設定） -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     /* ───────────────────────────────
        変数・リセット
@@ -818,7 +818,8 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Supabase 初期化
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  const supabase = window.supabase.createClient(
+  // ※ 変数名を sbClient にすることで CDN の window.supabase グローバルとの衝突を回避
+  const sbClient = window.supabase.createClient(
     'https://wuthbgxzmvjeosugzfbs.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
   );
@@ -1193,7 +1194,7 @@
     container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     hideAlert('admin-booking-error');
     try {
-      let query = supabase.from('bookings').select('*').order('date').order('time');
+      let query = sbClient.from('bookings').select('*').order('date').order('time');
       if (fMenu) query = query.eq('menu', fMenu);
       const { data, error } = await query;
       if (error) throw error;
@@ -1247,7 +1248,7 @@
     container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     hideAlert('admin-customer-error');
     try {
-      const { data, error } = await supabase.from('customers').select('*').order('customer_number');
+      const { data, error } = await sbClient.from('customers').select('*').order('customer_number');
       if (error) throw error;
 
       let list = data || [];
@@ -1281,7 +1282,7 @@
     if (!confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) return;
     showLoading('削除中...');
     try {
-      const { error } = await supabase.from('bookings').delete().eq('id', id);
+      const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
       await renderBookings();
     } catch (e) {
@@ -1295,7 +1296,7 @@
     if (!confirm(`顧客No.${customerNumber}「${name}」を削除しますか？\n削除するとこの顧客番号でのログインができなくなります。`)) return;
     showLoading('削除中...');
     try {
-      const { error } = await supabase.from('customers').delete().eq('id', id);
+      const { error } = await sbClient.from('customers').delete().eq('id', id);
       if (error) throw error;
       await renderCustomers();
     } catch (e) {
@@ -1345,7 +1346,7 @@
   /** 既存の customer_number 一覧を取得して重複しない3桁番号を生成 */
   async function generateCustomerId() {
     console.log('🔵 [generateCustomerId] 既存顧客番号を取得中...');
-    const { data, error } = await supabase.from('customers').select('customer_number');
+    const { data, error } = await sbClient.from('customers').select('customer_number');
     if (error) throwSupabaseError('顧客番号一覧の取得', error);
 
     const existing = (data || []).map(c => c.customer_number);
@@ -1453,7 +1454,7 @@
   /** 起動時に Supabase 接続を疎通確認 */
   async function checkConnection() {
     try {
-      const { error } = await supabase.from('customers').select('id').limit(1);
+      const { error } = await sbClient.from('customers').select('id').limit(1);
       if (error) {
         console.error('❌ [接続確認] Supabase疎通エラー:', {
           message: error.message,
