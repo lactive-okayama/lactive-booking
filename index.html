@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lactive｜ご予約</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ───────────────────────────────
        変数・リセット
@@ -62,6 +64,24 @@
     .logo-sub  { font-size: .72rem; color: var(--text-light); letter-spacing: .1em; }
 
     /* ───────────────────────────────
+       ローディングオーバーレイ
+    ─────────────────────────────── */
+    #loading-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(255,255,255,.75); z-index: 999;
+      align-items: center; justify-content: center; flex-direction: column; gap: 12px;
+    }
+    #loading-overlay.show { display: flex; }
+    .spinner {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 4px solid var(--orange-light);
+      border-top-color: var(--orange);
+      animation: spin .8s linear infinite;
+    }
+    .loading-text { font-size: .88rem; color: var(--text-light); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ───────────────────────────────
        メイン・ページ管理
     ─────────────────────────────── */
     main { max-width: 780px; margin: 0 auto; padding: 28px 18px 72px; }
@@ -117,7 +137,7 @@
     .menu-card {
       background: var(--white); border-radius: var(--radius);
       padding: 20px 18px; cursor: pointer;
-      transition: transform .2s, box-shadow .2s, border-color .2s;
+      transition: transform .2s, box-shadow .2s;
       box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
       display: flex; flex-direction: column; gap: 6px;
     }
@@ -219,28 +239,23 @@
       font-size: .96rem; font-family: inherit; font-weight: 700;
       cursor: pointer; transition: all .2s;
     }
+    .btn:disabled { opacity: .65; cursor: not-allowed; transform: none !important; }
     .btn-primary {
       background: linear-gradient(135deg, var(--orange), var(--orange-dark));
       color: #fff; box-shadow: 0 4px 14px rgba(255,140,66,.4);
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(255,140,66,.5); }
+    .btn-primary:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(255,140,66,.5); }
     .btn-secondary {
       background: var(--white); color: var(--text-light);
       border: 1.5px solid var(--border);
     }
-    .btn-secondary:hover { border-color: var(--orange); color: var(--orange-deep); }
-    .btn-blue {
-      background: linear-gradient(135deg, var(--blue), #3A6A8A);
-      color: #fff; box-shadow: 0 4px 14px rgba(74,130,166,.4);
-    }
-    .btn-blue:hover { transform: translateY(-2px); }
+    .btn-secondary:not(:disabled):hover { border-color: var(--orange); color: var(--orange-deep); }
     .btn-danger {
       background: var(--danger-bg); color: var(--danger);
       border: 1.5px solid #F0A0A0; font-size: .8rem; padding: 7px 14px;
       border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
     }
     .btn-danger:hover { background: var(--danger); color: #fff; }
-    .btn-full  { width: 100%; }
     .btn-actions { display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
     .btn-actions .btn { flex: 1; min-width: 110px; }
 
@@ -383,6 +398,12 @@
 </head>
 <body>
 
+<!-- ローディングオーバーレイ -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">処理中...</div>
+</div>
+
 <header>
   <div class="header-inner">
     <div class="logo" onclick="navigateTo('page-top')">
@@ -476,7 +497,7 @@
         <button class="btn btn-primary" onclick="noticeAgree()">同意して次へ →</button>
       </div>
     </div>
-  </div><!-- /page-notice -->
+  </div>
 
   <!-- ▼ 問診票（STEP2：初回整体のみ） -->
   <div id="page-questionnaire" class="page">
@@ -524,7 +545,7 @@
         <button class="btn btn-primary" onclick="submitQuestionnaire()">次へ →</button>
       </div>
     </div>
-  </div><!-- /page-questionnaire -->
+  </div>
 
   <!-- ▼ 個人情報（初回共通） -->
   <div id="page-personal" class="page">
@@ -547,11 +568,11 @@
         <input type="email" id="p-email" placeholder="example@email.com">
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" id="personal-back-btn" onclick="personalBack()">← 戻る</button>
+        <button class="btn btn-secondary" onclick="personalBack()">← 戻る</button>
         <button class="btn btn-primary" onclick="submitPersonal()">次へ →</button>
       </div>
     </div>
-  </div><!-- /page-personal -->
+  </div>
 
   <!-- ▼ 会員認証：方法選択 -->
   <div id="page-member-auth" class="page">
@@ -574,7 +595,7 @@
         <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
       </div>
     </div>
-  </div><!-- /page-member-auth -->
+  </div>
 
   <!-- ▼ 会員ログイン -->
   <div id="page-member-login" class="page">
@@ -585,7 +606,6 @@
       </div>
       <div id="login-alert" class="alert alert-error"></div>
 
-      <!-- 入力状態 -->
       <div id="login-form-section">
         <div class="id-input-wrap">
           <input type="text" class="id-input" id="member-id-input"
@@ -594,11 +614,10 @@
         </div>
         <div class="btn-actions">
           <button class="btn btn-secondary" onclick="navigateTo('page-member-auth')">← 戻る</button>
-          <button class="btn btn-primary" onclick="verifyMemberId()">確認する</button>
+          <button class="btn btn-primary" id="verify-btn" onclick="verifyMemberId()">確認する</button>
         </div>
       </div>
 
-      <!-- 確認状態 -->
       <div id="login-confirm-section" style="display:none;">
         <div class="customer-card">
           <div class="customer-card-title">以下のお客様情報でよろしいですか？</div>
@@ -613,12 +632,11 @@
         </div>
       </div>
     </div>
-  </div><!-- /page-member-login -->
+  </div>
 
   <!-- ▼ 会員新規登録 -->
   <div id="page-member-register" class="page">
     <div class="card">
-      <!-- 登録フォーム -->
       <div id="register-form-section">
         <div class="page-title">
           <h2>新規登録</h2>
@@ -639,11 +657,10 @@
         </div>
         <div class="btn-actions">
           <button class="btn btn-secondary" onclick="navigateTo('page-member-auth')">← 戻る</button>
-          <button class="btn btn-primary" onclick="submitRegister()">登録して次へ →</button>
+          <button class="btn btn-primary" id="register-btn" onclick="submitRegister()">登録して次へ →</button>
         </div>
       </div>
 
-      <!-- 登録完了 → 番号表示 -->
       <div id="register-done-section" style="display:none;">
         <div class="page-title">
           <h2>顧客番号が発行されました</h2>
@@ -658,7 +675,7 @@
         </div>
       </div>
     </div>
-  </div><!-- /page-member-register -->
+  </div>
 
   <!-- ▼ 日時選択（共通） -->
   <div id="page-datetime" class="page">
@@ -693,11 +710,11 @@
         <textarea id="dt-memo" placeholder="気になること、ご要望などがあればご記入ください"></textarea>
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" id="dt-back-btn" onclick="datetimeBack()">← 戻る</button>
-        <button class="btn btn-primary" onclick="submitBooking()">予約を確定する ✓</button>
+        <button class="btn btn-secondary" onclick="datetimeBack()">← 戻る</button>
+        <button class="btn btn-primary" id="booking-btn" onclick="submitBooking()">予約を確定する ✓</button>
       </div>
     </div>
-  </div><!-- /page-datetime -->
+  </div>
 
   <!-- ▼ 予約完了 -->
   <div id="page-done" class="page">
@@ -717,7 +734,7 @@
       </p>
       <button class="btn btn-primary" style="margin-top:22px;" onclick="navigateTo('page-top')">トップに戻る</button>
     </div>
-  </div><!-- /page-done -->
+  </div>
 
   <!-- ▼ 管理ログイン -->
   <div id="page-admin-login" class="page">
@@ -739,13 +756,14 @@
         </div>
       </div>
     </div>
-  </div><!-- /page-admin-login -->
+  </div>
 
   <!-- ▼ 管理ダッシュボード -->
   <div id="page-admin" class="page">
     <div class="admin-header">
       <h2>管理画面</h2>
-      <button class="btn btn-secondary" style="padding:7px 16px;font-size:.84rem;border-radius:var(--radius-sm);"
+      <button class="btn btn-secondary"
+              style="padding:7px 16px;font-size:.84rem;border-radius:var(--radius-sm);"
               onclick="adminLogout()">ログアウト</button>
     </div>
 
@@ -754,7 +772,6 @@
       <button class="tab-btn"        onclick="switchTab('tab-customers', this)">顧客一覧</button>
     </div>
 
-    <!-- 予約一覧タブ -->
     <div id="tab-bookings" class="tab-panel active">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
         <span class="count-badge" id="booking-count">0件</span>
@@ -770,12 +787,12 @@
           </select>
         </div>
       </div>
+      <div id="admin-booking-error" class="alert alert-error"></div>
       <div class="list-scroll">
         <div id="booking-list"></div>
       </div>
     </div>
 
-    <!-- 顧客一覧タブ -->
     <div id="tab-customers" class="tab-panel">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
         <span class="count-badge" id="customer-count">0件</span>
@@ -783,22 +800,31 @@
           <input type="text" id="cf-name" placeholder="名前・電話番号で検索" oninput="renderCustomers()">
         </div>
       </div>
+      <div id="admin-customer-error" class="alert alert-error"></div>
       <div class="list-scroll">
         <div id="customer-list"></div>
       </div>
     </div>
-  </div><!-- /page-admin -->
+  </div>
 
 </main>
 
 <script>
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 定数（変更可能）
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const ADMIN_PASSWORD = 'admin1234';
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Supabase 初期化
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const SUPABASE_URL = 'https://wuthbgxzmvjeosugzfbs.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_sD9NE2kt7Kc2QeqIbdWZKQ_ltl4NpqX';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // フロー設定
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const FLOW_CONFIG = {
     'first-seitai': {
       steps: [
@@ -836,18 +862,28 @@
 
   // アプリ状態
   let ST = {
-    flow:           '',    // 'first-seitai' | 'first-pilates' | 'member'
-    menu:           '',
-    questionnaire:  {},
-    personal:       { name: '', phone: '', email: '' },
-    customer:       null,  // 既存顧客オブジェクト
-    isNewCustomer:  false,
-    newCustomerId:  '',
+    flow: '', menu: '',
+    questionnaire: {},
+    personal: { name: '', phone: '', email: '' },
+    customer: null,
+    isNewCustomer: false,
+    newCustomerId: ''
   };
 
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ローディング制御
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function showLoading(msg = '処理中...') {
+    document.getElementById('loading-text').textContent = msg;
+    document.getElementById('loading-overlay').classList.add('show');
+  }
+  function hideLoading() {
+    document.getElementById('loading-overlay').classList.remove('show');
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ナビゲーション
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function navigateTo(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
@@ -859,13 +895,10 @@
     const container = document.getElementById('steps-container');
     const noStepPages = ['page-top', 'page-done', 'page-admin-login', 'page-admin'];
     if (!ST.flow || noStepPages.includes(pageId)) { container.innerHTML = ''; return; }
-
     const cfg = FLOW_CONFIG[ST.flow];
     if (!cfg) { container.innerHTML = ''; return; }
-
     const activeIdx = cfg.pageStep[pageId] ?? -1;
     if (activeIdx === -1) { container.innerHTML = ''; return; }
-
     let html = '<div class="steps-bar">';
     cfg.steps.forEach((s, i) => {
       const cls = i < activeIdx ? 'done' : i === activeIdx ? 'active' : 'pending';
@@ -883,9 +916,9 @@
     container.innerHTML = html;
   }
 
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 初回フロー
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startFirstFlow(flow) {
     ST = {
       flow, menu: flow === 'first-seitai' ? '初回整体体験 90分' : '初回ピラティス体験 60分',
@@ -896,21 +929,15 @@
   }
 
   function noticeAgree() {
-    if (ST.flow === 'first-seitai') {
-      navigateTo('page-questionnaire');
-    } else {
-      navigateTo('page-personal');
-    }
+    navigateTo(ST.flow === 'first-seitai' ? 'page-questionnaire' : 'page-personal');
   }
 
-  // 問診票
   function submitQuestionnaire() {
     const q1 = document.getElementById('q1').value.trim();
     const q2 = document.querySelector('input[name="q2"]:checked')?.value || '';
     const q3 = document.getElementById('q3').value.trim();
     const q4 = document.querySelector('input[name="q4"]:checked')?.value || '';
     const q5 = document.querySelector('input[name="q5"]:checked')?.value || '';
-
     if (!q1 || !q2 || !q3 || !q4 || !q5) {
       showAlert('q-alert', 'すべての項目にご回答ください。');
       return;
@@ -920,10 +947,8 @@
     navigateTo('page-personal');
   }
 
-  // 個人情報（初回）
   function personalBack() {
-    if (ST.flow === 'first-seitai') navigateTo('page-questionnaire');
-    else navigateTo('page-notice');
+    navigateTo(ST.flow === 'first-seitai' ? 'page-questionnaire' : 'page-notice');
   }
 
   function submitPersonal() {
@@ -939,39 +964,49 @@
     navigateTo('page-datetime');
   }
 
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 会員フロー
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startMemberFlow(menuName) {
     ST = {
       flow: 'member', menu: menuName,
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: ''
     };
-    document.getElementById('member-auth-menu-label').textContent =
-      `メニュー：${menuName}`;
+    document.getElementById('member-auth-menu-label').textContent = `メニュー：${menuName}`;
     navigateTo('page-member-auth');
   }
 
-  // 顧客番号ログイン
-  function verifyMemberId() {
+  async function verifyMemberId() {
     const raw = document.getElementById('member-id-input').value.trim();
-    if (!raw || raw.length > 3) { showAlert('login-alert', '3桁の顧客番号を入力してください。'); return; }
-    const id = raw.padStart(3, '0');
-    const customer = findCustomer(id);
-    if (!customer) {
-      showAlert('login-alert', '顧客番号が見つかりません。番号をご確認のうえ、もう一度お試しください。');
+    if (!raw || !/^\d{1,3}$/.test(raw)) {
+      showAlert('login-alert', '1〜3桁の数字で顧客番号を入力してください。');
       return;
     }
-    hideAlert('login-alert');
-    ST.customer = customer;
-    // 確認表示
-    document.getElementById('lc-id').textContent    = customer.id;
-    document.getElementById('lc-name').textContent  = customer.name;
-    document.getElementById('lc-phone').textContent = customer.phone;
-    document.getElementById('lc-email').textContent = customer.email;
-    document.getElementById('login-form-section').style.display    = 'none';
-    document.getElementById('login-confirm-section').style.display = 'block';
+    const id = raw.padStart(3, '0');
+    const btn = document.getElementById('verify-btn');
+    btn.disabled = true;
+    showLoading('顧客情報を確認中...');
+    try {
+      const customer = await findCustomer(id);
+      if (!customer) {
+        showAlert('login-alert', '顧客番号が見つかりません。番号をご確認のうえ、もう一度お試しください。');
+        return;
+      }
+      hideAlert('login-alert');
+      ST.customer = customer;
+      document.getElementById('lc-id').textContent    = customer.customer_number;
+      document.getElementById('lc-name').textContent  = customer.name;
+      document.getElementById('lc-phone').textContent = customer.phone;
+      document.getElementById('lc-email').textContent = customer.email;
+      document.getElementById('login-form-section').style.display    = 'none';
+      document.getElementById('login-confirm-section').style.display = 'block';
+    } catch (e) {
+      showAlert('login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
+    } finally {
+      btn.disabled = false;
+      hideLoading();
+    }
   }
 
   function resetMemberLogin() {
@@ -983,14 +1018,15 @@
 
   function loginConfirm() {
     ST.personal = {
-      name: ST.customer.name, phone: ST.customer.phone, email: ST.customer.email
+      name: ST.customer.name,
+      phone: ST.customer.phone,
+      email: ST.customer.email
     };
     setupDatetime();
     navigateTo('page-datetime');
   }
 
-  // 新規登録
-  function submitRegister() {
+  async function submitRegister() {
     const name  = document.getElementById('r-name').value.trim();
     const phone = document.getElementById('r-phone').value.trim();
     const email = document.getElementById('r-email').value.trim();
@@ -999,33 +1035,41 @@
     if (!email) { showAlert('register-alert', 'メールアドレスを入力してください。'); return; }
     hideAlert('register-alert');
 
-    const newId = generateCustomerId();
-    ST.isNewCustomer = true;
-    ST.newCustomerId = newId;
-    ST.personal = { name, phone, email };
-
-    document.getElementById('issued-id').textContent = newId;
-    document.getElementById('register-form-section').style.display = 'none';
-    document.getElementById('register-done-section').style.display = 'block';
-    renderSteps('page-member-register');
+    const btn = document.getElementById('register-btn');
+    btn.disabled = true;
+    showLoading('顧客番号を発行中...');
+    try {
+      const newId = await generateCustomerId();
+      await saveCustomer({ customer_number: newId, name, phone, email });
+      ST.isNewCustomer = true;
+      ST.newCustomerId = newId;
+      ST.personal = { name, phone, email };
+      document.getElementById('issued-id').textContent = newId;
+      document.getElementById('register-form-section').style.display = 'none';
+      document.getElementById('register-done-section').style.display = 'block';
+      renderSteps('page-member-register');
+    } catch (e) {
+      showAlert('register-alert', '登録に失敗しました。しばらくしてからお試しください。');
+      btn.disabled = false;
+    } finally {
+      hideLoading();
+    }
   }
 
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 日時選択
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function setupDatetime() {
     const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm   = String(today.getMonth() + 1).padStart(2, '0');
-    const dd   = String(today.getDate()).padStart(2, '0');
+    const yyyy  = today.getFullYear();
+    const mm    = String(today.getMonth() + 1).padStart(2, '0');
+    const dd    = String(today.getDate()).padStart(2, '0');
     document.getElementById('dt-date').min   = `${yyyy}-${mm}-${dd}`;
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     document.getElementById('dt-memo').value = '';
     hideAlert('datetime-alert');
-
     document.getElementById('datetime-menu-label').textContent = `メニュー：${ST.menu}`;
-
     const noticeEl = document.getElementById('datetime-newid-notice');
     if (ST.isNewCustomer) {
       noticeEl.textContent = `顧客番号【${ST.newCustomerId}】が発行されました。次回からこの番号でログインできます。`;
@@ -1033,6 +1077,7 @@
     } else {
       noticeEl.style.display = 'none';
     }
+    document.getElementById('booking-btn').disabled = false;
   }
 
   function datetimeBack() {
@@ -1049,72 +1094,66 @@
     }
   }
 
-  function submitBooking() {
+  async function submitBooking() {
     const date = document.getElementById('dt-date').value;
     const time = document.getElementById('dt-time').value;
     const memo = document.getElementById('dt-memo').value.trim();
-
     if (!date) { showAlert('datetime-alert', '希望日を選択してください。'); return; }
     if (!time) { showAlert('datetime-alert', '希望時間を選択してください。'); return; }
 
-    // 新規会員を保存
-    if (ST.isNewCustomer) {
-      saveCustomer({
-        id: ST.newCustomerId,
-        name:  ST.personal.name,
-        phone: ST.personal.phone,
-        email: ST.personal.email
+    const btn = document.getElementById('booking-btn');
+    btn.disabled = true;
+    showLoading('予約を送信中...');
+    try {
+      const q = ST.questionnaire;
+      await saveBooking({
+        customer_number:   ST.customer?.customer_number || (ST.isNewCustomer ? ST.newCustomerId : null),
+        name:              ST.personal.name,
+        phone:             ST.personal.phone,
+        email:             ST.personal.email,
+        menu:              ST.menu,
+        date,
+        time,
+        memo:              memo || null,
+        symptom:           q.q1 || null,
+        treatment_history: q.q2 || null,
+        symptom_start:     q.q3 || null,
+        exercise_ok:       q.q4 || null,
+        daily_impact:      q.q5 || null
       });
-    }
 
-    // 予約を保存
-    const booking = {
-      id: Date.now(),
-      menu:   ST.menu,
-      name:   ST.personal.name,
-      phone:  ST.personal.phone,
-      email:  ST.personal.email,
-      customerId: ST.customer?.id || (ST.isNewCustomer ? ST.newCustomerId : ''),
-      date, time, memo,
-      questionnaire: ST.questionnaire,
-      createdAt: new Date().toISOString()
-    };
-    saveBooking(booking);
+      // 完了画面
+      document.getElementById('dn-name').textContent = ST.personal.name;
+      document.getElementById('dn-menu').textContent = ST.menu;
+      document.getElementById('dn-dt').textContent   = `${formatDate(date)} ${time}`;
+      const custId = ST.customer?.customer_number || (ST.isNewCustomer ? ST.newCustomerId : '');
+      const idRow = document.getElementById('dn-id-row');
+      if (custId) { document.getElementById('dn-id').textContent = custId; idRow.style.display = ''; }
+      else { idRow.style.display = 'none'; }
+      const memoRow = document.getElementById('dn-memo-row');
+      if (memo) { document.getElementById('dn-memo').textContent = memo; memoRow.style.display = ''; }
+      else { memoRow.style.display = 'none'; }
 
-    // 完了画面
-    document.getElementById('dn-name').textContent = ST.personal.name;
-    document.getElementById('dn-menu').textContent = ST.menu;
-    document.getElementById('dn-dt').textContent   = `${formatDate(date)} ${time}`;
-    const idRow = document.getElementById('dn-id-row');
-    const custId = booking.customerId;
-    if (custId) {
-      document.getElementById('dn-id').textContent = custId;
-      idRow.style.display = '';
-    } else {
-      idRow.style.display = 'none';
+      navigateTo('page-done');
+    } catch (e) {
+      showAlert('datetime-alert', '予約の送信に失敗しました。しばらくしてからお試しください。');
+      btn.disabled = false;
+    } finally {
+      hideLoading();
     }
-    const memoRow = document.getElementById('dn-memo-row');
-    if (memo) {
-      document.getElementById('dn-memo').textContent = memo;
-      memoRow.style.display = '';
-    } else {
-      memoRow.style.display = 'none';
-    }
-
-    navigateTo('page-done');
   }
 
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 管理画面
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function adminLogin() {
     const pw = document.getElementById('admin-pw').value;
     if (pw === ADMIN_PASSWORD) {
       document.getElementById('admin-pw').value = '';
       hideAlert('admin-login-alert');
+      navigateTo('page-admin');
       renderBookings();
       renderCustomers();
-      navigateTo('page-admin');
     } else {
       showAlert('admin-login-alert');
       document.getElementById('admin-pw').value = '';
@@ -1133,74 +1172,123 @@
     if (tabId === 'tab-customers') renderCustomers();
   }
 
-  function renderBookings() {
+  async function renderBookings() {
     const fName = document.getElementById('bf-name').value.toLowerCase();
     const fMenu = document.getElementById('bf-menu').value;
-    let list = getBookings();
-    if (fName) list = list.filter(b => b.name.toLowerCase().includes(fName) || (b.customerId||'').includes(fName));
-    if (fMenu) list = list.filter(b => b.menu === fMenu);
-    list.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.time < b.time ? -1 : 1);
-
-    document.getElementById('booking-count').textContent = `${list.length}件`;
     const container = document.getElementById('booking-list');
-    if (!list.length) { container.innerHTML = emptyState('📋', '予約がありません'); return; }
+    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
+    hideAlert('admin-booking-error');
+    try {
+      let query = db.from('bookings').select('*').order('date').order('time');
+      if (fMenu) query = query.eq('menu', fMenu);
+      const { data, error } = await query;
+      if (error) throw error;
 
-    container.innerHTML = list.map(b => {
-      const isFirst = b.menu.startsWith('初回');
-      const tagCls  = isFirst ? '' : ' blue-tag';
-      const qHtml   = b.questionnaire?.q1 ? `
-        <div class="admin-q">
-          <span class="admin-q-toggle" onclick="toggleQ(this)">▶ 問診内容を見る</span>
-          <div class="admin-q-body">
-            <div>① 症状：${esc(b.questionnaire.q1)}</div>
-            <div>② 受診歴：${esc(b.questionnaire.q2)}</div>
-            <div>③ 発症時期：${esc(b.questionnaire.q3)}</div>
-            <div>④ 動作可否：${esc(b.questionnaire.q4)}</div>
-            <div>⑤ 日常生活の影響：${esc(b.questionnaire.q5)}</div>
-          </div>
-        </div>` : '';
-      return `
-        <div class="admin-item">
-          <div class="admin-info">
-            <div class="admin-name">${esc(b.name)}</div>
-            <span class="admin-tag${tagCls}">${esc(b.menu)}</span>
-            <div class="admin-meta">
-              <span>📅 ${formatDate(b.date)} ${esc(b.time)}</span>
-              <span>📞 ${esc(b.phone)}</span>
-              ${b.customerId ? `<span>🔑 No.${esc(b.customerId)}</span>` : ''}
+      let list = data || [];
+      if (fName) list = list.filter(b =>
+        (b.name || '').toLowerCase().includes(fName) ||
+        (b.customer_number || '').includes(fName)
+      );
+      document.getElementById('booking-count').textContent = `${list.length}件`;
+      if (!list.length) { container.innerHTML = emptyState('📋', '予約がありません'); return; }
+
+      container.innerHTML = list.map(b => {
+        const isFirst = (b.menu || '').startsWith('初回');
+        const qHtml = b.symptom ? `
+          <div class="admin-q">
+            <span class="admin-q-toggle" onclick="toggleQ(this)">▶ 問診内容を見る</span>
+            <div class="admin-q-body">
+              <div>① 症状：${esc(b.symptom)}</div>
+              <div>② 受診歴：${esc(b.treatment_history)}</div>
+              <div>③ 発症時期：${esc(b.symptom_start)}</div>
+              <div>④ 動作可否：${esc(b.exercise_ok)}</div>
+              <div>⑤ 日常生活：${esc(b.daily_impact)}</div>
             </div>
-            ${b.memo ? `<div class="admin-memo">📝 ${esc(b.memo)}</div>` : ''}
-            ${qHtml}
-          </div>
-          <button class="btn-danger" onclick="deleteBookingConfirm(${b.id}, '${esc(b.name).replace(/'/g,'\\u0027')}')">削除</button>
-        </div>`;
-    }).join('');
+          </div>` : '';
+        return `
+          <div class="admin-item">
+            <div class="admin-info">
+              <div class="admin-name">${esc(b.name)}</div>
+              <span class="admin-tag${isFirst ? '' : ' blue-tag'}">${esc(b.menu)}</span>
+              <div class="admin-meta">
+                <span>📅 ${formatDate(b.date)} ${esc(b.time)}</span>
+                <span>📞 ${esc(b.phone)}</span>
+                ${b.customer_number ? `<span>🔑 No.${esc(b.customer_number)}</span>` : ''}
+              </div>
+              ${b.memo ? `<div class="admin-memo">📝 ${esc(b.memo)}</div>` : ''}
+              ${qHtml}
+            </div>
+            <button class="btn-danger" onclick="deleteBookingConfirm('${esc(b.id)}', '${esc(b.name).replace(/'/g,'\\u0027')}')">削除</button>
+          </div>`;
+      }).join('');
+    } catch (e) {
+      showAlert('admin-booking-error', '予約データの取得に失敗しました。ページを再読み込みしてください。');
+      container.innerHTML = '';
+    }
   }
 
-  function renderCustomers() {
+  async function renderCustomers() {
     const fName = document.getElementById('cf-name').value.toLowerCase();
-    let list = getCustomers();
-    if (fName) list = list.filter(c =>
-      c.name.toLowerCase().includes(fName) || c.phone.includes(fName) || c.id.includes(fName)
-    );
-    list.sort((a, b) => a.id.localeCompare(b.id));
-
-    document.getElementById('customer-count').textContent = `${list.length}件`;
     const container = document.getElementById('customer-list');
-    if (!list.length) { container.innerHTML = emptyState('👤', '顧客が登録されていません'); return; }
+    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
+    hideAlert('admin-customer-error');
+    try {
+      const { data, error } = await db.from('customers').select('*').order('customer_number');
+      if (error) throw error;
 
-    container.innerHTML = list.map(c => `
-      <div class="admin-item">
-        <div class="admin-info">
-          <div class="admin-name">${esc(c.name)}</div>
-          <span class="admin-tag blue-tag">No.${esc(c.id)}</span>
-          <div class="admin-meta">
-            <span>📞 ${esc(c.phone)}</span>
-            <span>✉️ ${esc(c.email)}</span>
+      let list = data || [];
+      if (fName) list = list.filter(c =>
+        (c.name || '').toLowerCase().includes(fName) ||
+        (c.phone || '').includes(fName) ||
+        (c.customer_number || '').includes(fName)
+      );
+      document.getElementById('customer-count').textContent = `${list.length}件`;
+      if (!list.length) { container.innerHTML = emptyState('👤', '顧客が登録されていません'); return; }
+
+      container.innerHTML = list.map(c => `
+        <div class="admin-item">
+          <div class="admin-info">
+            <div class="admin-name">${esc(c.name)}</div>
+            <span class="admin-tag blue-tag">No.${esc(c.customer_number)}</span>
+            <div class="admin-meta">
+              <span>📞 ${esc(c.phone)}</span>
+              <span>✉️ ${esc(c.email)}</span>
+            </div>
           </div>
-        </div>
-        <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
-      </div>`).join('');
+          <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
+        </div>`).join('');
+    } catch (e) {
+      showAlert('admin-customer-error', '顧客データの取得に失敗しました。ページを再読み込みしてください。');
+      container.innerHTML = '';
+    }
+  }
+
+  async function deleteBookingConfirm(id, name) {
+    if (!confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) return;
+    showLoading('削除中...');
+    try {
+      const { error } = await db.from('bookings').delete().eq('id', id);
+      if (error) throw error;
+      await renderBookings();
+    } catch (e) {
+      showAlert('admin-booking-error', '予約の削除に失敗しました。しばらくしてからお試しください。');
+    } finally {
+      hideLoading();
+    }
+  }
+
+  async function deleteCustomerConfirm(id, customerNumber, name) {
+    if (!confirm(`顧客No.${customerNumber}「${name}」を削除しますか？\n削除するとこの顧客番号でのログインができなくなります。`)) return;
+    showLoading('削除中...');
+    try {
+      const { error } = await db.from('customers').delete().eq('id', id);
+      if (error) throw error;
+      await renderCustomers();
+    } catch (e) {
+      showAlert('admin-customer-error', '顧客の削除に失敗しました。しばらくしてからお試しください。');
+    } finally {
+      hideLoading();
+    }
   }
 
   function toggleQ(el) {
@@ -1209,45 +1297,70 @@
     el.textContent = open ? '▼ 問診内容を閉じる' : '▶ 問診内容を見る';
   }
 
-  function deleteBookingConfirm(id, name) {
-    if (confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) {
-      const list = getBookings().filter(b => b.id !== id);
-      localStorage.setItem('lactive_bookings', JSON.stringify(list));
-      renderBookings();
-    }
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Supabase DB 操作
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  /** 顧客を customer_number で検索 */
+  async function findCustomer(customerNumber) {
+    const { data, error } = await db
+      .from('customers')
+      .select('*')
+      .eq('customer_number', customerNumber)
+      .maybeSingle();
+    if (error) throw new Error('顧客情報の取得に失敗しました: ' + error.message);
+    return data; // null if not found
   }
 
-  function deleteCustomerConfirm(id, name) {
-    if (confirm(`顧客No.${id}「${name}」を削除しますか？\n削除するとこの顧客番号でのログインができなくなります。`)) {
-      const list = getCustomers().filter(c => c.id !== id);
-      localStorage.setItem('lactive_customers', JSON.stringify(list));
-      renderCustomers();
-    }
-  }
-
-  // ─────────────────────────────────────────
-  // localStorage
-  // ─────────────────────────────────────────
-  function getBookings()  { try { return JSON.parse(localStorage.getItem('lactive_bookings')  || '[]'); } catch { return []; } }
-  function getCustomers() { try { return JSON.parse(localStorage.getItem('lactive_customers') || '[]'); } catch { return []; } }
-  function saveBooking(b)  { const l = getBookings();  l.push(b); localStorage.setItem('lactive_bookings',  JSON.stringify(l)); }
-  function saveCustomer(c) { const l = getCustomers(); l.push(c); localStorage.setItem('lactive_customers', JSON.stringify(l)); }
-  function findCustomer(id) { return getCustomers().find(c => c.id === id); }
-
-  function generateCustomerId() {
-    const existing = getCustomers().map(c => c.id);
+  /** 既存の customer_number 一覧を取得して重複しない3桁番号を生成 */
+  async function generateCustomerId() {
+    const { data, error } = await db.from('customers').select('customer_number');
+    if (error) throw new Error('顧客番号生成に失敗しました: ' + error.message);
+    const existing = (data || []).map(c => c.customer_number);
+    if (existing.length >= 999) throw new Error('顧客番号が上限に達しています。');
     let id;
     let tries = 0;
     do {
       id = String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
       tries++;
-    } while (existing.includes(id) && tries < 2000);
+    } while (existing.includes(id) && tries < 5000);
     return id;
   }
 
-  // ─────────────────────────────────────────
+  /** 顧客を保存 */
+  async function saveCustomer(c) {
+    const { error } = await db.from('customers').insert({
+      customer_number: c.customer_number,
+      name:            c.name,
+      phone:           c.phone,
+      email:           c.email
+    });
+    if (error) throw new Error('顧客登録に失敗しました: ' + error.message);
+  }
+
+  /** 予約を保存 */
+  async function saveBooking(b) {
+    const { error } = await db.from('bookings').insert({
+      customer_number:   b.customer_number   || null,
+      name:              b.name,
+      phone:             b.phone,
+      email:             b.email,
+      menu:              b.menu,
+      date:              b.date,
+      time:              b.time,
+      memo:              b.memo              || null,
+      symptom:           b.symptom           || null,
+      treatment_history: b.treatment_history || null,
+      symptom_start:     b.symptom_start     || null,
+      exercise_ok:       b.exercise_ok       || null,
+      daily_impact:      b.daily_impact      || null
+    });
+    if (error) throw new Error('予約の保存に失敗しました: ' + error.message);
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ユーティリティ
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function formatDate(s) {
     if (!s) return '';
     const [y, m, d] = s.split('-');
@@ -1255,20 +1368,25 @@
   }
   function showAlert(id, msg) {
     const el = document.getElementById(id);
+    if (!el) return;
     if (msg) el.textContent = msg;
     el.classList.add('show');
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
-  function hideAlert(id) { document.getElementById(id).classList.remove('show'); }
+  function hideAlert(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  }
   function esc(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    return String(s || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
   function emptyState(icon, msg) {
     return `<div class="empty-state"><div class="ei">${icon}</div><p>${msg}</p></div>`;
   }
 
-  // ラジオボタンにselectedクラスを付与
+  // ラジオボタンのビジュアル選択
   document.querySelectorAll('.radio-group').forEach(g => {
     g.querySelectorAll('input[type=radio]').forEach(r => {
       r.addEventListener('change', () => {
@@ -1278,9 +1396,9 @@
     });
   });
 
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 初期化
-  // ─────────────────────────────────────────
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   (function init() {
     if (window.location.search.includes('admin')) {
       navigateTo('page-admin-login');
