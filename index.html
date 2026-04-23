@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lactive｜ご予約</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Supabase CDN（UMD 明示ビルド・バージョン固定） -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ───────────────────────────────
        変数・リセット
@@ -818,16 +818,11 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Supabase 初期化
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  const SUPABASE_URL = 'https://wuthbgxzmvjeosugzfbs.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_sD9NE2kt7Kc2QeqIbdWZKQ_ltl4NpqX';
-
-  // UMD ビルドは window.supabase に { createClient } を格納する
-  if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-    console.error('❌ [Supabase] ライブラリの読み込みに失敗しました。CDN接続を確認してください。');
-  }
-  const { createClient } = window.supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-  console.log('🟢 [Supabase] クライアント初期化完了 URL:', SUPABASE_URL);
+  const supabase = window.supabase.createClient(
+    'https://wuthbgxzmvjeosugzfbs.supabase.co',
+    'sb_publishable_sD9NE2kt7Kc2QeqIbdWZKQ_ltl4NpqX'
+  );
+  console.log('🟢 [Supabase] クライアント初期化完了');
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // フロー設定
@@ -1198,7 +1193,7 @@
     container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     hideAlert('admin-booking-error');
     try {
-      let query = db.from('bookings').select('*').order('date').order('time');
+      let query = supabase.from('bookings').select('*').order('date').order('time');
       if (fMenu) query = query.eq('menu', fMenu);
       const { data, error } = await query;
       if (error) throw error;
@@ -1252,7 +1247,7 @@
     container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     hideAlert('admin-customer-error');
     try {
-      const { data, error } = await db.from('customers').select('*').order('customer_number');
+      const { data, error } = await supabase.from('customers').select('*').order('customer_number');
       if (error) throw error;
 
       let list = data || [];
@@ -1286,7 +1281,7 @@
     if (!confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) return;
     showLoading('削除中...');
     try {
-      const { error } = await db.from('bookings').delete().eq('id', id);
+      const { error } = await supabase.from('bookings').delete().eq('id', id);
       if (error) throw error;
       await renderBookings();
     } catch (e) {
@@ -1300,7 +1295,7 @@
     if (!confirm(`顧客No.${customerNumber}「${name}」を削除しますか？\n削除するとこの顧客番号でのログインができなくなります。`)) return;
     showLoading('削除中...');
     try {
-      const { error } = await db.from('customers').delete().eq('id', id);
+      const { error } = await supabase.from('customers').delete().eq('id', id);
       if (error) throw error;
       await renderCustomers();
     } catch (e) {
@@ -1350,7 +1345,7 @@
   /** 既存の customer_number 一覧を取得して重複しない3桁番号を生成 */
   async function generateCustomerId() {
     console.log('🔵 [generateCustomerId] 既存顧客番号を取得中...');
-    const { data, error } = await db.from('customers').select('customer_number');
+    const { data, error } = await supabase.from('customers').select('customer_number');
     if (error) throwSupabaseError('顧客番号一覧の取得', error);
 
     const existing = (data || []).map(c => c.customer_number);
@@ -1458,7 +1453,7 @@
   /** 起動時に Supabase 接続を疎通確認 */
   async function checkConnection() {
     try {
-      const { error } = await db.from('customers').select('id').limit(1);
+      const { error } = await supabase.from('customers').select('id').limit(1);
       if (error) {
         console.error('❌ [接続確認] Supabase疎通エラー:', {
           message: error.message,
