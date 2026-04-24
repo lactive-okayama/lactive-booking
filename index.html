@@ -609,7 +609,7 @@
       <div id="login-form-section">
         <div class="id-input-wrap">
           <input type="text" class="id-input" id="member-id-input"
-                 maxlength="6" placeholder="000000" autocomplete="off" inputmode="numeric"
+                 maxlength="6" placeholder="例：123456" autocomplete="off" inputmode="numeric"
                  onkeydown="if(event.key==='Enter') document.getElementById('member-name-input').focus()">
         </div>
         <div class="form-group" style="margin-top:16px;">
@@ -989,15 +989,15 @@
   async function verifyMemberId() {
     const raw         = document.getElementById('member-id-input').value.trim();
     const enteredName = document.getElementById('member-name-input').value.trim();
-    if (!raw || !/^\d{1,6}$/.test(raw)) {
-      showAlert('login-alert', '1〜6桁の数字で顧客番号を入力してください。');
+    if (!raw || !/^\d{6}$/.test(raw)) {
+      showAlert('login-alert', '6桁の数字で顧客番号を入力してください。');
       return;
     }
     if (!enteredName) {
       showAlert('login-alert', 'お名前（姓）を入力してください。');
       return;
     }
-    const id  = raw.padStart(6, '0');
+    const id = raw;
     const btn = document.getElementById('verify-btn');
     btn.disabled = true;
     showLoading('顧客情報を確認中...');
@@ -1367,13 +1367,13 @@
     const existing = (data || []).map(c => c.customer_number);
     console.log('🔵 [generateCustomerId] 既存番号一覧:', existing);
 
-    if (existing.length >= 999999) throw new Error('顧客番号が上限（999999件）に達しています。');
+    if (existing.length >= 900000) throw new Error('顧客番号が上限に達しています。');
 
-    // 重複しない番号が確定するまでループ
+    // 重複しない番号が確定するまでループ（100000〜999999 の範囲で生成）
     let id;
     let tries = 0;
     do {
-      id = String(Math.floor(Math.random() * 999999) + 1).padStart(6, '0');
+      id = String(Math.floor(Math.random() * 900000) + 100000);
       tries++;
       if (tries > 5000) throw new Error('顧客番号の生成に失敗しました（試行上限）。');
     } while (existing.includes(id)); // ← 重複する限り必ず再生成
