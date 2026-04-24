@@ -1333,7 +1333,7 @@
   /** 顧客を customer_number で検索 */
   async function findCustomer(customerNumber) {
     console.log('🔵 [findCustomer] 検索中 customer_number:', customerNumber);
-    const { data, error } = await db
+    const { data, error } = await sbClient
       .from('customers')
       .select('*')
       .eq('customer_number', customerNumber)
@@ -1369,7 +1369,7 @@
   /** 顧客を保存（INSERT 後に保存行を返す） */
   async function saveCustomer(c) {
     console.log('🔵 [saveCustomer] INSERT開始:', c);
-    const { data, error } = await db
+    const { data, error } = await sbClient
       .from('customers')
       .insert({
         customer_number: c.customer_number,
@@ -1386,7 +1386,7 @@
   /** 予約を保存 */
   async function saveBooking(b) {
     console.log('🔵 [saveBooking] INSERT開始:', b);
-    const { data, error } = await db
+    const { data, error } = await sbClient
       .from('bookings')
       .insert({
         customer_number:   b.customer_number   || null,
