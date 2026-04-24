@@ -303,6 +303,36 @@
     .customer-id-num   { font-size: 2.5rem; font-weight: 700; color: var(--success); letter-spacing: .2em; }
     .customer-id-note  { font-size: .8rem; color: var(--success); margin-top: 6px; }
 
+    /* ───────────────────────────────
+       時間帯グリッド
+    ─────────────────────────────── */
+    .time-slot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 460px) { .time-slot-grid { grid-template-columns: repeat(3, 1fr); } }
+    .time-slot-btn {
+      padding: 10px 4px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); background: var(--white);
+      font-size: .88rem; font-family: inherit; cursor: pointer;
+      transition: all .18s; text-align: center; color: var(--text); line-height: 1.4;
+    }
+    .time-slot-btn:hover:not(.booked) { border-color: var(--orange); background: var(--orange-pale); }
+    .time-slot-btn.selected {
+      background: var(--orange); color: #fff;
+      border-color: var(--orange-dark); font-weight: 700;
+    }
+    .time-slot-btn.booked {
+      background: #F2F2F2; color: #BBBBBB;
+      border-color: #E0E0E0; cursor: not-allowed; font-size: .78rem;
+    }
+    .time-slot-placeholder {
+      padding: 16px; text-align: center; color: var(--text-light); font-size: .86rem;
+      background: var(--bg); border: 1.5px dashed var(--border);
+      border-radius: var(--radius-sm);
+    }
+
     /* 6桁入力 */
     .id-input-wrap { text-align: center; padding: 12px 0 6px; }
     .id-input {
@@ -692,24 +722,20 @@
         <p id="datetime-menu-label"></p>
       </div>
       <div id="datetime-alert" class="alert alert-error"></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>希望日<span class="req">*</span></label>
-          <input type="date" id="dt-date">
+      <div class="form-group">
+        <label>希望日<span class="req">*</span></label>
+        <input type="date" id="dt-date" onchange="onDateChange()">
+      </div>
+      <div class="form-group">
+        <label>希望時間<span class="req">*</span></label>
+        <input type="hidden" id="dt-time" value="">
+        <div id="time-slot-placeholder" class="time-slot-placeholder">
+          まず希望日を選択してください
         </div>
-        <div class="form-group">
-          <label>希望時間<span class="req">*</span></label>
-          <select id="dt-time">
-            <option value="">選択してください</option>
-            <option>10:00</option>
-            <option>11:00</option>
-            <option>12:00</option>
-            <option>14:00</option>
-            <option>15:00</option>
-            <option>16:00</option>
-            <option>17:00</option>
-          </select>
+        <div id="time-slot-loading" style="display:none; padding:14px; text-align:center; color:var(--text-light); font-size:.86rem;">
+          ⏳ 確認中...
         </div>
+        <div id="time-slot-grid" class="time-slot-grid" style="display:none;"></div>
       </div>
       <div class="form-group">
         <label>メモ・ご要望（任意）</label>
@@ -820,6 +846,10 @@
   // 定数
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const ADMIN_PASSWORD = 'Lactive2024!';
+  const ALL_TIMES = [
+    '9:00','10:00','11:00','12:00','13:00',
+    '14:00','15:00','16:00','17:00','18:00','19:00','20:00'
+  ];
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Supabase 初期化
@@ -1098,6 +1128,11 @@
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     document.getElementById('dt-memo').value = '';
+    // 時間帯グリッドをリセット
+    document.getElementById('time-slot-placeholder').style.display = 'block';
+    document.getElementById('time-slot-loading').style.display     = 'none';
+    document.getElementById('time-slot-grid').style.display        = 'none';
+    document.getElementById('time-slot-grid').innerHTML            = '';
     hideAlert('datetime-alert');
     document.getElementById('datetime-menu-label').textContent = `メニュー：${ST.menu}`;
     const noticeEl = document.getElementById('datetime-newid-notice');
@@ -1108,6 +1143,64 @@
       noticeEl.style.display = 'none';
     }
     document.getElementById('booking-btn').disabled = false;
+  }
+
+  /** 日付変更時：予約済み時間帯を取得してグリッドを再描画 */
+  async function onDateChange() {
+    const date = document.getElementById('dt-date').value;
+    document.getElementById('dt-time').value = '';
+    if (!date) {
+      document.getElementById('time-slot-placeholder').style.display = 'block';
+      document.getElementById('time-slot-loading').style.display     = 'none';
+      document.getElementById('time-slot-grid').style.display        = 'none';
+      return;
+    }
+    document.getElementById('time-slot-placeholder').style.display = 'none';
+    document.getElementById('time-slot-loading').style.display     = 'block';
+    document.getElementById('time-slot-grid').style.display        = 'none';
+    hideAlert('datetime-alert');
+    try {
+      const bookedTimes = await fetchBookedTimes(date);
+      renderTimeSlots(bookedTimes);
+    } catch (e) {
+      console.error('時間帯取得エラー:', e);
+      renderTimeSlots([]); // エラー時は全枠を選択可能として表示
+    }
+  }
+
+  /** Supabase から指定日の予約済み時間帯を取得 */
+  async function fetchBookedTimes(date) {
+    const { data, error } = await sbClient
+      .from('bookings')
+      .select('time')
+      .eq('date', date);
+    if (error) throwSupabaseError('予約済み時間帯の取得', error);
+    return (data || []).map(b => b.time);
+  }
+
+  /** 時間帯グリッドを描画 */
+  function renderTimeSlots(bookedTimes) {
+    document.getElementById('time-slot-loading').style.display = 'none';
+    const grid = document.getElementById('time-slot-grid');
+    grid.style.display = 'grid';
+    grid.innerHTML = ALL_TIMES.map(t => {
+      const isBooked = bookedTimes.includes(t);
+      return `<button type="button"
+        class="time-slot-btn${isBooked ? ' booked' : ''}"
+        ${isBooked
+          ? 'disabled'
+          : `onclick="selectTimeSlot(this,'${t}')"`}>
+        ${t}${isBooked ? '<br><small>予約済み</small>' : ''}
+      </button>`;
+    }).join('');
+  }
+
+  /** 時間帯を選択 */
+  function selectTimeSlot(el, time) {
+    document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('dt-time').value = time;
+    hideAlert('datetime-alert');
   }
 
   function datetimeBack() {
@@ -1130,6 +1223,15 @@
     const memo = document.getElementById('dt-memo').value.trim();
     if (!date) { showAlert('datetime-alert', '希望日を選択してください。'); return; }
     if (!time) { showAlert('datetime-alert', '希望時間を選択してください。'); return; }
+    // 確定時に再度重複チェック（二重送信防止）
+    const bookedNow = await fetchBookedTimes(date).catch(() => []);
+    if (bookedNow.includes(time)) {
+      showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
+      const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
+      renderTimeSlots(bookedTimesRefresh);
+      document.getElementById('dt-time').value = '';
+      return;
+    }
 
     const btn = document.getElementById('booking-btn');
     btn.disabled = true;
