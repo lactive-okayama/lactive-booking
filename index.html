@@ -747,25 +747,18 @@
     <div style="max-width:380px;margin:0 auto;">
       <div class="page-title">
         <h2>管理画面ログイン</h2>
-        <p>管理者メールアドレスとパスワードを入力してください</p>
+        <p>管理者パスワードを入力してください</p>
       </div>
       <div class="card">
-        <div id="admin-login-alert" class="alert alert-error">メールアドレスまたはパスワードが正しくありません。</div>
-        <div class="form-group">
-          <label>メールアドレス</label>
-          <input type="email" id="admin-email" placeholder="admin@example.com"
-                 autocomplete="username"
-                 onkeydown="if(event.key==='Enter') document.getElementById('admin-pw').focus()">
-        </div>
+        <div id="admin-login-alert" class="alert alert-error">パスワードが正しくありません。</div>
         <div class="form-group">
           <label>パスワード</label>
           <input type="password" id="admin-pw" placeholder="パスワードを入力"
-                 autocomplete="current-password"
                  onkeydown="if(event.key==='Enter') adminLogin()">
         </div>
         <div class="btn-actions">
           <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
-          <button class="btn btn-primary" id="admin-login-btn" onclick="adminLogin()">ログイン</button>
+          <button class="btn btn-primary" onclick="adminLogin()">ログイン</button>
         </div>
       </div>
     </div>
@@ -823,6 +816,11 @@
 </main>
 
 <script>
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 定数
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const ADMIN_PASSWORD = 'Lactive2024!';
+
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Supabase 初期化
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1178,39 +1176,22 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 管理画面
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function adminLogin() {
-    const email = document.getElementById('admin-email').value.trim();
-    const pw    = document.getElementById('admin-pw').value;
-    if (!email || !pw) {
-      showAlert('admin-login-alert', 'メールアドレスとパスワードを入力してください。');
-      return;
-    }
-    const btn = document.getElementById('admin-login-btn');
-    btn.disabled = true;
-    showLoading('ログイン中...');
-    try {
-      const { error } = await sbClient.auth.signInWithPassword({ email, password: pw });
-      if (error) throw error;
-      document.getElementById('admin-email').value = '';
-      document.getElementById('admin-pw').value    = '';
+  function adminLogin() {
+    const pw = document.getElementById('admin-pw').value;
+    if (pw === ADMIN_PASSWORD) {
+      document.getElementById('admin-pw').value = '';
       hideAlert('admin-login-alert');
       navigateTo('page-admin');
       renderBookings();
       renderCustomers();
-    } catch (e) {
-      showAlert('admin-login-alert', 'メールアドレスまたはパスワードが正しくありません。');
+    } else {
+      showAlert('admin-login-alert');
       document.getElementById('admin-pw').value = '';
       document.getElementById('admin-pw').focus();
-    } finally {
-      btn.disabled = false;
-      hideLoading();
     }
   }
 
-  async function adminLogout() {
-    await sbClient.auth.signOut();
-    navigateTo('page-top');
-  }
+  function adminLogout() { navigateTo('page-top'); }
 
   function switchTab(tabId, btn) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
