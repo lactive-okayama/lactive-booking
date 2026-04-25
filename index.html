@@ -713,7 +713,7 @@
           <div class="customer-id-note">次回からこの番号でログインできます。<br>必ずお控えください。</div>
         </div>
         <div class="btn-actions" style="justify-content:center;">
-          <button class="btn btn-primary" style="min-width:180px;" onclick="navigateTo('page-datetime')">日時を選ぶ →</button>
+          <button class="btn btn-primary" style="min-width:180px;" onclick="setupDatetime(); navigateTo('page-datetime')">日時を選ぶ →</button>
         </div>
       </div>
     </div>
@@ -730,7 +730,7 @@
       <div id="datetime-alert" class="alert alert-error"></div>
       <div class="form-group">
         <label>希望日<span class="req">*</span></label>
-        <input type="date" id="dt-date" onchange="onDateChange()">
+        <input type="date" id="dt-date" onchange="onDateChange()" oninput="onDateChange()">
       </div>
       <div class="form-group">
         <label>希望時間<span class="req">*</span></label>
@@ -1141,6 +1141,7 @@
     document.getElementById('dt-time').value = '';
     document.getElementById('dt-memo').value = '';
     // 時間帯グリッドをリセット
+    _dateChangeLast = '';
     document.getElementById('time-slot-placeholder').style.display = 'block';
     document.getElementById('time-slot-loading').style.display     = 'none';
     document.getElementById('time-slot-grid').style.display        = 'none';
@@ -1158,8 +1159,11 @@
   }
 
   /** 日付変更時：予約済み時間帯を取得してグリッドを再描画 */
+  let _dateChangeLast = '';
   async function onDateChange() {
     const date = document.getElementById('dt-date').value;
+    if (date === _dateChangeLast) return; // oninput+onchange 重複呼び出し防止
+    _dateChangeLast = date;
     document.getElementById('dt-time').value = '';
     if (!date) {
       document.getElementById('time-slot-placeholder').style.display = 'block';
@@ -1195,16 +1199,18 @@
     document.getElementById('time-slot-loading').style.display = 'none';
     const grid = document.getElementById('time-slot-grid');
     grid.style.display = 'grid';
-    grid.innerHTML = ALL_TIMES.map(t => {
-      const isBooked = bookedTimes.includes(t);
-      return `<button type="button"
-        class="time-slot-btn${isBooked ? ' booked' : ''}"
-        ${isBooked ? 'disabled title="この時間帯は予約できません"' : `onclick="selectTimeSlot(this,'${t}')"`}>
-        ${isBooked
-          ? `${t}<em class="slot-mark">× 不可</em>`
-          : t}
-      </button>`;
-    }).join('');
+    let html = '';
+    for (const t of ALL_TIMES) {
+      if (bookedTimes.includes(t)) {
+        html += '<button type="button" class="time-slot-btn booked" disabled>'
+              + t + '<em class="slot-mark">\u00d7 \u4e0d\u53ef</em></button>';
+      } else {
+        html += '<button type="button" class="time-slot-btn"'
+              + ' onclick="selectTimeSlot(this,\'' + t + '\')">'
+              + t + '</button>';
+      }
+    }
+    grid.innerHTML = html;
   }
 
   /** 時間帯を選択 */
