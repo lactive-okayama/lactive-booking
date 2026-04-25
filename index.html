@@ -1065,8 +1065,14 @@
   }
 
   function loginConfirm() {
+    // ST.customer が null の場合（リロード後など）は入力画面に戻す
+    if (!ST.customer) {
+      resetMemberLogin();
+      showAlert('login-alert', 'セッションが切れました。もう一度顧客番号とお名前を入力してください。');
+      return;
+    }
     ST.personal = {
-      name: ST.customer.name,
+      name:  ST.customer.name,
       phone: ST.customer.phone,
       email: ST.customer.email
     };
