@@ -324,8 +324,14 @@
       border-color: var(--orange-dark); font-weight: 700;
     }
     .time-slot-btn.booked {
-      background: #F2F2F2; color: #BBBBBB;
-      border-color: #E0E0E0; cursor: not-allowed; font-size: .78rem;
+      background: #EEEEEE; color: #AAAAAA;
+      border-color: #DDDDDD; cursor: not-allowed;
+      text-decoration: line-through; opacity: .7;
+      font-size: .86rem;
+    }
+    .time-slot-btn.booked .slot-mark {
+      display: block; font-size: .72rem; color: #AAAAAA; font-style: normal;
+      text-decoration: none;
     }
     .time-slot-placeholder {
       padding: 16px; text-align: center; color: var(--text-light); font-size: .86rem;
@@ -1193,10 +1199,10 @@
       const isBooked = bookedTimes.includes(t);
       return `<button type="button"
         class="time-slot-btn${isBooked ? ' booked' : ''}"
+        ${isBooked ? 'disabled title="この時間帯は予約できません"' : `onclick="selectTimeSlot(this,'${t}')"`}>
         ${isBooked
-          ? 'disabled'
-          : `onclick="selectTimeSlot(this,'${t}')"`}>
-        ${t}${isBooked ? '<br><small>予約済み</small>' : ''}
+          ? `${t}<em class="slot-mark">× 不可</em>`
+          : t}
       </button>`;
     }).join('');
   }
