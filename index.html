@@ -432,7 +432,7 @@
     .empty-state p { font-size: .88rem; }
 
     /* ───────────────────────────────
-       キャンセル画面
+       マイページ・キャンセル
     ─────────────────────────────── */
     .cancel-link-wrap {
       text-align: center; margin-top: 28px; padding-top: 24px;
@@ -448,19 +448,45 @@
     }
     .cancel-link-btn:hover { border-color: var(--orange); color: var(--orange-dark); }
 
-    .cancel-item {
-      background: var(--white); border: 1.5px solid var(--border);
-      border-radius: var(--radius); padding: 16px 18px;
-      margin-bottom: 12px;
-      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    .mypage-customer-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 4px; margin-bottom: 18px;
+    }
+    .mypage-customer-name { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .mypage-customer-num  { font-size: .8rem; color: var(--text-light); }
+
+    .mypage-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+      border-radius: var(--radius); padding: 22px 16px; text-align: center;
+      color: #fff; box-shadow: 0 4px 14px rgba(255,140,66,.4);
+    }
+    .stat-num   { font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 7px; }
+    .stat-label { font-size: .78rem; opacity: .9; letter-spacing: .04em; }
+
+    .mypage-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
+
+    .booking-upcoming {
+      background: var(--white); border: 2px solid var(--orange-light);
+      border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
       transition: border-color .18s;
     }
-    .cancel-item:hover { border-color: var(--orange-light); }
-    .cancel-item-info { flex: 1; min-width: 0; }
-    .cancel-item-date { font-size: .98rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .cancel-item-menu { font-size: .84rem; color: var(--text-light); }
-    .cancel-today-note { font-size: .78rem; color: var(--danger); margin-top: 5px; font-weight: 500; }
-    .cancel-past-note  { font-size: .78rem; color: var(--text-light); margin-top: 5px; }
+    .booking-upcoming:hover { border-color: var(--orange); }
+    .booking-past {
+      background: #F9F9F9; border: 1.5px solid #E0E0E0;
+      border-radius: var(--radius); padding: 14px 18px; margin-bottom: 10px;
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+    }
+    .booking-info { flex: 1; min-width: 0; }
+    .booking-date-upcoming { font-size: .98rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .booking-date-past     { font-size: .95rem; font-weight: 500; color: #999; margin-bottom: 4px; }
+    .booking-menu-upcoming { font-size: .84rem; color: var(--text-light); }
+    .booking-menu-past     { font-size: .84rem; color: #BBB; }
+    .cancel-today-note { font-size: .78rem; color: var(--danger); margin-top: 5px; font-weight: 500; line-height: 1.5; }
+
     .btn-cancel-item {
       background: var(--danger-bg); color: var(--danger);
       border: 1.5px solid #F0A0A0; font-size: .8rem; padding: 8px 14px;
@@ -469,6 +495,14 @@
       transition: all .18s;
     }
     .btn-cancel-item:hover { background: var(--danger); color: #fff; }
+
+    .visited-check {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .76rem; color: var(--text-light); cursor: pointer;
+      margin-bottom: 6px; white-space: nowrap;
+    }
+    .visited-check input[type=checkbox] { accent-color: var(--success); width: 14px; height: 14px; cursor: pointer; }
+    .visited-check.checked-label { color: var(--success); font-weight: 600; }
 
     /* ───────────────────────────────
        同意チェックボックス
@@ -897,16 +931,35 @@
     </div>
   </div>
 
-  <!-- ▼ キャンセル：予約一覧 -->
+  <!-- ▼ マイページ -->
   <div id="page-cancel-list" class="page">
     <div class="card">
-      <div class="page-title">
-        <h2>予約一覧</h2>
-        <p id="cancel-list-name"></p>
+      <div class="mypage-customer-bar">
+        <span class="mypage-customer-name" id="mypage-customer-name"></span>
+        <span class="mypage-customer-num"  id="mypage-customer-num"></span>
       </div>
-      <div id="cancel-list-success" class="alert alert-success"></div>
-      <div id="cancel-list-alert" class="alert alert-error"></div>
-      <div id="cancel-booking-list"></div>
+      <div class="mypage-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="mp-total">-</div>
+          <div class="stat-label">総予約回数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="mp-visited">-</div>
+          <div class="stat-label">来院済み回数</div>
+        </div>
+      </div>
+      <div id="mypage-success" class="alert alert-success"></div>
+      <div id="mypage-alert"   class="alert alert-error"></div>
+      <div class="mypage-tabs">
+        <button class="tab-btn active" id="mypage-tab-btn-upcoming" onclick="switchMypageTab('upcoming', this)">今後の予約</button>
+        <button class="tab-btn"        id="mypage-tab-btn-past"     onclick="switchMypageTab('past', this)">過去の予約</button>
+      </div>
+      <div id="mypage-tab-upcoming" class="tab-panel active">
+        <div id="mypage-upcoming-list"></div>
+      </div>
+      <div id="mypage-tab-past" class="tab-panel">
+        <div id="mypage-past-list"></div>
+      </div>
       <div class="btn-actions" style="margin-top:20px;">
         <button class="btn btn-secondary" onclick="navigateTo('page-cancel-login')">← 戻る</button>
       </div>
@@ -1448,9 +1501,21 @@
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // キャンセルフロー
+  // マイページ・キャンセルフロー
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   let cancelCustomer = null;
+
+  function getDayOfWeek(dateStr) {
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return days[new Date(y, m - 1, d).getDay()];
+  }
+
+  function todayMidnight() {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    return t;
+  }
 
   async function verifyCancelLogin() {
     const raw         = document.getElementById('cancel-id-input').value.trim();
@@ -1468,7 +1533,7 @@
     showLoading('予約を確認中...');
     try {
       const customer = await findCustomer(raw);
-      const storedName     = (customer?.name || '').replace(/[\s　]/g, '');
+      const storedName      = (customer?.name || '').replace(/[\s　]/g, '');
       const normalizedEntry = enteredName.replace(/[\s　]/g, '');
       if (!customer || !storedName.startsWith(normalizedEntry)) {
         showAlert('cancel-login-alert', '顧客番号またはお名前が正しくありません。');
@@ -1476,10 +1541,11 @@
       }
       hideAlert('cancel-login-alert');
       cancelCustomer = customer;
-      document.getElementById('cancel-list-name').textContent = `${customer.name} 様の予約一覧`;
-      hideAlert('cancel-list-success');
-      hideAlert('cancel-list-alert');
-      await renderCancelBookings();
+      document.getElementById('mypage-customer-name').textContent = `${customer.name} 様`;
+      document.getElementById('mypage-customer-num').textContent  = `顧客番号：${customer.customer_number}`;
+      hideAlert('mypage-success');
+      hideAlert('mypage-alert');
+      await renderMypage();
       navigateTo('page-cancel-list');
     } catch (e) {
       showAlert('cancel-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
@@ -1489,9 +1555,11 @@
     }
   }
 
-  async function renderCancelBookings() {
-    const container = document.getElementById('cancel-booking-list');
-    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
+  async function renderMypage() {
+    document.getElementById('mypage-upcoming-list').innerHTML =
+      '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
+    document.getElementById('mypage-past-list').innerHTML = '';
+
     try {
       const { data, error } = await sbClient
         .from('bookings')
@@ -1501,41 +1569,78 @@
         .order('time');
       if (error) throw error;
 
-      const list = data || [];
-      if (!list.length) {
-        container.innerHTML = emptyState('📋', 'ご予約はありません');
-        return;
+      const all      = data || [];
+      const today    = todayMidnight();
+      const upcoming = [];
+      const past     = [];
+
+      all.forEach(b => {
+        const [y, m, d] = b.date.split('-').map(Number);
+        const bd = new Date(y, m - 1, d);
+        bd >= today ? upcoming.push(b) : past.push(b);
+      });
+
+      // 統計
+      document.getElementById('mp-total').textContent   = all.length;
+      document.getElementById('mp-visited').textContent = past.length;
+
+      // 今後の予約
+      if (!upcoming.length) {
+        document.getElementById('mypage-upcoming-list').innerHTML =
+          emptyState('📅', '今後の予約はありません');
+      } else {
+        document.getElementById('mypage-upcoming-list').innerHTML = upcoming.map(b => {
+          const [y, m, d] = b.date.split('-').map(Number);
+          const bd       = new Date(y, m - 1, d);
+          const diffDays = Math.round((bd - today) / 86400000);
+          const dow      = getDayOfWeek(b.date);
+
+          let actionHtml;
+          if (diffDays === 0) {
+            actionHtml = `<div class="cancel-today-note">当日のキャンセルは<br>お電話でご連絡ください</div>`;
+          } else {
+            actionHtml = `<button class="btn-cancel-item" onclick="cancelBookingConfirm('${esc(b.id)}','${esc(b.date)}','${esc(b.time)}','${esc(b.menu).replace(/'/g,'\\u0027')}')">キャンセル</button>`;
+          }
+          return `
+            <div class="booking-upcoming">
+              <div class="booking-info">
+                <div class="booking-date-upcoming">📅 ${formatDate(b.date)}（${dow}）${esc(b.time)}</div>
+                <div class="booking-menu-upcoming">${esc(b.menu)}</div>
+              </div>
+              <div style="flex-shrink:0; text-align:right;">${actionHtml}</div>
+            </div>`;
+        }).join('');
       }
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      container.innerHTML = list.map(b => {
-        const bookingDate = new Date(b.date);
-        bookingDate.setHours(0, 0, 0, 0);
-        const diffDays = Math.round((bookingDate - today) / 86400000);
-
-        let actionHtml;
-        if (diffDays < 0) {
-          actionHtml = '<div class="cancel-past-note">終了済み</div>';
-        } else if (diffDays === 0) {
-          actionHtml = '<div class="cancel-today-note">当日のキャンセルは<br>お電話でご連絡ください</div>';
-        } else {
-          actionHtml = `<button class="btn-cancel-item" onclick="cancelBookingConfirm('${esc(b.id)}', '${esc(b.date)}', '${esc(b.time)}', '${esc(b.menu).replace(/'/g, '\\u0027')}')">キャンセル</button>`;
-        }
-
-        return `
-          <div class="cancel-item">
-            <div class="cancel-item-info">
-              <div class="cancel-item-date">📅 ${formatDate(b.date)} ${esc(b.time)}</div>
-              <div class="cancel-item-menu">${esc(b.menu)}</div>
-            </div>
-            <div style="flex-shrink:0; text-align:right;">${actionHtml}</div>
-          </div>`;
-      }).join('');
+      // 過去の予約（新しい順）
+      const pastDesc = [...past].reverse();
+      if (!pastDesc.length) {
+        document.getElementById('mypage-past-list').innerHTML =
+          emptyState('📋', '過去の予約はありません');
+      } else {
+        document.getElementById('mypage-past-list').innerHTML = pastDesc.map(b => {
+          const dow = getDayOfWeek(b.date);
+          return `
+            <div class="booking-past">
+              <div class="booking-info">
+                <div class="booking-date-past">📅 ${formatDate(b.date)}（${dow}）${esc(b.time)}</div>
+                <div class="booking-menu-past">${esc(b.menu)}</div>
+              </div>
+            </div>`;
+        }).join('');
+      }
     } catch (e) {
-      container.innerHTML = emptyState('⚠️', '予約データの取得に失敗しました');
+      document.getElementById('mypage-upcoming-list').innerHTML =
+        emptyState('⚠️', '予約データの取得に失敗しました');
     }
+  }
+
+  function switchMypageTab(tab, btn) {
+    ['upcoming', 'past'].forEach(t => {
+      document.getElementById(`mypage-tab-${t}`).classList.toggle('active', t === tab);
+    });
+    document.querySelectorAll('.mypage-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   }
 
   async function cancelBookingConfirm(id, date, time, menu) {
@@ -1544,13 +1649,13 @@
     try {
       const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
-      await renderCancelBookings();
-      const el = document.getElementById('cancel-list-success');
+      await renderMypage();
+      const el = document.getElementById('mypage-success');
       el.textContent = 'キャンセルが完了しました。またのご利用をお待ちしております。';
       el.classList.add('show');
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (e) {
-      showAlert('cancel-list-alert', 'キャンセルに失敗しました。しばらくしてからお試しください。');
+      showAlert('mypage-alert', 'キャンセルに失敗しました。しばらくしてからお試しください。');
     } finally {
       hideLoading();
     }
@@ -1631,7 +1736,14 @@
               ${b.memo ? `<div class="admin-memo">📝 ${esc(b.memo)}</div>` : ''}
               ${qHtml}
             </div>
-            <button class="btn-danger" onclick="deleteBookingConfirm('${esc(b.id)}', '${esc(b.name).replace(/'/g,'\\u0027')}')">削除</button>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
+              <label class="visited-check${b.visited ? ' checked-label' : ''}">
+                <input type="checkbox" ${b.visited ? 'checked' : ''}
+                  onchange="toggleVisited('${esc(b.id)}', this)">
+                来院済み
+              </label>
+              <button class="btn-danger" onclick="deleteBookingConfirm('${esc(b.id)}', '${esc(b.name).replace(/'/g,'\\u0027')}')">削除</button>
+            </div>
           </div>`;
       }).join('');
     } catch (e) {
@@ -1701,6 +1813,22 @@
       showAlert('admin-customer-error', '顧客の削除に失敗しました。しばらくしてからお試しください。');
     } finally {
       hideLoading();
+    }
+  }
+
+  async function toggleVisited(id, checkbox) {
+    const checked = checkbox.checked;
+    const label   = checkbox.closest('.visited-check');
+    try {
+      const { error } = await sbClient
+        .from('bookings')
+        .update({ visited: checked })
+        .eq('id', id);
+      if (error) throw error;
+      label.classList.toggle('checked-label', checked);
+    } catch (e) {
+      checkbox.checked = !checked; // 失敗時は元に戻す
+      showAlert('admin-booking-error', '来院済みの更新に失敗しました。');
     }
   }
 
