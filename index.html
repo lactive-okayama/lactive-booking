@@ -461,6 +461,40 @@
     .empty-state p { font-size: .88rem; }
 
     /* ───────────────────────────────
+       トップ選択画面
+    ─────────────────────────────── */
+    .top-choice-wrap {
+      display: flex; flex-direction: column; gap: 16px;
+      max-width: 480px; margin: 0 auto; padding: 8px 0 24px;
+    }
+    .top-choice-title { text-align: center; margin-bottom: 8px; }
+    .top-choice-title h2 { font-size: 1.3rem; font-weight: 700; color: var(--orange-deep); margin-bottom: 5px; }
+    .top-choice-title p  { font-size: .86rem; color: var(--text-light); }
+
+    .choice-btn {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 7px;
+      width: 100%; padding: 30px 24px; border: none; border-radius: var(--radius);
+      cursor: pointer; font-family: inherit; transition: all .2s;
+    }
+    .choice-btn-main { font-size: 1.3rem; font-weight: 700; }
+    .choice-btn-sub  { font-size: .84rem; opacity: .85; }
+
+    .choice-btn-first {
+      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+      color: #fff; box-shadow: 0 4px 20px rgba(255,140,66,.4);
+    }
+    .choice-btn-first:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(255,140,66,.5); }
+
+    .choice-btn-member {
+      background: var(--white); color: var(--orange-deep);
+      border: 2px solid var(--orange) !important;
+      box-shadow: 0 4px 14px rgba(255,140,66,.15);
+    }
+    .choice-btn-member .choice-btn-sub { color: var(--text-light); opacity: 1; }
+    .choice-btn-member:hover { background: var(--orange-pale); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(255,140,66,.3); }
+
+    /* ───────────────────────────────
        マイページ・キャンセル
     ─────────────────────────────── */
     .cancel-link-wrap {
@@ -589,19 +623,36 @@
       <div class="logo-name">Lactive</div>
       <div class="logo-sub">整体院｜ご予約</div>
     </div>
-    <button class="header-nav-btn" onclick="navigateTo('page-cancel-login')">予約確認・キャンセル</button>
   </div>
 </header>
 
 <main>
   <div id="steps-container"></div>
 
-  <!-- ▼ トップ（メニュー選択） -->
+  <!-- ▼ トップ（2択） -->
   <div id="page-top" class="page active">
+    <div class="top-choice-wrap">
+      <div class="top-choice-title">
+        <h2>ようこそ、Lactiveへ</h2>
+        <p>ご来院区分をお選びください</p>
+      </div>
+      <button class="choice-btn choice-btn-first" onclick="navigateTo('page-first-select')">
+        <span class="choice-btn-main">はじめての方</span>
+        <span class="choice-btn-sub">初回体験メニューのご予約はこちら</span>
+      </button>
+      <button class="choice-btn choice-btn-member" onclick="navigateTo('page-member-choice')">
+        <span class="choice-btn-main">会員の方</span>
+        <span class="choice-btn-sub">ご予約・予約確認・キャンセルはこちら</span>
+      </button>
+    </div>
+  </div><!-- /page-top -->
+
+  <!-- ▼ 初回メニュー選択 -->
+  <div id="page-first-select" class="page">
     <div class="section-block">
-      <div class="section-label">
-        <span class="badge-tag badge-first">初回の方</span>
-        <span class="section-title">はじめてのご予約</span>
+      <div class="page-title">
+        <h2>メニューを選んでください</h2>
+        <p>初回体験メニューをお選びください</p>
       </div>
       <div class="menu-grid">
         <div class="menu-card" onclick="startFirstFlow('first-seitai')">
@@ -623,12 +674,39 @@
           <div class="card-price">¥1,980</div>
         </div>
       </div>
+      <div class="btn-actions" style="margin-top:20px;">
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+      </div>
     </div>
+  </div><!-- /page-first-select -->
 
+  <!-- ▼ 会員の方：選択 -->
+  <div id="page-member-choice" class="page">
+    <div class="top-choice-wrap">
+      <div class="top-choice-title">
+        <h2>会員メニュー</h2>
+        <p>ご用件をお選びください</p>
+      </div>
+      <button class="choice-btn choice-btn-first" onclick="navigateTo('page-member-menu')">
+        <span class="choice-btn-main">予約する</span>
+        <span class="choice-btn-sub">メニューを選んでご予約ください</span>
+      </button>
+      <button class="choice-btn choice-btn-member" onclick="navigateTo('page-cancel-login')">
+        <span class="choice-btn-main">予約確認・キャンセル</span>
+        <span class="choice-btn-sub">マイページで予約内容をご確認ください</span>
+      </button>
+      <div class="btn-actions" style="margin-top:4px;">
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+      </div>
+    </div>
+  </div><!-- /page-member-choice -->
+
+  <!-- ▼ 会員メニュー選択 -->
+  <div id="page-member-menu" class="page">
     <div class="section-block">
-      <div class="section-label">
-        <span class="badge-tag badge-member">会員の方</span>
-        <span class="section-title">会員メニュー</span>
+      <div class="page-title">
+        <h2>メニューを選んでください</h2>
+        <p>ご希望のメニューをお選びください</p>
       </div>
       <div class="menu-grid single-col">
         <div class="menu-card member-card" onclick="startMemberFlow('整体（運動療法）30分')">
@@ -656,13 +734,11 @@
           <div class="card-duration">40分</div>
         </div>
       </div>
+      <div class="btn-actions" style="margin-top:20px;">
+        <button class="btn btn-secondary" onclick="navigateTo('page-member-choice')">← 戻る</button>
+      </div>
     </div>
-    <div class="cancel-link-wrap">
-      <button class="cancel-link-btn" onclick="navigateTo('page-cancel-login')">
-        📋 予約確認・キャンセル
-      </button>
-    </div>
-  </div><!-- /page-top -->
+  </div><!-- /page-member-menu -->
 
   <!-- ▼ 注意事項（STEP1：初回共通） -->
   <div id="page-notice" class="page">
@@ -678,7 +754,7 @@
         <li class="notice-item"><span class="notice-icon">⏰</span>遅刻・キャンセルの際は必ずご連絡ください</li>
       </ul>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-first-select')">← 戻る</button>
         <button class="btn btn-primary" onclick="noticeAgree()">同意して次へ →</button>
       </div>
     </div>
@@ -783,7 +859,7 @@
         </div>
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-member-menu')">← 戻る</button>
       </div>
     </div>
   </div>
@@ -955,7 +1031,7 @@
                onkeydown="if(event.key==='Enter') verifyCancelLogin()">
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-member-choice')">← 戻る</button>
         <button class="btn btn-primary" id="cancel-verify-btn" onclick="verifyCancelLogin()">予約を確認する</button>
       </div>
     </div>
@@ -1169,7 +1245,7 @@
 
   function renderSteps(pageId) {
     const container = document.getElementById('steps-container');
-    const noStepPages = ['page-top', 'page-done', 'page-admin-login', 'page-admin', 'page-cancel-login', 'page-cancel-list'];
+    const noStepPages = ['page-top', 'page-first-select', 'page-member-choice', 'page-member-menu', 'page-done', 'page-admin-login', 'page-admin', 'page-cancel-login', 'page-cancel-list'];
     if (!ST.flow || noStepPages.includes(pageId)) { container.innerHTML = ''; return; }
     const cfg = FLOW_CONFIG[ST.flow];
     if (!cfg) { container.innerHTML = ''; return; }
