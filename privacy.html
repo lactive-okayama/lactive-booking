@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プライバシーポリシー｜Lactive</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange:        #FF8C42;
+      --orange-light:  #FFE0C5;
+      --orange-pale:   #FFF5ED;
+      --orange-dark:   #E06010;
+      --orange-deep:   #B84800;
+      --white:         #FFFFFF;
+      --bg:            #FFFAF5;
+      --text:          #2E1E0E;
+      --text-light:    #8A6040;
+      --border:        #EED4B0;
+      --shadow:        0 4px 20px rgba(0,0,0,0.08);
+      --radius:        14px;
+      --radius-sm:     8px;
+    }
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.7;
+      font-size: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: var(--white);
+      border-bottom: 2px solid var(--orange-light);
+      padding: 0 20px;
+      position: sticky; top: 0; z-index: 200;
+      box-shadow: 0 2px 10px rgba(255,140,66,.12);
+    }
+    .header-inner {
+      max-width: 780px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 62px;
+    }
+    .logo { cursor: pointer; text-decoration: none; }
+    .logo-name { font-size: 1.45rem; font-weight: 700; color: var(--orange-deep); letter-spacing: .08em; }
+    .logo-sub  { font-size: .72rem; color: var(--text-light); letter-spacing: .1em; }
+
+    main {
+      max-width: 780px; margin: 0 auto; padding: 40px 18px 60px;
+      flex: 1;
+    }
+    .page-heading {
+      text-align: center; margin-bottom: 36px;
+    }
+    .page-heading h1 {
+      font-size: 1.5rem; font-weight: 700; color: var(--orange-deep);
+      margin-bottom: 8px;
+    }
+    .page-heading p {
+      font-size: .86rem; color: var(--text-light);
+    }
+
+    .policy-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    @media (max-width: 480px) { .policy-card { padding: 20px 16px; } }
+
+    .policy-section { margin-bottom: 32px; }
+    .policy-section:last-child { margin-bottom: 0; }
+
+    .policy-section h2 {
+      font-size: 1rem; font-weight: 700; color: var(--orange-deep);
+      padding: 8px 14px;
+      background: var(--orange-pale);
+      border-left: 4px solid var(--orange);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 14px;
+    }
+    .policy-section p {
+      font-size: .92rem; color: var(--text); line-height: 1.9;
+      margin-bottom: 10px;
+    }
+    .policy-section p:last-child { margin-bottom: 0; }
+    .policy-section ul {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .policy-section ul li {
+      font-size: .92rem; color: var(--text); line-height: 1.8;
+      padding-left: 18px; position: relative;
+    }
+    .policy-section ul li::before {
+      content: '・';
+      position: absolute; left: 0;
+      color: var(--orange);
+    }
+
+    .policy-meta {
+      text-align: right; font-size: .82rem; color: var(--text-light);
+      margin-top: 28px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .contact-box {
+      background: var(--orange-pale);
+      border: 1.5px solid var(--orange-light);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      font-size: .92rem;
+      line-height: 1.9;
+    }
+    .contact-box a {
+      color: var(--orange-dark);
+      font-weight: 700;
+    }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 11px 24px; border: none; border-radius: 40px;
+      font-size: .92rem; font-family: inherit; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255,140,66,.4);
+      transition: all .2s;
+      margin-top: 28px;
+    }
+    .back-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 20px rgba(255,140,66,.5); }
+
+    footer {
+      background: var(--white);
+      border-top: 1px solid var(--orange-light);
+      padding: 20px;
+      text-align: center;
+    }
+    .footer-inner {
+      max-width: 780px; margin: 0 auto;
+    }
+    .footer-links {
+      margin-bottom: 8px;
+    }
+    .footer-links a {
+      font-size: .82rem; color: var(--text-light);
+      text-decoration: none;
+    }
+    .footer-links a:hover { color: var(--orange-dark); text-decoration: underline; }
+    .footer-copy {
+      font-size: .78rem; color: var(--text-light);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-name">Lactive</div>
+      <div class="logo-sub">整体院｜ご予約</div>
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="page-heading">
+    <h1>プライバシーポリシー</h1>
+    <p>個人情報の取り扱いについて</p>
+  </div>
+
+  <div class="policy-card">
+
+    <div class="policy-section">
+      <h2>事業者情報</h2>
+      <p>
+        事業者名：Lactive（ラクティブ）<br>
+        所在地：岡山市北区中仙道<br>
+        運営者：整体師・ピラティスインストラクター
+      </p>
+    </div>
+
+    <div class="policy-section">
+      <h2>収集する個人情報</h2>
+      <p>当サービスでは、以下の個人情報をご提供いただきます。</p>
+      <ul>
+        <li>氏名</li>
+        <li>電話番号</li>
+        <li>メールアドレス</li>
+        <li>予約情報（日時・メニュー等）</li>
+        <li>問診情報（症状・体調等）</li>
+      </ul>
+    </div>
+
+    <div class="policy-section">
+      <h2>利用目的</h2>
+      <p>収集した個人情報は、以下の目的のみに使用いたします。</p>
+      <ul>
+        <li>予約の受付・管理のため</li>
+        <li>施術内容のご案内・確認のため</li>
+        <li>ご予約に関する連絡のため</li>
+      </ul>
+    </div>
+
+    <div class="policy-section">
+      <h2>第三者への提供</h2>
+      <p>お客様の個人情報は、法令に基づく場合を除き、第三者への提供は一切行いません。</p>
+    </div>
+
+    <div class="policy-section">
+      <h2>データの管理</h2>
+      <p>
+        お客様の個人情報は、Supabase（クラウドデータベースサービス）を使用して安全に管理しております。
+        不正アクセス・紛失・漏洩等を防止するため、適切なセキュリティ対策を講じています。
+      </p>
+    </div>
+
+    <div class="policy-section">
+      <h2>個人情報の開示・訂正・削除</h2>
+      <p>
+        ご自身の個人情報の開示・訂正・削除をご希望の場合は、下記のお問い合わせ先までご連絡ください。
+        ご本人確認のうえ、速やかに対応いたします。
+      </p>
+    </div>
+
+    <div class="policy-section">
+      <h2>お問い合わせ</h2>
+      <div class="contact-box">
+        個人情報の取り扱いに関するお問い合わせは、公式LINEよりご連絡ください。<br>
+        公式LINE：<a href="https://lin.ee/D31nngh" target="_blank" rel="noopener">https://lin.ee/D31nngh</a>
+      </div>
+    </div>
+
+    <div class="policy-meta">
+      制定日：2024年1月1日<br>
+      Lactive（ラクティブ）
+    </div>
+  </div>
+
+  <a class="back-btn" href="index.html">← 予約ページに戻る</a>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="privacy.html">プライバシーポリシー</a>
+    </div>
+    <div class="footer-copy">&copy; 2024 Lactive All Rights Reserved.</div>
+  </div>
+</footer>
+
+</body>
+</html>
