@@ -461,6 +461,57 @@
     .empty-state p { font-size: .88rem; }
 
     /* ───────────────────────────────
+       休業日カレンダー
+    ─────────────────────────────── */
+    .holiday-cal-header {
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; margin-bottom: 16px;
+    }
+    .holiday-nav-btn {
+      background: var(--orange-pale); border: 1.5px solid var(--orange-light);
+      border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer;
+      color: var(--orange-deep); font-weight: 700; font-family: inherit;
+      font-size: .88rem;
+    }
+    .holiday-nav-btn:hover { background: var(--orange-light); }
+    .holiday-month-label { font-size: 1.05rem; font-weight: 700; color: var(--text); min-width: 110px; text-align: center; }
+
+    .holiday-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .holiday-cal-dow {
+      text-align: center; font-size: .75rem; font-weight: 700;
+      padding: 6px 0; color: var(--text-light);
+    }
+    .holiday-cal-dow.sun { color: var(--danger); }
+    .holiday-cal-dow.sat { color: var(--blue); }
+
+    .holiday-cal-day {
+      aspect-ratio: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      cursor: pointer; background: var(--white); padding: 4px;
+      transition: all .15s; min-height: 48px; overflow: hidden;
+    }
+    .holiday-cal-day:hover:not(.empty):not(.past) { border-color: var(--orange); background: var(--orange-pale); }
+    .holiday-cal-day.empty { border: none; cursor: default; background: transparent; }
+    .holiday-cal-day.past  { color: #BBB; cursor: default; background: #F8F8F8; }
+    .holiday-cal-day.holiday {
+      background: var(--orange) !important; border-color: var(--orange-dark);
+      color: #fff; font-weight: 700;
+    }
+    .holiday-cal-day.holiday:hover { background: var(--orange-dark) !important; }
+    .holiday-cal-day.today { box-shadow: inset 0 0 0 2px var(--orange-deep); }
+    .holiday-day-num { font-size: .9rem; line-height: 1; font-weight: 700; }
+    .holiday-day-reason {
+      font-size: .58rem; line-height: 1.1; max-width: 100%;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .holiday-help {
+      font-size: .8rem; color: var(--text-light);
+      margin-top: 14px; padding: 11px 14px; background: var(--bg);
+      border-radius: var(--radius-sm); line-height: 1.7;
+    }
+
+    /* ───────────────────────────────
        トップ選択画面
     ─────────────────────────────── */
     .top-choice-wrap {
@@ -587,6 +638,69 @@
     }
     .consent-label a {
       color: var(--orange-dark); font-weight: 700; text-decoration: underline;
+    }
+
+    /* ───────────────────────────────
+       休業日カレンダー（管理画面）
+    ─────────────────────────────── */
+    .holiday-cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px; gap: 10px; flex-wrap: wrap;
+    }
+    .holiday-cal-title { font-size: 1.05rem; font-weight: 700; color: var(--orange-deep); }
+    .cal-nav-btn {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 6px 14px;
+      font-family: inherit; font-size: .88rem; cursor: pointer;
+      color: var(--text); transition: all .18s;
+    }
+    .cal-nav-btn:hover { border-color: var(--orange); color: var(--orange-dark); background: var(--orange-pale); }
+    .holiday-cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    .cal-weekday {
+      text-align: center; font-size: .76rem; font-weight: 600;
+      color: var(--text-light); padding: 5px 0;
+    }
+    .cal-weekday.sun { color: var(--danger); }
+    .cal-weekday.sat { color: var(--blue); }
+    .cal-day {
+      min-height: 44px; display: flex; align-items: center; justify-content: center;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-size: .92rem; cursor: pointer;
+      transition: all .18s; position: relative; user-select: none;
+    }
+    .cal-day:hover:not(.cal-day-empty):not(.cal-day-past) {
+      border-color: var(--orange); background: var(--orange-pale);
+    }
+    .cal-day-empty { background: transparent; border: none; cursor: default; }
+    .cal-day-past  { color: #BBB; cursor: not-allowed; background: #F8F8F8; }
+    .cal-day-today { border-color: var(--orange); font-weight: 700; }
+    .cal-day-holiday {
+      background: var(--orange); color: #fff !important; border-color: var(--orange-dark);
+      font-weight: 700;
+    }
+    .cal-day-holiday::after {
+      content: '休'; position: absolute; bottom: 1px; right: 3px; font-size: .56rem;
+    }
+    .holiday-list-section { margin-top: 22px; }
+    .holiday-list-title {
+      font-size: .92rem; font-weight: 700; color: var(--text);
+      margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .holiday-list-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: var(--orange-pale);
+      border: 1.5px solid var(--orange-light); border-radius: var(--radius-sm);
+      margin-bottom: 8px; font-size: .88rem; gap: 10px; flex-wrap: wrap;
+    }
+    .holiday-list-date   { font-weight: 700; color: var(--orange-deep); }
+    .holiday-list-reason { color: var(--text-light); font-size: .82rem; margin-left: 8px; }
+    .holiday-help {
+      font-size: .8rem; color: var(--text-light);
+      padding: 10px 14px; background: var(--bg);
+      border-left: 3px solid var(--orange-light); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 16px; line-height: 1.7;
     }
 
     /* ───────────────────────────────
@@ -1106,6 +1220,7 @@
     <div class="admin-tabs">
       <button class="tab-btn active" onclick="switchTab('tab-bookings', this)">予約一覧</button>
       <button class="tab-btn"        onclick="switchTab('tab-customers', this)">顧客一覧</button>
+      <button class="tab-btn"        onclick="switchTab('tab-holidays', this)">休業日設定</button>
     </div>
 
     <div id="tab-bookings" class="tab-panel active">
@@ -1139,6 +1254,20 @@
       <div id="admin-customer-error" class="alert alert-error"></div>
       <div class="list-scroll">
         <div id="customer-list"></div>
+      </div>
+    </div>
+
+    <div id="tab-holidays" class="tab-panel">
+      <div class="holiday-cal-header">
+        <button class="holiday-nav-btn" onclick="changeHolidayMonth(-1)">‹ 前月</button>
+        <span class="holiday-month-label" id="holiday-month-label">-</span>
+        <button class="holiday-nav-btn" onclick="changeHolidayMonth(1)">次月 ›</button>
+      </div>
+      <div id="admin-holiday-error" class="alert alert-error"></div>
+      <div class="holiday-cal-grid" id="holiday-cal-grid"></div>
+      <div class="holiday-help">
+        💡 日付をクリックすると休業日に設定できます（理由の入力欄が表示されます）。<br>
+        休業日（オレンジ表示）をもう一度クリックすると解除できます。
       </div>
     </div>
   </div>
@@ -1478,17 +1607,30 @@
     if (date === _dateChangeLast) return; // oninput+onchange 重複呼び出し防止
     _dateChangeLast = date;
     document.getElementById('dt-time').value = '';
+    const phEl = document.getElementById('time-slot-placeholder');
     if (!date) {
-      document.getElementById('time-slot-placeholder').style.display = 'block';
-      document.getElementById('time-slot-loading').style.display     = 'none';
-      document.getElementById('time-slot-grid').style.display        = 'none';
+      phEl.textContent = 'まず希望日を選択してください';
+      phEl.style.display = 'block';
+      document.getElementById('time-slot-loading').style.display = 'none';
+      document.getElementById('time-slot-grid').style.display    = 'none';
       return;
     }
-    document.getElementById('time-slot-placeholder').style.display = 'none';
-    document.getElementById('time-slot-loading').style.display     = 'block';
-    document.getElementById('time-slot-grid').style.display        = 'none';
+    phEl.style.display = 'none';
+    document.getElementById('time-slot-loading').style.display = 'block';
+    document.getElementById('time-slot-grid').style.display    = 'none';
     hideAlert('datetime-alert');
     try {
+      // 休業日チェック
+      const holiday = await checkIsHoliday(date);
+      if (holiday) {
+        document.getElementById('time-slot-loading').style.display = 'none';
+        document.getElementById('time-slot-grid').style.display    = 'none';
+        const reason = holiday.reason ? `（${holiday.reason}）` : '';
+        phEl.textContent = `この日は休業日です${reason}。別の日付をお選びください。`;
+        phEl.style.display = 'block';
+        showAlert('datetime-alert', `この日は休業日です${reason}。`);
+        return;
+      }
       const bookedTimes = await fetchBookedTimes(date);
       renderTimeSlots(bookedTimes);
     } catch (e) {
@@ -1554,6 +1696,13 @@
     const memo = document.getElementById('dt-memo').value.trim();
     if (!date) { showAlert('datetime-alert', '希望日を選択してください。'); return; }
     if (!time) { showAlert('datetime-alert', '希望時間を選択してください。'); return; }
+    // 確定時に休業日を再チェック（管理側で直前に休業日設定された場合の保険）
+    const holidayCheck = await checkIsHoliday(date).catch(() => null);
+    if (holidayCheck) {
+      const reason = holidayCheck.reason ? `（${holidayCheck.reason}）` : '';
+      showAlert('datetime-alert', `この日は休業日のため予約できません${reason}。別の日付をお選びください。`);
+      return;
+    }
     // 確定時に再度重複チェック（二重送信防止）
     const bookedNow = await fetchBookedTimes(date).catch(() => []);
     if (bookedNow.includes(time)) {
@@ -1794,6 +1943,155 @@
     btn.classList.add('active');
     if (tabId === 'tab-bookings')  renderBookings();
     if (tabId === 'tab-customers') renderCustomers();
+    if (tabId === 'tab-holidays')  initHolidayCalendar();
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 休業日設定
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  let holidayViewYear  = null;
+  let holidayViewMonth = null; // 0-11
+
+  function initHolidayCalendar() {
+    if (holidayViewYear === null) {
+      const now = new Date();
+      holidayViewYear  = now.getFullYear();
+      holidayViewMonth = now.getMonth();
+    }
+    renderHolidayCalendar();
+  }
+
+  function changeHolidayMonth(delta) {
+    holidayViewMonth += delta;
+    if (holidayViewMonth < 0)  { holidayViewMonth = 11; holidayViewYear--; }
+    if (holidayViewMonth > 11) { holidayViewMonth = 0;  holidayViewYear++; }
+    renderHolidayCalendar();
+  }
+
+  /** 指定月の休業日を取得（map: dateStr -> reason） */
+  async function fetchHolidaysForMonth(year, month) {
+    const mm  = String(month + 1).padStart(2, '0');
+    const ld  = new Date(year, month + 1, 0).getDate();
+    const start = `${year}-${mm}-01`;
+    const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
+    const { data, error } = await sbClient
+      .from('holidays')
+      .select('date, reason')
+      .gte('date', start)
+      .lte('date', end);
+    if (error) throwSupabaseError('休業日一覧の取得', error);
+    const map = {};
+    (data || []).forEach(h => { map[h.date] = h.reason || ''; });
+    return map;
+  }
+
+  async function renderHolidayCalendar() {
+    document.getElementById('holiday-month-label').textContent =
+      `${holidayViewYear}年${holidayViewMonth + 1}月`;
+    const grid = document.getElementById('holiday-cal-grid');
+    hideAlert('admin-holiday-error');
+
+    let holidays = {};
+    try {
+      holidays = await fetchHolidaysForMonth(holidayViewYear, holidayViewMonth);
+    } catch (e) {
+      console.error('❌ [renderHolidayCalendar] エラー:', e);
+      showAlert('admin-holiday-error', `休業日データの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
+    }
+
+    const dows = ['日', '月', '火', '水', '木', '金', '土'];
+    let html = '';
+    dows.forEach((d, i) => {
+      const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
+      html += `<div class="holiday-cal-dow ${cls}">${d}</div>`;
+    });
+
+    const firstDow = new Date(holidayViewYear, holidayViewMonth, 1).getDay();
+    const numDays  = new Date(holidayViewYear, holidayViewMonth + 1, 0).getDate();
+    const today    = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < firstDow; i++) {
+      html += `<div class="holiday-cal-day empty"></div>`;
+    }
+
+    for (let d = 1; d <= numDays; d++) {
+      const dateObj = new Date(holidayViewYear, holidayViewMonth, d);
+      const mm      = String(holidayViewMonth + 1).padStart(2, '0');
+      const dd      = String(d).padStart(2, '0');
+      const dateStr = `${holidayViewYear}-${mm}-${dd}`;
+      const isPast    = dateObj < today;
+      const isToday   = dateObj.getTime() === today.getTime();
+      const isHoliday = holidays[dateStr] !== undefined;
+
+      const classes = ['holiday-cal-day'];
+      if (isPast)    classes.push('past');
+      if (isToday)   classes.push('today');
+      if (isHoliday) classes.push('holiday');
+
+      const onclick = isPast ? '' : `onclick="toggleHoliday('${dateStr}', this)"`;
+      const reason  = isHoliday && holidays[dateStr]
+        ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
+      html += `<div class="${classes.join(' ')}" ${onclick}>
+        <span class="holiday-day-num">${d}</span>
+        ${reason}
+      </div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  async function toggleHoliday(dateStr, dayEl) {
+    const isHoliday = dayEl.classList.contains('holiday');
+    if (isHoliday) {
+      if (!confirm(`${dateStr} の休業日設定を解除しますか？`)) return;
+      showLoading('解除中...');
+      try {
+        const { error } = await sbClient.from('holidays').delete().eq('date', dateStr);
+        if (error) throwSupabaseError('休業日の解除', error);
+        await renderHolidayCalendar();
+      } catch (e) {
+        console.error('❌ [toggleHoliday/delete] エラー:', e);
+        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
+        showAlert('admin-holiday-error', `休業日の解除に失敗しました。${detail}`);
+      } finally {
+        hideLoading();
+      }
+    } else {
+      const reason = prompt(`${dateStr} を休業日に設定します。\n理由（任意・空欄でも可）：`, '');
+      if (reason === null) return; // キャンセル
+      showLoading('登録中...');
+      try {
+        const { data, error } = await sbClient
+          .from('holidays')
+          .insert({ date: dateStr, reason: reason.trim() || null })
+          .select();
+        if (error) throwSupabaseError('休業日の登録', error);
+        if (!data || data.length === 0) {
+          showAlert('admin-holiday-error',
+            '休業日を登録できませんでした。Supabase の holidays テーブルに INSERT 用の RLS ポリシーが設定されているかご確認ください。');
+          return;
+        }
+        await renderHolidayCalendar();
+      } catch (e) {
+        console.error('❌ [toggleHoliday/insert] エラー:', e);
+        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
+        showAlert('admin-holiday-error', `休業日の登録に失敗しました。${detail}`);
+      } finally {
+        hideLoading();
+      }
+    }
+  }
+
+  /** 指定日が休業日かどうか確認 */
+  async function checkIsHoliday(dateStr) {
+    const { data, error } = await sbClient
+      .from('holidays')
+      .select('reason')
+      .eq('date', dateStr)
+      .maybeSingle();
+    if (error) throwSupabaseError('休業日チェック', error);
+    return data; // null なら休業日ではない
   }
 
   async function renderBookings() {
