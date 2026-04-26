@@ -62,6 +62,35 @@
     .logo { cursor: pointer; }
     .logo-name { font-size: 1.45rem; font-weight: 700; color: var(--orange-deep); letter-spacing: .08em; }
     .logo-sub  { font-size: .72rem; color: var(--text-light); letter-spacing: .1em; }
+    .header-nav-btn {
+      font-size: .82rem; font-weight: 600; color: var(--orange-deep);
+      background: var(--orange-pale); border: 1.5px solid var(--orange-light);
+      border-radius: 20px; padding: 7px 14px;
+      cursor: pointer; font-family: inherit; white-space: nowrap;
+      transition: all .18s;
+    }
+    .header-nav-btn:hover { background: var(--orange-light); border-color: var(--orange); }
+    @media (max-width: 400px) { .header-nav-btn { font-size: .75rem; padding: 6px 10px; } }
+
+    .visit-count-wrap {
+      display: flex; align-items: center; gap: 7px; margin-top: 9px; flex-wrap: wrap;
+    }
+    .visit-count-label { font-size: .78rem; color: var(--text-light); }
+    .visit-count-input {
+      width: 64px; text-align: center; padding: 5px 6px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: .9rem; font-family: inherit; color: var(--text);
+      transition: border-color .18s;
+    }
+    .visit-count-input:focus { border-color: var(--orange); outline: none; }
+    .btn-visit-update {
+      background: var(--orange-pale); color: var(--orange-dark);
+      border: 1.5px solid var(--orange-light); font-size: .76rem;
+      padding: 5px 11px; border-radius: var(--radius-sm);
+      font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: all .18s; white-space: nowrap;
+    }
+    .btn-visit-update:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
 
     /* ───────────────────────────────
        ローディングオーバーレイ
@@ -560,6 +589,7 @@
       <div class="logo-name">Lactive</div>
       <div class="logo-sub">整体院｜ご予約</div>
     </div>
+    <button class="header-nav-btn" onclick="navigateTo('page-cancel-login')">予約確認・キャンセル</button>
   </div>
 </header>
 
@@ -1582,7 +1612,7 @@
 
       // 統計
       document.getElementById('mp-total').textContent   = all.length;
-      document.getElementById('mp-visited').textContent = past.length;
+      document.getElementById('mp-visited').textContent = cancelCustomer.visit_count ?? 0;
 
       // 今後の予約
       if (!upcoming.length) {
@@ -1779,12 +1809,39 @@
               <span>📞 ${esc(c.phone)}</span>
               <span>✉️ ${esc(c.email)}</span>
             </div>
+            <div class="visit-count-wrap">
+              <span class="visit-count-label">来院済み回数：</span>
+              <input class="visit-count-input" type="number" min="0"
+                id="vc-${esc(c.id)}" value="${c.visit_count ?? 0}">
+              <button class="btn-visit-update"
+                onclick="updateVisitCount('${esc(c.id)}')">更新</button>
+            </div>
           </div>
           <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
         </div>`).join('');
     } catch (e) {
       showAlert('admin-customer-error', '顧客データの取得に失敗しました。ページを再読み込みしてください。');
       container.innerHTML = '';
+    }
+  }
+
+  async function updateVisitCount(customerId) {
+    const input = document.getElementById(`vc-${customerId}`);
+    const count = parseInt(input.value, 10);
+    if (isNaN(count) || count < 0) {
+      showAlert('admin-customer-error', '正しい回数（0以上の整数）を入力してください。');
+      return;
+    }
+    try {
+      const { error } = await sbClient
+        .from('customers')
+        .update({ visit_count: count })
+        .eq('id', customerId);
+      if (error) throw error;
+      input.style.borderColor = 'var(--success)';
+      setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    } catch (e) {
+      showAlert('admin-customer-error', '来院済み回数の更新に失敗しました。');
     }
   }
 
