@@ -500,6 +500,19 @@
     }
     .holiday-cal-day.holiday:hover { background: var(--orange-dark) !important; }
     .holiday-cal-day.today { box-shadow: inset 0 0 0 2px var(--orange-deep); }
+    .holiday-cal-day.selected-date {
+      background: var(--orange-pale) !important;
+      border: 2px solid var(--orange);
+      color: var(--orange-deep); font-weight: 700;
+    }
+    .holiday-legend {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      font-size: .74rem; color: var(--text-light); margin-top: 10px;
+    }
+    .holiday-legend-swatch {
+      display: inline-block; width: 12px; height: 12px;
+      border-radius: 3px; vertical-align: middle; margin-right: 4px;
+    }
     .holiday-day-num { font-size: .9rem; line-height: 1; font-weight: 700; }
     .holiday-day-reason {
       font-size: .58rem; line-height: 1.1; max-width: 100%;
@@ -1081,8 +1094,19 @@
       <div id="datetime-alert" class="alert alert-error"></div>
       <div class="form-group">
         <label>希望日<span class="req">*</span></label>
-        <input type="date" id="dt-date" onchange="onDateChange()" oninput="onDateChange()">
-        <div style="font-size:.78rem; color:var(--text-light); margin-top:6px;">※休業日は選択できません</div>
+        <input type="hidden" id="dt-date" value="">
+        <div class="holiday-cal-header">
+          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(-1)">‹ 前月</button>
+          <span class="holiday-month-label" id="booking-month-label">-</span>
+          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(1)">次月 ›</button>
+        </div>
+        <div class="holiday-cal-grid" id="booking-cal-grid"></div>
+        <div class="holiday-legend">
+          <span><span class="holiday-legend-swatch" style="background:var(--orange);"></span>休業日</span>
+          <span><span class="holiday-legend-swatch" style="background:#F8F8F8;border:1px solid #DDD;"></span>選択不可</span>
+          <span><span class="holiday-legend-swatch" style="background:var(--orange-pale);border:1.5px solid var(--orange);"></span>選択中</span>
+        </div>
+        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日（オレンジ）は選択できません</div>
       </div>
       <div class="form-group">
         <label>希望時間<span class="req">*</span></label>
@@ -1575,11 +1599,6 @@
   // 日時選択
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function setupDatetime() {
-    const today = new Date();
-    const yyyy  = today.getFullYear();
-    const mm    = String(today.getMonth() + 1).padStart(2, '0');
-    const dd    = String(today.getDate()).padStart(2, '0');
-    document.getElementById('dt-date').min   = `${yyyy}-${mm}-${dd}`;
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     document.getElementById('dt-memo').value = '';
@@ -1599,6 +1618,88 @@
       noticeEl.style.display = 'none';
     }
     document.getElementById('booking-btn').disabled = false;
+    // 予約用カレンダーを今月で初期化
+    const now = new Date();
+    bookingViewYear  = now.getFullYear();
+    bookingViewMonth = now.getMonth();
+    renderBookingCalendar();
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 予約用カレンダー
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  let bookingViewYear  = null;
+  let bookingViewMonth = null;
+
+  function changeBookingMonth(delta) {
+    bookingViewMonth += delta;
+    if (bookingViewMonth < 0)  { bookingViewMonth = 11; bookingViewYear--; }
+    if (bookingViewMonth > 11) { bookingViewMonth = 0;  bookingViewYear++; }
+    renderBookingCalendar();
+  }
+
+  async function renderBookingCalendar() {
+    document.getElementById('booking-month-label').textContent =
+      `${bookingViewYear}年${bookingViewMonth + 1}月`;
+    const grid = document.getElementById('booking-cal-grid');
+
+    let holidays = {};
+    try {
+      holidays = await fetchHolidaysForMonth(bookingViewYear, bookingViewMonth);
+    } catch (e) {
+      console.error('❌ [renderBookingCalendar] 休業日取得エラー:', e);
+    }
+
+    const dows = ['日', '月', '火', '水', '木', '金', '土'];
+    let html = '';
+    dows.forEach((d, i) => {
+      const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
+      html += `<div class="holiday-cal-dow ${cls}">${d}</div>`;
+    });
+
+    const firstDow = new Date(bookingViewYear, bookingViewMonth, 1).getDay();
+    const numDays  = new Date(bookingViewYear, bookingViewMonth + 1, 0).getDate();
+    const today    = new Date(); today.setHours(0, 0, 0, 0);
+    const selectedDate = document.getElementById('dt-date').value;
+
+    for (let i = 0; i < firstDow; i++) {
+      html += `<div class="holiday-cal-day empty"></div>`;
+    }
+
+    for (let d = 1; d <= numDays; d++) {
+      const dateObj = new Date(bookingViewYear, bookingViewMonth, d);
+      const mm      = String(bookingViewMonth + 1).padStart(2, '0');
+      const dd      = String(d).padStart(2, '0');
+      const dateStr = `${bookingViewYear}-${mm}-${dd}`;
+      const isPast    = dateObj < today;
+      const isToday   = dateObj.getTime() === today.getTime();
+      const isHoliday = holidays[dateStr] !== undefined;
+      const isSelected = dateStr === selectedDate;
+
+      const classes = ['holiday-cal-day'];
+      if (isPast)     classes.push('past');
+      if (isToday)    classes.push('today');
+      if (isHoliday)  classes.push('holiday');
+      if (isSelected) classes.push('selected-date');
+
+      const clickable = !isPast && !isHoliday;
+      const onclick = clickable ? `onclick="selectBookingDate('${dateStr}')"` : '';
+      const reason = isHoliday && holidays[dateStr]
+        ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
+      html += `<div class="${classes.join(' ')}" ${onclick}>
+        <span class="holiday-day-num">${d}</span>
+        ${reason}
+      </div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  function selectBookingDate(dateStr) {
+    document.getElementById('dt-date').value = dateStr;
+    renderBookingCalendar(); // 選択状態を反映
+    _dateChangeLast = '';     // 強制再取得
+    onDateChange();
   }
 
   /** 日付変更時：予約済み時間帯を取得してグリッドを再描画 */
