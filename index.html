@@ -432,6 +432,45 @@
     .empty-state p { font-size: .88rem; }
 
     /* ───────────────────────────────
+       キャンセル画面
+    ─────────────────────────────── */
+    .cancel-link-wrap {
+      text-align: center; margin-top: 28px; padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .cancel-link-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .88rem; color: var(--text-light);
+      background: none; border: 1.5px solid var(--border);
+      border-radius: 40px; padding: 9px 22px;
+      cursor: pointer; font-family: inherit; font-weight: 500;
+      transition: all .18s;
+    }
+    .cancel-link-btn:hover { border-color: var(--orange); color: var(--orange-dark); }
+
+    .cancel-item {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      transition: border-color .18s;
+    }
+    .cancel-item:hover { border-color: var(--orange-light); }
+    .cancel-item-info { flex: 1; min-width: 0; }
+    .cancel-item-date { font-size: .98rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .cancel-item-menu { font-size: .84rem; color: var(--text-light); }
+    .cancel-today-note { font-size: .78rem; color: var(--danger); margin-top: 5px; font-weight: 500; }
+    .cancel-past-note  { font-size: .78rem; color: var(--text-light); margin-top: 5px; }
+    .btn-cancel-item {
+      background: var(--danger-bg); color: var(--danger);
+      border: 1.5px solid #F0A0A0; font-size: .8rem; padding: 8px 14px;
+      border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0; font-family: inherit;
+      transition: all .18s;
+    }
+    .btn-cancel-item:hover { background: var(--danger); color: #fff; }
+
+    /* ───────────────────────────────
        同意チェックボックス
     ─────────────────────────────── */
     .consent-box {
@@ -553,6 +592,11 @@
           <div class="card-duration">40分</div>
         </div>
       </div>
+    </div>
+    <div class="cancel-link-wrap">
+      <button class="cancel-link-btn" onclick="navigateTo('page-cancel-login')">
+        📋 予約確認・キャンセル
+      </button>
     </div>
   </div><!-- /page-top -->
 
@@ -827,6 +871,48 @@
     </div>
   </div>
 
+  <!-- ▼ キャンセル：ログイン -->
+  <div id="page-cancel-login" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>予約確認・キャンセル</h2>
+        <p>6桁の顧客番号とお名前（姓）を入力してください</p>
+      </div>
+      <div id="cancel-login-alert" class="alert alert-error"></div>
+      <div class="id-input-wrap">
+        <input type="text" class="id-input" id="cancel-id-input"
+               maxlength="6" placeholder="例：123456" autocomplete="off" inputmode="numeric"
+               onkeydown="if(event.key==='Enter') document.getElementById('cancel-name-input').focus()">
+      </div>
+      <div class="form-group" style="margin-top:16px;">
+        <label>お名前（姓のみでOK）<span class="req">*</span></label>
+        <input type="text" id="cancel-name-input" placeholder="例：山田"
+               autocomplete="off"
+               onkeydown="if(event.key==='Enter') verifyCancelLogin()">
+      </div>
+      <div class="btn-actions">
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+        <button class="btn btn-primary" id="cancel-verify-btn" onclick="verifyCancelLogin()">予約を確認する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ▼ キャンセル：予約一覧 -->
+  <div id="page-cancel-list" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>予約一覧</h2>
+        <p id="cancel-list-name"></p>
+      </div>
+      <div id="cancel-list-success" class="alert alert-success"></div>
+      <div id="cancel-list-alert" class="alert alert-error"></div>
+      <div id="cancel-booking-list"></div>
+      <div class="btn-actions" style="margin-top:20px;">
+        <button class="btn btn-secondary" onclick="navigateTo('page-cancel-login')">← 戻る</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ▼ 管理ログイン -->
   <div id="page-admin-login" class="page">
     <div style="max-width:380px;margin:0 auto;">
@@ -1000,7 +1086,7 @@
 
   function renderSteps(pageId) {
     const container = document.getElementById('steps-container');
-    const noStepPages = ['page-top', 'page-done', 'page-admin-login', 'page-admin'];
+    const noStepPages = ['page-top', 'page-done', 'page-admin-login', 'page-admin', 'page-cancel-login', 'page-cancel-list'];
     if (!ST.flow || noStepPages.includes(pageId)) { container.innerHTML = ''; return; }
     const cfg = FLOW_CONFIG[ST.flow];
     if (!cfg) { container.innerHTML = ''; return; }
@@ -1356,6 +1442,115 @@
     } catch (e) {
       showAlert('datetime-alert', '予約の送信に失敗しました。しばらくしてからお試しください。');
       btn.disabled = false;
+    } finally {
+      hideLoading();
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // キャンセルフロー
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  let cancelCustomer = null;
+
+  async function verifyCancelLogin() {
+    const raw         = document.getElementById('cancel-id-input').value.trim();
+    const enteredName = document.getElementById('cancel-name-input').value.trim();
+    if (!raw || !/^\d{6}$/.test(raw)) {
+      showAlert('cancel-login-alert', '6桁の数字で顧客番号を入力してください。');
+      return;
+    }
+    if (!enteredName) {
+      showAlert('cancel-login-alert', 'お名前（姓）を入力してください。');
+      return;
+    }
+    const btn = document.getElementById('cancel-verify-btn');
+    btn.disabled = true;
+    showLoading('予約を確認中...');
+    try {
+      const customer = await findCustomer(raw);
+      const storedName     = (customer?.name || '').replace(/[\s　]/g, '');
+      const normalizedEntry = enteredName.replace(/[\s　]/g, '');
+      if (!customer || !storedName.startsWith(normalizedEntry)) {
+        showAlert('cancel-login-alert', '顧客番号またはお名前が正しくありません。');
+        return;
+      }
+      hideAlert('cancel-login-alert');
+      cancelCustomer = customer;
+      document.getElementById('cancel-list-name').textContent = `${customer.name} 様の予約一覧`;
+      hideAlert('cancel-list-success');
+      hideAlert('cancel-list-alert');
+      await renderCancelBookings();
+      navigateTo('page-cancel-list');
+    } catch (e) {
+      showAlert('cancel-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
+    } finally {
+      btn.disabled = false;
+      hideLoading();
+    }
+  }
+
+  async function renderCancelBookings() {
+    const container = document.getElementById('cancel-booking-list');
+    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
+    try {
+      const { data, error } = await sbClient
+        .from('bookings')
+        .select('*')
+        .eq('customer_number', cancelCustomer.customer_number)
+        .order('date')
+        .order('time');
+      if (error) throw error;
+
+      const list = data || [];
+      if (!list.length) {
+        container.innerHTML = emptyState('📋', 'ご予約はありません');
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      container.innerHTML = list.map(b => {
+        const bookingDate = new Date(b.date);
+        bookingDate.setHours(0, 0, 0, 0);
+        const diffDays = Math.round((bookingDate - today) / 86400000);
+
+        let actionHtml;
+        if (diffDays < 0) {
+          actionHtml = '<div class="cancel-past-note">終了済み</div>';
+        } else if (diffDays === 0) {
+          actionHtml = '<div class="cancel-today-note">当日のキャンセルは<br>お電話でご連絡ください</div>';
+        } else {
+          actionHtml = `<button class="btn-cancel-item" onclick="cancelBookingConfirm('${esc(b.id)}', '${esc(b.date)}', '${esc(b.time)}', '${esc(b.menu).replace(/'/g, '\\u0027')}')">キャンセル</button>`;
+        }
+
+        return `
+          <div class="cancel-item">
+            <div class="cancel-item-info">
+              <div class="cancel-item-date">📅 ${formatDate(b.date)} ${esc(b.time)}</div>
+              <div class="cancel-item-menu">${esc(b.menu)}</div>
+            </div>
+            <div style="flex-shrink:0; text-align:right;">${actionHtml}</div>
+          </div>`;
+      }).join('');
+    } catch (e) {
+      container.innerHTML = emptyState('⚠️', '予約データの取得に失敗しました');
+    }
+  }
+
+  async function cancelBookingConfirm(id, date, time, menu) {
+    if (!confirm(`以下の予約をキャンセルしますか？\n\n${formatDate(date)} ${time}\n${menu}\n\nこの操作は取り消せません。`)) return;
+    showLoading('キャンセル処理中...');
+    try {
+      const { error } = await sbClient.from('bookings').delete().eq('id', id);
+      if (error) throw error;
+      await renderCancelBookings();
+      const el = document.getElementById('cancel-list-success');
+      el.textContent = 'キャンセルが完了しました。またのご利用をお待ちしております。';
+      el.classList.add('show');
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (e) {
+      showAlert('cancel-list-alert', 'キャンセルに失敗しました。しばらくしてからお試しください。');
     } finally {
       hideLoading();
     }
