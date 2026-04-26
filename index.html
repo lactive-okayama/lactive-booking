@@ -637,11 +637,11 @@
         <p>ご来院区分をお選びください</p>
       </div>
       <button class="choice-btn choice-btn-first" onclick="navigateTo('page-first-select')">
-        <span class="choice-btn-main">はじめての方</span>
-        <span class="choice-btn-sub">初回体験メニューのご予約はこちら</span>
+        <span class="choice-btn-main">はじめて来院される方</span>
+        <span class="choice-btn-sub">初回来院メニューのご予約はこちら</span>
       </button>
       <button class="choice-btn choice-btn-member" onclick="navigateTo('page-member-choice')">
-        <span class="choice-btn-main">会員の方</span>
+        <span class="choice-btn-main">既存の方</span>
         <span class="choice-btn-sub">ご予約・予約確認・キャンセルはこちら</span>
       </button>
     </div>
@@ -652,24 +652,24 @@
     <div class="section-block">
       <div class="page-title">
         <h2>メニューを選んでください</h2>
-        <p>初回体験メニューをお選びください</p>
+        <p>初回来院メニューをお選びください</p>
       </div>
       <div class="menu-grid">
         <div class="menu-card" onclick="startFirstFlow('first-seitai')">
           <div class="card-top">
-            <span class="card-type-badge first-badge">初回体験</span>
+            <span class="card-type-badge first-badge">初回来院</span>
             <span class="card-arrow">›</span>
           </div>
-          <div class="card-name">初回整体体験</div>
+          <div class="card-name">初回整体来院</div>
           <div class="card-duration">90分</div>
           <div class="card-price">¥1,980</div>
         </div>
         <div class="menu-card" onclick="startFirstFlow('first-pilates')">
           <div class="card-top">
-            <span class="card-type-badge first-badge">初回体験</span>
+            <span class="card-type-badge first-badge">初回来院</span>
             <span class="card-arrow">›</span>
           </div>
-          <div class="card-name">初回ピラティス体験</div>
+          <div class="card-name">初回ピラティス来院</div>
           <div class="card-duration">60分</div>
           <div class="card-price">¥1,980</div>
         </div>
@@ -1115,8 +1115,8 @@
           <input type="text" id="bf-name" placeholder="名前で検索" oninput="renderBookings()">
           <select id="bf-menu" onchange="renderBookings()">
             <option value="">すべてのメニュー</option>
-            <option>初回整体体験 90分</option>
-            <option>初回ピラティス体験 60分</option>
+            <option>初回整体来院 90分</option>
+            <option>初回ピラティス来院 60分</option>
             <option>整体（運動療法）30分</option>
             <option>マシンピラティス 40分</option>
             <option>マットピラティス 40分</option>
@@ -1161,7 +1161,7 @@
   const ADMIN_PASSWORD = 'Lactive2024!';
   const ALL_TIMES = [
     '9:00','10:00','11:00','12:00','13:00',
-    '14:00','15:00','16:00','17:00','18:00','19:00','20:00'
+    '14:00','15:00','16:00','17:00','18:00','19:00'
   ];
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1273,7 +1273,7 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startFirstFlow(flow) {
     ST = {
-      flow, menu: flow === 'first-seitai' ? '初回整体体験 90分' : '初回ピラティス体験 60分',
+      flow, menu: flow === 'first-seitai' ? '初回整体来院 90分' : '初回ピラティス来院 60分',
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: ''
     };
