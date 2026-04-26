@@ -1908,16 +1908,47 @@
       showAlert('admin-customer-error', '正しい回数（0以上の整数）を入力してください。');
       return;
     }
+    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, count });
     try {
-      const { error } = await sbClient
+      // .select() を付けることで RLS で UPDATE が拒否された場合（0行更新）を検知できる
+      const { data, error } = await sbClient
         .from('customers')
         .update({ visit_count: count })
-        .eq('id', customerId);
-      if (error) throw error;
+        .eq('id', customerId)
+        .select();
+
+      if (error) {
+        console.error('❌ [updateVisitCount] Supabaseエラー詳細:', {
+          message: error.message,
+          code:    error.code,
+          details: error.details,
+          hint:    error.hint,
+          status:  error.status
+        });
+        const detail = error.code
+          ? `（${error.code}: ${error.message}）`
+          : `（${error.message}）`;
+        showAlert('admin-customer-error', `来院済み回数の更新に失敗しました。${detail}`);
+        return;
+      }
+
+      // RLS で UPDATE 権限がない場合、エラーは出ずに data が空配列で返ってくる
+      if (!data || data.length === 0) {
+        console.error('❌ [updateVisitCount] 0行更新（RLSのUPDATEポリシー未設定の可能性）:', { customerId, count });
+        showAlert(
+          'admin-customer-error',
+          '更新できませんでした。Supabase の customers テーブルに UPDATE 用の RLS ポリシーが設定されているかご確認ください。'
+        );
+        return;
+      }
+
+      console.log('✅ [updateVisitCount] UPDATE成功 保存行:', data);
       input.style.borderColor = 'var(--success)';
       setTimeout(() => { input.style.borderColor = ''; }, 1500);
+      hideAlert('admin-customer-error');
     } catch (e) {
-      showAlert('admin-customer-error', '来院済み回数の更新に失敗しました。');
+      console.error('❌ [updateVisitCount] 予期せぬエラー:', e);
+      showAlert('admin-customer-error', `来院済み回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
     }
   }
 
