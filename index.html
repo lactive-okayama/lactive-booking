@@ -1082,6 +1082,7 @@
       <div class="form-group">
         <label>希望日<span class="req">*</span></label>
         <input type="date" id="dt-date" onchange="onDateChange()" oninput="onDateChange()">
+        <div style="font-size:.78rem; color:var(--text-light); margin-top:6px;">※休業日は選択できません</div>
       </div>
       <div class="form-group">
         <label>希望時間<span class="req">*</span></label>
@@ -1623,12 +1624,18 @@
       // 休業日チェック
       const holiday = await checkIsHoliday(date);
       if (holiday) {
+        // 日付選択をリセット
+        document.getElementById('dt-date').value = '';
+        document.getElementById('dt-time').value = '';
+        _dateChangeLast = '';
+        // 時間帯ボタンを非表示
         document.getElementById('time-slot-loading').style.display = 'none';
         document.getElementById('time-slot-grid').style.display    = 'none';
-        const reason = holiday.reason ? `（${holiday.reason}）` : '';
-        phEl.textContent = `この日は休業日です${reason}。別の日付をお選びください。`;
+        document.getElementById('time-slot-grid').innerHTML        = '';
+        phEl.textContent = 'まず希望日を選択してください';
         phEl.style.display = 'block';
-        showAlert('datetime-alert', `この日は休業日です${reason}。`);
+        const reason = holiday.reason ? `（${holiday.reason}）` : '';
+        showAlert('datetime-alert', `この日は休業日のためご予約いただけません${reason}。別の日程をお選びください。`);
         return;
       }
       const bookedTimes = await fetchBookedTimes(date);
