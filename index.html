@@ -1330,7 +1330,7 @@
 <footer>
   <div class="footer-inner">
     <div class="footer-links">
-      <a href="privacy.html">プライバシーポリシー</a>
+      <a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>
     </div>
     <div class="footer-copy">&copy; 2024 Lactive All Rights Reserved.</div>
   </div>
@@ -1672,10 +1672,18 @@
     const grid = document.getElementById('booking-cal-grid');
 
     let holidays = {};
+    let fetchFailed = false;
     try {
       holidays = await fetchHolidaysForMonth(bookingViewYear, bookingViewMonth);
+      console.log(`🟢 [renderBookingCalendar] ${bookingViewYear}年${bookingViewMonth + 1}月の休業日:`, holidays);
     } catch (e) {
       console.error('❌ [renderBookingCalendar] 休業日取得エラー:', e);
+      fetchFailed = true;
+      const detail = e.supabaseError
+        ? `（${e.supabaseError.code}: ${e.supabaseError.message}）`
+        : '';
+      showAlert('datetime-alert',
+        `休業日情報の取得に失敗しました。${detail}（管理者にお問い合わせください）`);
     }
 
     const dows = ['日', '月', '火', '水', '木', '金', '土'];
