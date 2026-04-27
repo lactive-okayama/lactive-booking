@@ -505,6 +505,35 @@
       border: 2px solid var(--orange);
       color: var(--orange-deep); font-weight: 700;
     }
+    /* 予約用カレンダーの休業日：グレーアウト */
+    .holiday-cal-day.holiday-disabled {
+      background: #F0F0F0; border-color: #DDD;
+      color: #999; cursor: not-allowed;
+    }
+    .holiday-cal-day.holiday-disabled:hover {
+      background: #F0F0F0; border-color: #DDD;
+    }
+    .holiday-cal-day.holiday-disabled .holiday-day-reason { color: #AAA; }
+    /* 予約フォーム内のカレンダー：休業日はグレーアウト（管理画面はオレンジのまま） */
+    #booking-cal-grid .holiday-cal-day.holiday {
+      background: #EAEAEA !important;
+      border-color: #CCCCCC;
+      color: #999999; font-weight: 500;
+      cursor: not-allowed;
+    }
+    #booking-cal-grid .holiday-cal-day.holiday:hover {
+      background: #DDDDDD !important;
+      border-color: #BBBBBB;
+    }
+    #booking-cal-grid .holiday-cal-day.holiday .holiday-day-reason { color: #888; }
+    /* 予約フォーム用：休業日はグレーアウトで非選択風に */
+    .holiday-cal-day.holiday-disabled {
+      background: #E8E8E8 !important; border-color: #CCC !important;
+      color: #999 !important; cursor: not-allowed; font-weight: 500;
+    }
+    .holiday-cal-day.holiday-disabled:hover {
+      background: #DDD !important; border-color: #BBB !important;
+    }
     .holiday-legend {
       display: flex; gap: 14px; flex-wrap: wrap;
       font-size: .74rem; color: var(--text-light); margin-top: 10px;
@@ -862,7 +891,7 @@
         </div>
       </div>
       <div class="btn-actions" style="margin-top:20px;">
-        <button class="btn btn-secondary" onclick="navigateTo('page-member-choice')">← 戻る</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
       </div>
     </div>
   </div><!-- /page-member-menu -->
@@ -1013,7 +1042,7 @@
                  onkeydown="if(event.key==='Enter') verifyMemberId()">
         </div>
         <div class="btn-actions">
-          <button class="btn btn-secondary" onclick="navigateTo('page-member-auth')">← 戻る</button>
+          <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
           <button class="btn btn-primary" id="verify-btn" onclick="verifyMemberId()">確認する</button>
         </div>
       </div>
@@ -1062,7 +1091,7 @@
           </span>
         </label>
         <div class="btn-actions">
-          <button class="btn btn-secondary" onclick="navigateTo('page-member-auth')">← 戻る</button>
+          <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
           <button class="btn btn-primary" id="register-btn" onclick="submitRegister()">登録して次へ →</button>
         </div>
       </div>
@@ -1102,11 +1131,10 @@
         </div>
         <div class="holiday-cal-grid" id="booking-cal-grid"></div>
         <div class="holiday-legend">
-          <span><span class="holiday-legend-swatch" style="background:var(--orange);"></span>休業日</span>
-          <span><span class="holiday-legend-swatch" style="background:#F8F8F8;border:1px solid #DDD;"></span>選択不可</span>
+          <span><span class="holiday-legend-swatch" style="background:#F0F0F0;border:1px solid #DDD;"></span>休業日・選択不可</span>
           <span><span class="holiday-legend-swatch" style="background:var(--orange-pale);border:1.5px solid var(--orange);"></span>選択中</span>
         </div>
-        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日（オレンジ）は選択できません</div>
+        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日は選択できません</div>
       </div>
       <div class="form-group">
         <label>希望時間<span class="req">*</span></label>
@@ -1170,7 +1198,7 @@
                onkeydown="if(event.key==='Enter') verifyCancelLogin()">
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-member-choice')">← 戻る</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
         <button class="btn btn-primary" id="cancel-verify-btn" onclick="verifyCancelLogin()">予約を確認する</button>
       </div>
     </div>
@@ -1454,7 +1482,7 @@
   }
 
   function personalBack() {
-    navigateTo(ST.flow === 'first-seitai' ? 'page-questionnaire' : 'page-notice');
+    navigateTo('page-first-select');
   }
 
   function submitPersonal() {
@@ -1679,11 +1707,15 @@
       const classes = ['holiday-cal-day'];
       if (isPast)     classes.push('past');
       if (isToday)    classes.push('today');
-      if (isHoliday)  classes.push('holiday');
+      if (isHoliday)  classes.push('holiday-disabled'); // 予約フォームではグレーアウト
       if (isSelected) classes.push('selected-date');
 
-      const clickable = !isPast && !isHoliday;
-      const onclick = clickable ? `onclick="selectBookingDate('${dateStr}')"` : '';
+      let onclick = '';
+      if (!isPast) {
+        onclick = isHoliday
+          ? `onclick="alertBookingHoliday()"`
+          : `onclick="selectBookingDate('${dateStr}')"`;
+      }
       const reason = isHoliday && holidays[dateStr]
         ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>
@@ -1700,6 +1732,22 @@
     renderBookingCalendar(); // 選択状態を反映
     _dateChangeLast = '';     // 強制再取得
     onDateChange();
+  }
+
+  function alertBookingHoliday() {
+    // 日付・時間選択をリセット
+    document.getElementById('dt-date').value = '';
+    document.getElementById('dt-time').value = '';
+    _dateChangeLast = '';
+    // 時間帯ボタンを非表示
+    document.getElementById('time-slot-loading').style.display = 'none';
+    document.getElementById('time-slot-grid').style.display    = 'none';
+    document.getElementById('time-slot-grid').innerHTML        = '';
+    const ph = document.getElementById('time-slot-placeholder');
+    ph.textContent = 'まず希望日を選択してください';
+    ph.style.display = 'block';
+    showAlert('datetime-alert', 'この日は休業日のためご予約いただけません。別の日程をお選びください。');
+    renderBookingCalendar();
   }
 
   /** 日付変更時：予約済み時間帯を取得してグリッドを再描画 */
