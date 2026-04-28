@@ -26,14 +26,25 @@ serve(async (req: Request) => {
 
   try {
     const body = await req.json();
+    console.log('受信ペイロード:', body);
     const { isFirstVisit, customerNumber, name, menu, date, time, phone, memo } = body;
+
+    // null / undefined / 'undefined' / 'null' を全て無効値として扱う
+    const validCustNum =
+      customerNumber !== undefined &&
+      customerNumber !== null &&
+      String(customerNumber).trim() !== '' &&
+      String(customerNumber).trim() !== 'undefined' &&
+      String(customerNumber).trim() !== 'null'
+        ? String(customerNumber).trim()
+        : null;
 
     // 初回 or 会員でヘッダーと顧客番号行を切り替え
     const lines: string[] = [
       isFirstVisit ? '【初回予約】' : '【会員予約】',
       `お名前：${name ?? ''} 様`,
     ];
-    if (!isFirstVisit && customerNumber) lines.push(`顧客番号：${customerNumber}`);
+    if (!isFirstVisit && validCustNum) lines.push(`顧客番号：${validCustNum}`);
     lines.push(
       `メニュー：${menu ?? ''}`,
       `日時：${formatDate(date ?? '')} ${time ?? ''}`,

@@ -1899,20 +1899,32 @@
       });
 
       // LINE通知を送信（失敗しても予約完了は継続）
-      const _isFirst  = ST.flow !== 'member';
-      const _custNum  = _isFirst
-        ? null
-        : (ST.customer?.customer_number || ST.newCustomerId || null);
-      sendLineNotify({
-        isFirstVisit:   _isFirst,
-        customerNumber: _custNum,
-        name:           ST.personal.name,
-        menu:           ST.menu,
+      // ST.flow が 'member' の場合は既存会員 → ST.customer.customer_number を必ず取得
+      // 初回フロー（first-seitai / first-pilates）の場合は isFirstVisit: true
+      const isFirstVisit = ST.flow !== 'member';
+      let customerNumber = null;
+      if (!isFirstVisit) {
+        // 既存会員ログイン → ST.customer.customer_number
+        // 新規会員登録直後 → ST.newCustomerId
+        const candidate =
+          (ST.customer && ST.customer.customer_number) ||
+          ST.newCustomerId ||
+          null;
+        customerNumber = candidate ? String(candidate) : null;
+      }
+      const lineData = {
+        name:  ST.personal.name,
+        menu:  ST.menu,
         date,
         time,
-        phone:          ST.personal.phone,
-        memo:           memo || ''
-      }).catch(e => console.warn('LINE通知エラー（無視）:', e));
+        phone: ST.personal.phone,
+        memo:  memo || '',
+        isFirstVisit,
+        customerNumber
+      };
+      console.log('送信データ:', lineData);
+      console.log('🔵 [LINE通知] ST.flow:', ST.flow, 'ST.customer:', ST.customer, 'ST.newCustomerId:', ST.newCustomerId);
+      sendLineNotify(lineData).catch(e => console.warn('LINE通知エラー（無視）:', e));
 
       // 完了画面
       document.getElementById('dn-name').textContent = ST.personal.name;
