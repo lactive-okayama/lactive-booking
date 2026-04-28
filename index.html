@@ -2579,7 +2579,10 @@
       'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-notify',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
+        },
         body: JSON.stringify({ name, menu, date, time, phone, memo })
       }
     );
