@@ -26,15 +26,14 @@ serve(async (req: Request) => {
 
   try {
     const body = await req.json();
-    const { type, customerNumber, name, menu, date, time, phone, memo } = body;
+    const { isFirstVisit, customerNumber, name, menu, date, time, phone, memo } = body;
 
     // 初回 or 会員でヘッダーと顧客番号行を切り替え
-    const isMember = type === 'member';
     const lines: string[] = [
-      isMember ? '【会員予約】' : '【初回予約】',
+      isFirstVisit ? '【初回予約】' : '【会員予約】',
       `お名前：${name ?? ''} 様`,
     ];
-    if (isMember && customerNumber) lines.push(`顧客番号：${customerNumber}`);
+    if (!isFirstVisit && customerNumber) lines.push(`顧客番号：${customerNumber}`);
     lines.push(
       `メニュー：${menu ?? ''}`,
       `日時：${formatDate(date ?? '')} ${time ?? ''}`,

@@ -1899,9 +1899,13 @@
       });
 
       // LINE通知を送信（失敗しても予約完了は継続）
+      const _isFirst  = ST.flow !== 'member';
+      const _custNum  = _isFirst
+        ? null
+        : (ST.customer?.customer_number || ST.newCustomerId || null);
       sendLineNotify({
-        type:           ST.flow === 'member' ? 'member' : 'first',
-        customerNumber: ST.customer?.customer_number || (ST.isNewCustomer ? ST.newCustomerId : ''),
+        isFirstVisit:   _isFirst,
+        customerNumber: _custNum,
         name:           ST.personal.name,
         menu:           ST.menu,
         date,
