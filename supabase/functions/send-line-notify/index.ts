@@ -27,9 +27,10 @@ serve(async (req: Request) => {
   try {
     const body = await req.json();
     console.log('受信ペイロード:', body);
+    // ※ customerNumber は受け取っても一切使わない（顧客番号行は出力しない）
     const { isFirstVisit, name, menu, date, time, phone, memo } = body;
 
-    // 初回 or 会員でヘッダーを切り替え
+    // 初回 or 会員でヘッダーのみ切り替え（顧客番号行は出力しない）
     const lines: string[] = [
       isFirstVisit ? '【初回予約】' : '【会員予約】',
       `お名前：${name ?? ''} 様`,
@@ -39,6 +40,7 @@ serve(async (req: Request) => {
     ];
     if (memo) lines.push(`メモ：${memo}`);
     const messageText = lines.join('\n');
+    console.log('送信メッセージ:', messageText);
 
     // LINE Messaging API push message
     const lineRes = await fetch('https://api.line.me/v2/bot/message/push', {

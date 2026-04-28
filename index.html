@@ -1899,16 +1899,18 @@
       });
 
       // LINE通知を送信（失敗しても予約完了は継続）
+      // ※ ペイロードには customerNumber を一切含めない
       const isFirstVisit = ST.flow !== 'member';
       const name  = ST.personal.name;
       const menu  = ST.menu;
       const phone = ST.personal.phone;
-      console.log('LINE送信データ:', { name, menu, date, time, phone, isFirstVisit });
-      sendLineNotify({
+      const linePayload = {
         name, menu, date, time, phone,
         memo: memo || '',
         isFirstVisit
-      }).catch(e => console.warn('LINE通知エラー（無視）:', e));
+      };
+      console.log('LINE送信データ:', linePayload);
+      sendLineNotify(linePayload).catch(e => console.warn('LINE通知エラー（無視）:', e));
 
       // 完了画面
       document.getElementById('dn-name').textContent = ST.personal.name;
