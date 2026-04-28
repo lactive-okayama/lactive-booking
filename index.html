@@ -1900,26 +1900,14 @@
 
       // LINE通知を送信（失敗しても予約完了は継続）
       const isFirstVisit = ST.flow !== 'member';
-      const currentCustomer = ST.customer; // Supabaseから取得した顧客オブジェクト（プロパティはsnake_case）
-      let customerNumber = null;
-      if (!isFirstVisit) {
-        // 既存会員ログイン → currentCustomer.customer_number
-        // 新規会員登録直後 → ST.newCustomerId
-        if (currentCustomer && currentCustomer.customer_number) {
-          customerNumber = String(currentCustomer.customer_number);
-        } else if (ST.newCustomerId) {
-          customerNumber = String(ST.newCustomerId);
-        }
-      }
       const name  = ST.personal.name;
       const menu  = ST.menu;
       const phone = ST.personal.phone;
-      console.log('LINE送信データ:', { name, menu, date, time, phone, isFirstVisit, customerNumber });
+      console.log('LINE送信データ:', { name, menu, date, time, phone, isFirstVisit });
       sendLineNotify({
         name, menu, date, time, phone,
         memo: memo || '',
-        isFirstVisit,
-        customerNumber
+        isFirstVisit
       }).catch(e => console.warn('LINE通知エラー（無視）:', e));
 
       // 完了画面
