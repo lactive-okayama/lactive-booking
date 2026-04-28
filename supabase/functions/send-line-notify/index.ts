@@ -26,16 +26,20 @@ serve(async (req: Request) => {
 
   try {
     const body = await req.json();
-    const { name, menu, date, time, phone, memo } = body;
+    const { type, customerNumber, name, menu, date, time, phone, memo } = body;
 
-    // LINEメッセージ本文を組み立て
+    // 初回 or 会員でヘッダーと顧客番号行を切り替え
+    const isMember = type === 'member';
     const lines: string[] = [
-      '【新規予約】',
+      isMember ? '【会員予約】' : '【初回予約】',
       `お名前：${name ?? ''} 様`,
+    ];
+    if (isMember && customerNumber) lines.push(`顧客番号：${customerNumber}`);
+    lines.push(
       `メニュー：${menu ?? ''}`,
       `日時：${formatDate(date ?? '')} ${time ?? ''}`,
       `電話番号：${phone ?? ''}`,
-    ];
+    );
     if (memo) lines.push(`メモ：${memo}`);
     const messageText = lines.join('\n');
 

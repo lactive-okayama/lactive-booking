@@ -1900,12 +1900,14 @@
 
       // LINE通知を送信（失敗しても予約完了は継続）
       sendLineNotify({
-        name:  ST.personal.name,
-        menu:  ST.menu,
+        type:           ST.flow === 'member' ? 'member' : 'first',
+        customerNumber: ST.customer?.customer_number || (ST.isNewCustomer ? ST.newCustomerId : ''),
+        name:           ST.personal.name,
+        menu:           ST.menu,
         date,
         time,
-        phone: ST.personal.phone,
-        memo:  memo || ''
+        phone:          ST.personal.phone,
+        memo:           memo || ''
       }).catch(e => console.warn('LINE通知エラー（無視）:', e));
 
       // 完了画面
