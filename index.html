@@ -1898,6 +1898,16 @@
         daily_impact:      q.q5 || null
       });
 
+      // LINE通知を送信（失敗しても予約完了は継続）
+      sendLineNotify({
+        name:  ST.personal.name,
+        menu:  ST.menu,
+        date,
+        time,
+        phone: ST.personal.phone,
+        memo:  memo || ''
+      }).catch(e => console.warn('LINE通知エラー（無視）:', e));
+
       // 完了画面
       document.getElementById('dn-name').textContent = ST.personal.name;
       document.getElementById('dn-menu').textContent = ST.menu;
@@ -2559,6 +2569,20 @@
     if (error) throwSupabaseError('予約の保存', error);
     console.log('✅ [saveBooking] INSERT完了 保存行:', data);
     return data;
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // LINE通知
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  async function sendLineNotify({ name, menu, date, time, phone, memo }) {
+    await fetch(
+      'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-notify',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, menu, date, time, phone, memo })
+      }
+    );
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
