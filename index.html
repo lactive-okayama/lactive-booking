@@ -1340,7 +1340,7 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 定数
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  const ADMIN_PASSWORD = 'Lactive2024!';
+  // 管理者パスワードはコード内に保持しない（Supabase Edge Function: verify-admin で検証）
   const ALL_TIMES = [
     '9:00','10:00','11:00','12:00','13:00',
     '14:00','15:00','16:00','17:00','18:00','19:00'
@@ -2097,18 +2097,45 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 管理画面
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function adminLogin() {
-    const pw = document.getElementById('admin-pw').value;
-    if (pw === ADMIN_PASSWORD) {
-      document.getElementById('admin-pw').value = '';
-      hideAlert('admin-login-alert');
-      navigateTo('page-admin');
-      renderBookings();
-      renderCustomers();
-    } else {
-      showAlert('admin-login-alert');
-      document.getElementById('admin-pw').value = '';
-      document.getElementById('admin-pw').focus();
+  async function adminLogin() {
+    const pwInput = document.getElementById('admin-pw');
+    const pw = pwInput.value;
+    if (!pw) {
+      showAlert('admin-login-alert', 'パスワードを入力してください。');
+      pwInput.focus();
+      return;
+    }
+    showLoading('認証中...');
+    try {
+      const res = await fetch(
+        'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/verify-admin',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
+          },
+          body: JSON.stringify({ password: pw })
+        }
+      );
+      const result = await res.json().catch(() => ({}));
+      if (res.ok && result.isValid === true) {
+        pwInput.value = '';
+        hideAlert('admin-login-alert');
+        navigateTo('page-admin');
+        renderBookings();
+        renderCustomers();
+      } else {
+        showAlert('admin-login-alert', 'パスワードが正しくありません。');
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    } catch (e) {
+      console.error('管理者認証エラー:', e);
+      showAlert('admin-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
+      pwInput.focus();
+    } finally {
+      hideLoading();
     }
   }
 
