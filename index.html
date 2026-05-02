@@ -554,6 +554,131 @@
     }
 
     /* ───────────────────────────────
+       カレンダービュー（管理画面）
+    ─────────────────────────────── */
+    .cal-view-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .cal-month-label { font-size: 1.05rem; font-weight: 700; color: var(--orange-deep); }
+    .cal-nav-btn {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 6px 14px;
+      font-size: .86rem; font-family: inherit; color: var(--text);
+      cursor: pointer; transition: all .15s;
+    }
+    .cal-nav-btn:hover { border-color: var(--orange); color: var(--orange-deep); }
+
+    .cal-view-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    .cal-view-dow {
+      text-align: center; font-size: .75rem; font-weight: 700;
+      padding: 6px 0; color: var(--text-light);
+    }
+    .cal-view-dow.sun { color: var(--danger); }
+    .cal-view-dow.sat { color: var(--blue); }
+
+    .cal-view-day {
+      aspect-ratio: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start; gap: 3px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--white); padding: 5px 3px;
+      transition: all .15s; min-height: 56px; overflow: hidden;
+      position: relative;
+    }
+    .cal-view-day.empty { border: none; background: transparent; }
+    .cal-view-day[onclick] { cursor: pointer; }
+    .cal-view-day[onclick]:hover { border-color: var(--orange); background: var(--orange-pale); }
+    .cal-view-day.sun .cal-day-num { color: var(--danger); }
+    .cal-view-day.sat .cal-day-num { color: var(--blue); }
+    .cal-view-day.today {
+      box-shadow: inset 0 0 0 2px var(--orange-deep);
+      background: var(--orange-pale);
+    }
+    .cal-view-day.holiday {
+      background: #F0F0F0; border-color: #DDDDDD; cursor: default;
+    }
+    .cal-view-day.holiday .cal-day-num { color: #999; }
+    .cal-day-num { font-size: .92rem; font-weight: 700; line-height: 1.1; }
+    .cal-count-badge {
+      font-size: .7rem; font-weight: 700;
+      color: var(--orange-deep); line-height: 1.1;
+      background: var(--orange-light);
+      padding: 2px 6px; border-radius: 10px;
+      max-width: 100%; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .cal-holiday-mark {
+      font-size: 1.1rem; font-weight: 700; color: #BBBBBB; line-height: 1;
+    }
+
+    .cal-legend {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      font-size: .74rem; color: var(--text-light); margin-top: 12px;
+      padding: 10px 14px; background: var(--bg); border-radius: var(--radius-sm);
+    }
+    .cal-legend-dot {
+      display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+      vertical-align: middle; margin-right: 5px;
+    }
+    .cal-legend-dot.orange { background: var(--orange); }
+    .cal-legend-dot.gray { background: #BBBBBB; }
+    .cal-legend-dot.today-mark {
+      background: var(--orange-pale);
+      border: 2px solid var(--orange-deep); width: 8px; height: 8px;
+    }
+
+    @media (max-width: 480px) {
+      .cal-view-day { min-height: 48px; padding: 3px 1px; gap: 2px; }
+      .cal-day-num { font-size: .82rem; }
+      .cal-count-badge { font-size: .62rem; padding: 1px 4px; }
+    }
+
+    /* 日別予約一覧モーダル */
+    .day-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .day-modal-card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+      max-width: 480px; width: 100%; max-height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .day-modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1.5px solid var(--border);
+    }
+    .day-modal-header h3 {
+      font-size: 1rem; font-weight: 700; color: var(--orange-deep);
+    }
+    .day-modal-close {
+      background: none; border: none; font-size: 1.5rem; line-height: 1;
+      cursor: pointer; color: var(--text-light); padding: 0 4px;
+    }
+    .day-modal-close:hover { color: var(--danger); }
+    .day-modal-body { padding: 14px 18px; overflow-y: auto; }
+    .day-modal-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .day-modal-item:last-child { border-bottom: none; }
+    .day-modal-time {
+      font-size: .95rem; font-weight: 700; color: var(--orange-deep);
+      min-width: 50px; flex-shrink: 0;
+    }
+    .day-modal-info { flex: 1; min-width: 0; }
+    .day-modal-name { font-size: .92rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .day-modal-menu { font-size: .8rem; color: var(--text-light); }
+    .day-modal-empty {
+      padding: 30px 10px; text-align: center;
+      color: var(--text-light); font-size: .88rem;
+    }
+
+    /* ───────────────────────────────
        トップ選択画面
     ─────────────────────────────── */
     .top-choice-wrap {
@@ -1272,6 +1397,7 @@
 
     <div class="admin-tabs">
       <button class="tab-btn active" onclick="switchTab('tab-bookings', this)">予約一覧</button>
+      <button class="tab-btn"        onclick="switchTab('tab-calendar', this)">カレンダー</button>
       <button class="tab-btn"        onclick="switchTab('tab-customers', this)">顧客一覧</button>
       <button class="tab-btn"        onclick="switchTab('tab-holidays', this)">休業日設定</button>
     </div>
@@ -1310,6 +1436,21 @@
       </div>
     </div>
 
+    <div id="tab-calendar" class="tab-panel">
+      <div class="cal-view-header">
+        <button class="cal-nav-btn" onclick="changeCalendarMonth(-1)">‹ 前月</button>
+        <span class="cal-month-label" id="cal-month-label">-</span>
+        <button class="cal-nav-btn" onclick="changeCalendarMonth(1)">次月 ›</button>
+      </div>
+      <div id="admin-calendar-error" class="alert alert-error"></div>
+      <div class="cal-view-grid" id="cal-view-grid"></div>
+      <div class="cal-legend">
+        <span><span class="cal-legend-dot orange"></span>予約あり（件数表示）</span>
+        <span><span class="cal-legend-dot gray"></span>休業日（×印）</span>
+        <span><span class="cal-legend-dot today-mark"></span>今日</span>
+      </div>
+    </div>
+
     <div id="tab-holidays" class="tab-panel">
       <div class="holiday-cal-header">
         <button class="holiday-nav-btn" onclick="changeHolidayMonth(-1)">‹ 前月</button>
@@ -1322,6 +1463,17 @@
         💡 日付をクリックすると休業日に設定できます（理由の入力欄が表示されます）。<br>
         休業日（オレンジ表示）をもう一度クリックすると解除できます。
       </div>
+    </div>
+  </div>
+
+  <!-- ▼ 日別予約一覧モーダル（管理画面のカレンダータブ用） -->
+  <div id="day-bookings-modal" class="day-modal" style="display:none;" onclick="if(event.target===this)closeDayBookingsModal()">
+    <div class="day-modal-card">
+      <div class="day-modal-header">
+        <h3 id="day-modal-title">-</h3>
+        <button class="day-modal-close" onclick="closeDayBookingsModal()" aria-label="閉じる">×</button>
+      </div>
+      <div class="day-modal-body" id="day-modal-body"></div>
     </div>
   </div>
 
@@ -2149,6 +2301,147 @@
     if (tabId === 'tab-bookings')  renderBookings();
     if (tabId === 'tab-customers') renderCustomers();
     if (tabId === 'tab-holidays')  initHolidayCalendar();
+    if (tabId === 'tab-calendar')  initCalendarView();
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // カレンダービュー（管理画面）
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  let calViewYear  = null;
+  let calViewMonth = null; // 0-11
+  let _calBookingsByDate = {};
+
+  function initCalendarView() {
+    if (calViewYear === null) {
+      const now = new Date();
+      calViewYear  = now.getFullYear();
+      calViewMonth = now.getMonth();
+    }
+    renderCalendarView();
+  }
+
+  function changeCalendarMonth(delta) {
+    calViewMonth += delta;
+    if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
+    if (calViewMonth > 11) { calViewMonth = 0;  calViewYear++; }
+    renderCalendarView();
+  }
+
+  /** 指定月の予約を取得（map: dateStr -> [bookings]） */
+  async function fetchBookingsForMonth(year, month) {
+    const mm  = String(month + 1).padStart(2, '0');
+    const ld  = new Date(year, month + 1, 0).getDate();
+    const start = `${year}-${mm}-01`;
+    const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
+    const { data, error } = await sbClient
+      .from('bookings')
+      .select('id, name, menu, date, time, customer_number')
+      .gte('date', start)
+      .lte('date', end)
+      .order('date')
+      .order('time');
+    if (error) throwSupabaseError('予約一覧の取得', error);
+    const map = {};
+    (data || []).forEach(b => {
+      if (!map[b.date]) map[b.date] = [];
+      map[b.date].push(b);
+    });
+    return map;
+  }
+
+  async function renderCalendarView() {
+    document.getElementById('cal-month-label').textContent =
+      `${calViewYear}年${calViewMonth + 1}月`;
+    const grid = document.getElementById('cal-view-grid');
+    hideAlert('admin-calendar-error');
+
+    let bookings = {};
+    let holidays = {};
+    try {
+      [bookings, holidays] = await Promise.all([
+        fetchBookingsForMonth(calViewYear, calViewMonth),
+        fetchHolidaysForMonth(calViewYear, calViewMonth),
+      ]);
+    } catch (e) {
+      console.error('❌ [renderCalendarView] エラー:', e);
+      showAlert('admin-calendar-error',
+        `カレンダーデータの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
+    }
+    _calBookingsByDate = bookings;
+
+    const dows = ['日', '月', '火', '水', '木', '金', '土'];
+    let html = '';
+    dows.forEach((d, i) => {
+      const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
+      html += `<div class="cal-view-dow ${cls}">${d}</div>`;
+    });
+
+    const firstDow = new Date(calViewYear, calViewMonth, 1).getDay();
+    const numDays  = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+    const today    = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < firstDow; i++) {
+      html += `<div class="cal-view-day empty"></div>`;
+    }
+
+    for (let d = 1; d <= numDays; d++) {
+      const dateObj = new Date(calViewYear, calViewMonth, d);
+      const mm      = String(calViewMonth + 1).padStart(2, '0');
+      const dd      = String(d).padStart(2, '0');
+      const dateStr = `${calViewYear}-${mm}-${dd}`;
+      const dow     = dateObj.getDay();
+      const isToday   = dateObj.getTime() === today.getTime();
+      const isHoliday = holidays[dateStr] !== undefined;
+      const list      = bookings[dateStr] || [];
+      const count     = list.length;
+
+      const classes = ['cal-view-day'];
+      if (dow === 0)   classes.push('sun');
+      if (dow === 6)   classes.push('sat');
+      if (isToday)     classes.push('today');
+      if (isHoliday)   classes.push('holiday');
+
+      let body = `<div class="cal-day-num">${d}</div>`;
+      if (isHoliday) {
+        body += `<div class="cal-holiday-mark">×</div>`;
+      } else if (count > 0) {
+        body += `<div class="cal-count-badge">●${count}件</div>`;
+      }
+
+      // 予約がある日のみクリック可能
+      const onclick = (count > 0 && !isHoliday)
+        ? `onclick="showDayBookings('${dateStr}')"` : '';
+      html += `<div class="${classes.join(' ')}" ${onclick}>${body}</div>`;
+    }
+
+    grid.innerHTML = html;
+  }
+
+  /** 日付クリック時：その日の予約一覧をモーダルで表示 */
+  function showDayBookings(dateStr) {
+    const list = _calBookingsByDate[dateStr] || [];
+    const [y, m, d] = dateStr.split('-');
+    document.getElementById('day-modal-title').textContent =
+      `${y}年${parseInt(m)}月${parseInt(d)}日 の予約（${list.length}件）`;
+    const body = document.getElementById('day-modal-body');
+    if (!list.length) {
+      body.innerHTML = `<div class="day-modal-empty">予約はありません</div>`;
+    } else {
+      body.innerHTML = list.map(b => `
+        <div class="day-modal-item">
+          <div class="day-modal-time">${esc(b.time)}</div>
+          <div class="day-modal-info">
+            <div class="day-modal-name">${esc(b.name)}${b.customer_number ? `<span style="font-size:.72rem;color:var(--text-light);font-weight:400;margin-left:6px;">No.${esc(b.customer_number)}</span>` : ''}</div>
+            <div class="day-modal-menu">${esc(b.menu)}</div>
+          </div>
+        </div>`).join('');
+    }
+    document.getElementById('day-bookings-modal').style.display = 'flex';
+  }
+
+  function closeDayBookingsModal() {
+    document.getElementById('day-bookings-modal').style.display = 'none';
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
