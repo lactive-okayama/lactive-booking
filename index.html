@@ -2780,13 +2780,24 @@
     const checked = checkbox.checked;
     const label   = checkbox.closest('.visited-check');
     checkbox.disabled = true; // 二重操作防止
+    console.log('🔵 [toggleVisited] 開始:', { bookingId, customerNumber, checked });
+
     try {
-      // ① bookings.visited を更新
-      const { error: bErr } = await sbClient
+      // ① bookings.visited を更新（.select() で更新行を取得し RLS の 0 行ブロックを検知）
+      const { data: bData, error: bErr } = await sbClient
         .from('bookings')
         .update({ visited: checked })
-        .eq('id', bookingId);
-      if (bErr) throw bErr;
+        .eq('id', bookingId)
+        .select();
+      if (bErr) {
+        console.error('❌ [toggleVisited] bookings UPDATE エラー:', bErr);
+        throw new Error(`予約の更新失敗（${bErr.code || ''}: ${bErr.message}）`);
+      }
+      if (!bData || bData.length === 0) {
+        console.error('❌ [toggleVisited] bookings 0 行更新（RLSブロックの可能性）');
+        throw new Error('予約の更新に失敗しました。bookings テーブルの UPDATE 用 RLS ポリシーをご確認ください。');
+      }
+      console.log('✅ [toggleVisited] bookings UPDATE 成功:', bData);
 
       // ② 顧客番号がある場合、customers.visit_count を増減
       if (customerNumber) {
@@ -2795,28 +2806,47 @@
           .select('id, visit_count')
           .eq('customer_number', customerNumber)
           .maybeSingle();
-        if (cFetchErr) throw cFetchErr;
-
-        if (cust) {
+        if (cFetchErr) {
+          console.error('❌ [toggleVisited] customers 取得エラー:', cFetchErr);
+          throw new Error(`顧客情報の取得失敗（${cFetchErr.code || ''}: ${cFetchErr.message}）`);
+        }
+        if (!cust) {
+          console.warn('⚠️ [toggleVisited] customer_number に該当する顧客が見つかりません:', customerNumber);
+          // 顧客がいなくても予約のチェックは成功扱い
+        } else {
           const current  = cust.visit_count ?? 0;
           const newCount = checked ? current + 1 : Math.max(0, current - 1);
-          const { error: cUpdateErr } = await sbClient
+          console.log(`🔵 [toggleVisited] visit_count 更新: ${current} → ${newCount}`);
+          const { data: cData, error: cUpdateErr } = await sbClient
             .from('customers')
             .update({ visit_count: newCount })
-            .eq('id', cust.id);
-          if (cUpdateErr) throw cUpdateErr;
+            .eq('id', cust.id)
+            .select();
+          if (cUpdateErr) {
+            console.error('❌ [toggleVisited] customers UPDATE エラー:', cUpdateErr);
+            throw new Error(`来院回数の更新失敗（${cUpdateErr.code || ''}: ${cUpdateErr.message}）`);
+          }
+          if (!cData || cData.length === 0) {
+            console.error('❌ [toggleVisited] customers 0 行更新（RLSブロックの可能性）');
+            throw new Error('来院回数の更新に失敗しました。customers テーブルの UPDATE 用 RLS ポリシーをご確認ください。');
+          }
+          console.log('✅ [toggleVisited] visit_count UPDATE 成功:', cData);
         }
+      } else {
+        console.log('ℹ️ [toggleVisited] customer_number が空のため visit_count 更新はスキップ');
       }
 
       label.classList.toggle('checked-label', checked);
+      hideAlert('admin-booking-error');
 
       // 顧客一覧タブが表示中なら自動更新
       if (document.getElementById('tab-customers').classList.contains('active')) {
         await renderCustomers();
       }
     } catch (e) {
+      console.error('❌ [toggleVisited] 失敗:', e);
       checkbox.checked = !checked; // 失敗時は元に戻す
-      showAlert('admin-booking-error', '来院済みの更新に失敗しました。');
+      showAlert('admin-booking-error', `来院済みの更新に失敗しました。${e.message ? '（' + e.message + '）' : ''}`);
     } finally {
       checkbox.disabled = false;
     }
