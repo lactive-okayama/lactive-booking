@@ -2753,7 +2753,15 @@
               <span>✉️ ${esc(c.email)}</span>
             </div>
             <div class="visit-count-wrap">
-              <span class="visit-count-label">整体：${c.seitai_count ?? 0}回　ピラティス：${c.pilates_count ?? 0}回</span>
+              <span class="visit-count-label">整体：</span>
+              <input class="visit-count-input" type="number" min="0"
+                id="vc-seitai-${esc(c.id)}" value="${c.seitai_count ?? 0}">
+              <span class="visit-count-label">回　ピラティス：</span>
+              <input class="visit-count-input" type="number" min="0"
+                id="vc-pilates-${esc(c.id)}" value="${c.pilates_count ?? 0}">
+              <span class="visit-count-label">回</span>
+              <button class="btn-visit-update"
+                onclick="updateVisitCount('${esc(c.id)}')">更新</button>
             </div>
           </div>
           <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
@@ -2765,18 +2773,21 @@
   }
 
   async function updateVisitCount(customerId) {
-    const input = document.getElementById(`vc-${customerId}`);
-    const count = parseInt(input.value, 10);
-    if (isNaN(count) || count < 0) {
+    const seitaiInput  = document.getElementById(`vc-seitai-${customerId}`);
+    const pilatesInput = document.getElementById(`vc-pilates-${customerId}`);
+    const seitaiCount  = parseInt(seitaiInput.value, 10);
+    const pilatesCount = parseInt(pilatesInput.value, 10);
+    if (isNaN(seitaiCount) || seitaiCount < 0 || isNaN(pilatesCount) || pilatesCount < 0) {
       showAlert('admin-customer-error', '正しい回数（0以上の整数）を入力してください。');
       return;
     }
-    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, count });
+    const visitCount = seitaiCount + pilatesCount;
+    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, seitaiCount, pilatesCount, visitCount });
     try {
       // .select() を付けることで RLS で UPDATE が拒否された場合（0行更新）を検知できる
       const { data, error } = await sbClient
         .from('customers')
-        .update({ visit_count: count })
+        .update({ visit_count: visitCount, seitai_count: seitaiCount, pilates_count: pilatesCount })
         .eq('id', customerId)
         .select();
 
@@ -2791,13 +2802,13 @@
         const detail = error.code
           ? `（${error.code}: ${error.message}）`
           : `（${error.message}）`;
-        showAlert('admin-customer-error', `来院済み回数の更新に失敗しました。${detail}`);
+        showAlert('admin-customer-error', `来院回数の更新に失敗しました。${detail}`);
         return;
       }
 
       // RLS で UPDATE 権限がない場合、エラーは出ずに data が空配列で返ってくる
       if (!data || data.length === 0) {
-        console.error('❌ [updateVisitCount] 0行更新（RLSのUPDATEポリシー未設定の可能性）:', { customerId, count });
+        console.error('❌ [updateVisitCount] 0行更新（RLSのUPDATEポリシー未設定の可能性）:', { customerId, seitaiCount, pilatesCount });
         showAlert(
           'admin-customer-error',
           '更新できませんでした。Supabase の customers テーブルに UPDATE 用の RLS ポリシーが設定されているかご確認ください。'
@@ -2806,12 +2817,16 @@
       }
 
       console.log('✅ [updateVisitCount] UPDATE成功 保存行:', data);
-      input.style.borderColor = 'var(--success)';
-      setTimeout(() => { input.style.borderColor = ''; }, 1500);
+      seitaiInput.style.borderColor  = 'var(--success)';
+      pilatesInput.style.borderColor = 'var(--success)';
+      setTimeout(() => {
+        seitaiInput.style.borderColor  = '';
+        pilatesInput.style.borderColor = '';
+      }, 1500);
       hideAlert('admin-customer-error');
     } catch (e) {
       console.error('❌ [updateVisitCount] 予期せぬエラー:', e);
-      showAlert('admin-customer-error', `来院済み回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
+      showAlert('admin-customer-error', `来院回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
     }
   }
 
