@@ -748,15 +748,25 @@
     .mypage-customer-num  { font-size: .8rem; color: var(--text-light); }
 
     .mypage-stats {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px;
+      display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px;
     }
     .stat-card {
       background: linear-gradient(135deg, var(--orange), var(--orange-dark));
       border-radius: var(--radius); padding: 22px 16px; text-align: center;
       color: #fff; box-shadow: 0 4px 14px rgba(255,140,66,.4);
     }
-    .stat-num   { font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 7px; }
-    .stat-label { font-size: .78rem; opacity: .9; letter-spacing: .04em; }
+    .stat-card-sub-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .stat-card-sub {
+      background: linear-gradient(135deg, var(--orange-light), var(--orange));
+      border-radius: var(--radius-sm); padding: 12px 10px; text-align: center;
+      color: #fff; box-shadow: 0 2px 8px rgba(255,140,66,.25);
+    }
+    .stat-num        { font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 7px; }
+    .stat-num-sub    { font-size: 1.6rem; font-weight: 700; line-height: 1; margin-bottom: 4px; color: var(--orange-deep); }
+    .stat-label      { font-size: .78rem; opacity: .9; letter-spacing: .04em; }
+    .stat-label-sub  { font-size: .72rem; color: var(--orange-dark); letter-spacing: .04em; }
 
     .mypage-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
 
@@ -1352,13 +1362,15 @@
           <div class="stat-num" id="mp-total">-</div>
           <div class="stat-label">総予約回数</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-num" id="mp-seitai">-</div>
-          <div class="stat-label">整体 来院回数</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="mp-pilates">-</div>
-          <div class="stat-label">ピラティス 来院回数</div>
+        <div class="stat-card-sub-row">
+          <div class="stat-card-sub">
+            <div class="stat-num-sub" id="mp-seitai">-</div>
+            <div class="stat-label-sub">整体 来院回数</div>
+          </div>
+          <div class="stat-card-sub">
+            <div class="stat-num-sub" id="mp-pilates">-</div>
+            <div class="stat-label-sub">ピラティス 来院回数</div>
+          </div>
         </div>
       </div>
       <div id="mypage-success" class="alert alert-success"></div>
