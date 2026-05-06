@@ -1353,8 +1353,12 @@
           <div class="stat-label">総予約回数</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num" id="mp-visited">-</div>
-          <div class="stat-label">来院済み回数</div>
+          <div class="stat-num" id="mp-seitai">-</div>
+          <div class="stat-label">整体 来院回数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="mp-pilates">-</div>
+          <div class="stat-label">ピラティス 来院回数</div>
         </div>
       </div>
       <div id="mypage-success" class="alert alert-success"></div>
@@ -2221,7 +2225,8 @@
 
       // 統計
       document.getElementById('mp-total').textContent   = all.length;
-      document.getElementById('mp-visited').textContent = cancelCustomer.visit_count ?? 0;
+      document.getElementById('mp-seitai').textContent   = cancelCustomer.seitai_count ?? 0;
+      document.getElementById('mp-pilates').textContent  = cancelCustomer.pilates_count ?? 0;
 
       // 今後の予約
       if (!upcoming.length) {
@@ -2736,11 +2741,7 @@
               <span>✉️ ${esc(c.email)}</span>
             </div>
             <div class="visit-count-wrap">
-              <span class="visit-count-label">来院済み回数：</span>
-              <input class="visit-count-input" type="number" min="0"
-                id="vc-${esc(c.id)}" value="${c.visit_count ?? 0}">
-              <button class="btn-visit-update"
-                onclick="updateVisitCount('${esc(c.id)}')">更新</button>
+              <span class="visit-count-label">整体：${c.seitai_count ?? 0}回　ピラティス：${c.pilates_count ?? 0}回</span>
             </div>
           </div>
           <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
@@ -2857,7 +2858,7 @@
       if (customerNumber) {
         const { data: cust, error: cFetchErr } = await sbClient
           .from('customers')
-          .select('id, visit_count')
+          .select('id, visit_count, seitai_count, pilates_count')
           .eq('customer_number', customerNumber)
           .maybeSingle();
         if (cFetchErr) {
@@ -2868,12 +2869,28 @@
           console.warn('⚠️ [toggleVisited] customer_number に該当する顧客が見つかりません:', customerNumber);
           // 顧客がいなくても予約のチェックは成功扱い
         } else {
-          const current  = cust.visit_count ?? 0;
-          const newCount = checked ? current + 1 : Math.max(0, current - 1);
-          console.log(`🔵 [toggleVisited] visit_count 更新: ${current} → ${newCount}`);
+          const menu       = (bData[0]?.menu || '');
+          const isSeitai   = menu.includes('整体');
+          const isPilates  = menu.includes('ピラティス');
+
+          const curVisit   = cust.visit_count ?? 0;
+          const newVisit   = checked ? curVisit + 1 : Math.max(0, curVisit - 1);
+
+          const curSeitai  = cust.seitai_count ?? 0;
+          const newSeitai  = isSeitai
+            ? (checked ? curSeitai + 1 : Math.max(0, curSeitai - 1))
+            : curSeitai;
+
+          const curPilates = cust.pilates_count ?? 0;
+          const newPilates = isPilates
+            ? (checked ? curPilates + 1 : Math.max(0, curPilates - 1))
+            : curPilates;
+
+          console.log(`🔵 [toggleVisited] 更新: visit_count ${curVisit}→${newVisit}, seitai_count ${curSeitai}→${newSeitai}, pilates_count ${curPilates}→${newPilates}`);
+
           const { data: cData, error: cUpdateErr } = await sbClient
             .from('customers')
-            .update({ visit_count: newCount })
+            .update({ visit_count: newVisit, seitai_count: newSeitai, pilates_count: newPilates })
             .eq('id', cust.id)
             .select();
           if (cUpdateErr) {
@@ -2884,7 +2901,7 @@
             console.error('❌ [toggleVisited] customers 0 行更新（RLSブロックの可能性）');
             throw new Error('来院回数の更新に失敗しました。customers テーブルの UPDATE 用 RLS ポリシーをご確認ください。');
           }
-          console.log('✅ [toggleVisited] visit_count UPDATE 成功:', cData);
+          console.log('✅ [toggleVisited] visit_count/seitai_count/pilates_count UPDATE 成功:', cData);
         }
       } else {
         console.log('ℹ️ [toggleVisited] customer_number が空のため visit_count 更新はスキップ');
