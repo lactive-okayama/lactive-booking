@@ -241,6 +241,10 @@
       from { opacity:0; transform: translateY(20px); }
       to   { opacity:1; transform: translateY(0); }
     }
+    @keyframes shimmer {
+      0%,100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
 
     /* ===== PAIN ===== */
     #pain { background: var(--ivory); padding: 96px 24px; }
@@ -520,27 +524,61 @@
       .nav-logo { font-size: 17px; }
       .nav-cta { font-size: 12px; padding: 8px 16px; }
 
-      /* ヒーロー：縦2分割に変更 */
-      #hero { padding: 100px 18px 72px; }
-      .hero-bg { flex-direction: column; }
-      .hero-split-line {
-        width: auto; height: 1px; flex-shrink: 0;
-        background: linear-gradient(to right,
-          transparent 0%,
-          rgba(181,96,122,.45) 20%,
-          rgba(181,96,122,.45) 80%,
-          transparent 100%);
+      /* ヒーロー：フルスクリーン没入型 */
+      #hero { padding: 0; align-items: flex-end; }
+      .hero-bg { flex-direction: row; }
+      .hero-bg-panel-left,
+      .hero-split-line,
+      .hero-split-tag { display: none; }
+      .hero-bg-panel-right { flex: 1; }
+      .hero-bg-panel img { opacity: .88; }
+      .hero-bg-panel-right::after {
+        background: linear-gradient(to top,
+          rgba(8,3,6,.97) 0%,
+          rgba(8,3,6,.85) 40%,
+          rgba(8,3,6,.50) 65%,
+          rgba(8,3,6,.20) 100%);
       }
-      .hero-split-tag { bottom: 10px; font-size: 9px; }
-      .hero-ring { width: 320px; height: 320px; }
-
-      /* タイトル */
-      .hero-title { font-size: clamp(24px, 7vw, 36px); }
-      .hero-sub { font-size: 13px; letter-spacing: .06em; }
-      .hero-badges { gap: 8px; }
-      .badge { font-size: 11px; padding: 5px 14px; }
-      .btn-primary { font-size: 13px; padding: 14px 28px; }
-      .btn-outline  { font-size: 12px; padding: 12px 22px; }
+      .hero-ring { display: none; }
+      .hero-inner {
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 36px 28px 96px;
+        max-width: 100%;
+        width: 100%;
+        text-align: left;
+      }
+      .hero-eyebrow { color: var(--gold); margin-bottom: 16px; text-shadow: 0 1px 8px rgba(0,0,0,.6); }
+      .hero-title {
+        color: #fff;
+        font-size: clamp(27px, 7.8vw, 38px);
+        text-shadow: 0 2px 16px rgba(0,0,0,.8), 0 0 40px rgba(0,0,0,.5);
+      }
+      .hero-title em {
+        background: linear-gradient(90deg, #e8a0b8, var(--gold), #fff, var(--gold), #e8a0b8);
+        background-size: 300% 300%;
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        animation: shimmer 4s ease-in-out infinite;
+        filter: drop-shadow(0 1px 6px rgba(0,0,0,.5));
+      }
+      .hero-sub { color: rgba(255,255,255,.9); font-size: 14px; letter-spacing: .06em; margin-bottom: 32px; text-shadow: 0 1px 12px rgba(0,0,0,.8); line-height: 2; }
+      .hero-rule { justify-content: flex-start; margin: 22px 0; }
+      .hero-rule-line { background: linear-gradient(to right, rgba(201,164,106,.7), transparent); }
+      .hero-rule-line:last-child { display: none; }
+      .hero-rule-diamond { background: var(--gold); }
+      .hero-badges { justify-content: flex-start; gap: 8px; margin-bottom: 32px; }
+      .badge { background: rgba(0,0,0,.35); border-color: rgba(255,255,255,.35); color: #fff; font-size: 11px; padding: 5px 14px; }
+      .hero-btn-wrap { flex-direction: column; gap: 12px; align-items: stretch; }
+      .btn-primary { font-size: 14px; padding: 16px 32px; justify-content: center; }
+      .btn-outline { font-size: 13px; padding: 14px 28px; justify-content: center; border-color: rgba(255,255,255,.5); color: #fff; background: rgba(0,0,0,.25); }
+      .btn-outline:hover { background: rgba(255,255,255,.15); }
+      .scroll-hint { bottom: 20px; }
+      .scroll-hint span { color: rgba(255,255,255,.5); }
+      .scroll-line { background: linear-gradient(to bottom, rgba(201,164,106,.6), transparent); }
 
       /* セクション見出し */
       .section-title { font-size: clamp(20px, 5.5vw, 28px); }
