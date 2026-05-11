@@ -964,7 +964,7 @@
           </div>
           <div class="card-name">初回整体</div>
           <div class="card-duration">90分</div>
-          <div class="card-price">¥1,980</div>
+          <div class="card-price">¥5,980</div>
         </div>
         <div class="menu-card" onclick="startFirstFlow('first-pilates')">
           <div class="card-top">
@@ -972,7 +972,7 @@
             <span class="card-arrow">›</span>
           </div>
           <div class="card-name">初回ピラティス</div>
-          <div class="card-duration">60分</div>
+          <div class="card-duration">50分</div>
           <div class="card-price">¥1,980</div>
         </div>
       </div>
@@ -1437,7 +1437,7 @@
           <select id="bf-menu" onchange="renderBookings()">
             <option value="">すべてのメニュー</option>
             <option>初回整体 90分</option>
-            <option>初回ピラティス 60分</option>
+            <option>初回ピラティス 50分</option>
             <option>整体（運動療法）30分</option>
             <option>マシンピラティス 40分</option>
             <option>マットピラティス 40分</option>
@@ -1634,7 +1634,7 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startFirstFlow(flow) {
     ST = {
-      flow, menu: flow === 'first-seitai' ? '初回整体 90分' : '初回ピラティス 60分',
+      flow, menu: flow === 'first-seitai' ? '初回整体 90分' : '初回ピラティス 50分',
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: ''
     };
