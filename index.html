@@ -6,81 +6,7 @@
   <title>Lactive｜ご予約</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
   <!-- Supabase CDN（UMD ビルド：window.supabase を確実に設定） -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
-    // ════════════════════════════════════
-    // LINE Login 連携
-    // ════════════════════════════════════
-    const LINE_CHANNEL_ID   = '2004833107';
-    const LINE_REDIRECT_URI = 'https://lactive-okayama.github.io/lactive-booking/';
-    const EDGE_URL          = 'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1';
-    let lineUserId      = null;
-    let lineDisplayName = null;
-
-    /** LINEログインへリダイレクト（フォーム状態をsessionStorageに保存） */
-    function startLineLogin() {
-      const state = {
-        name:    document.getElementById('p-name')?.value    || '',
-        phone:   document.getElementById('p-phone')?.value   || '',
-        email:   document.getElementById('p-email')?.value   || '',
-        consent: document.getElementById('personal-consent')?.checked || false
-      };
-      sessionStorage.setItem('lineLoginFormState', JSON.stringify(state));
-      const url = 'https://access.line.me/oauth2/v2.1/authorize'
-        + '?response_type=code'
-        + '&client_id='    + LINE_CHANNEL_ID
-        + '&redirect_uri=' + encodeURIComponent(LINE_REDIRECT_URI)
-        + '&state=booking'
-        + '&scope=profile';
-      window.location.href = url;
-    }
-
-    /** LINE連携を解除 */
-    function cancelLineLink() {
-      lineUserId = null; lineDisplayName = null;
-      document.getElementById('line-linked-info').style.display = 'none';
-      document.getElementById('line-login-btn').style.display   = 'inline-block';
-    }
-
-    /** OAuthコールバック処理（ページロード時に呼ぶ） */
-    async function handleLineCallback() {
-      const params = new URLSearchParams(window.location.search);
-      const code   = params.get('code');
-      const state  = params.get('state');
-      if (!code || state !== 'booking') return false;
-      // URLをクリーン
-      window.history.replaceState({}, '', window.location.pathname);
-      // フォーム状態を復元
-      const saved = sessionStorage.getItem('lineLoginFormState');
-      if (saved) {
-        try {
-          const s = JSON.parse(saved);
-          sessionStorage.removeItem('lineLoginFormState');
-          setTimeout(() => {
-            if (s.name)    document.getElementById('p-name').value             = s.name;
-            if (s.phone)   document.getElementById('p-phone').value            = s.phone;
-            if (s.email)   document.getElementById('p-email').value            = s.email;
-            if (s.consent) document.getElementById('personal-consent').checked = s.consent;
-          }, 300);
-        } catch(e) {}
-      }
-      // Edge Functionでline_user_id取得
-      try {
-        const res  = await fetch(EDGE_URL + '/line-auth', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ code, redirect_uri: LINE_REDIRECT_URI })
-        });
-        const data = await res.json();
-        if (data.line_user_id) {
-          lineUserId = data.line_user_id; lineDisplayName = data.display_name;
-          document.getElementById('line-login-btn').style.display   = 'none';
-          document.getElementById('line-display-name').textContent  = lineDisplayName;
-          document.getElementById('line-linked-info').style.display = 'block';
-        }
-      } catch(e) { console.error('LINE auth error:', e); }
-      return true;
-    }
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     /* ───────────────────────────────
        変数・リセット
@@ -3244,6 +3170,80 @@
       }
     })();
   })();
-</script>
+
+    // ════════════════════════════════════
+    // LINE Login 連携
+    // ════════════════════════════════════
+    const LINE_CHANNEL_ID   = '2004833107';
+    const LINE_REDIRECT_URI = 'https://lactive-okayama.github.io/lactive-booking/';
+    const EDGE_URL          = 'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1';
+    let lineUserId      = null;
+    let lineDisplayName = null;
+
+    /** LINEログインへリダイレクト（フォーム状態をsessionStorageに保存） */
+    function startLineLogin() {
+      const state = {
+        name:    document.getElementById('p-name')?.value    || '',
+        phone:   document.getElementById('p-phone')?.value   || '',
+        email:   document.getElementById('p-email')?.value   || '',
+        consent: document.getElementById('personal-consent')?.checked || false
+      };
+      sessionStorage.setItem('lineLoginFormState', JSON.stringify(state));
+      const url = 'https://access.line.me/oauth2/v2.1/authorize'
+        + '?response_type=code'
+        + '&client_id='    + LINE_CHANNEL_ID
+        + '&redirect_uri=' + encodeURIComponent(LINE_REDIRECT_URI)
+        + '&state=booking'
+        + '&scope=profile';
+      window.location.href = url;
+    }
+
+    /** LINE連携を解除 */
+    function cancelLineLink() {
+      lineUserId = null; lineDisplayName = null;
+      document.getElementById('line-linked-info').style.display = 'none';
+      document.getElementById('line-login-btn').style.display   = 'inline-block';
+    }
+
+    /** OAuthコールバック処理（ページロード時に呼ぶ） */
+    async function handleLineCallback() {
+      const params = new URLSearchParams(window.location.search);
+      const code   = params.get('code');
+      const state  = params.get('state');
+      if (!code || state !== 'booking') return false;
+      // URLをクリーン
+      window.history.replaceState({}, '', window.location.pathname);
+      // フォーム状態を復元
+      const saved = sessionStorage.getItem('lineLoginFormState');
+      if (saved) {
+        try {
+          const s = JSON.parse(saved);
+          sessionStorage.removeItem('lineLoginFormState');
+          setTimeout(() => {
+            if (s.name)    document.getElementById('p-name').value             = s.name;
+            if (s.phone)   document.getElementById('p-phone').value            = s.phone;
+            if (s.email)   document.getElementById('p-email').value            = s.email;
+            if (s.consent) document.getElementById('personal-consent').checked = s.consent;
+          }, 300);
+        } catch(e) {}
+      }
+      // Edge Functionでline_user_id取得
+      try {
+        const res  = await fetch(EDGE_URL + '/line-auth', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ code, redirect_uri: LINE_REDIRECT_URI })
+        });
+        const data = await res.json();
+        if (data.line_user_id) {
+          lineUserId = data.line_user_id; lineDisplayName = data.display_name;
+          document.getElementById('line-login-btn').style.display   = 'none';
+          document.getElementById('line-display-name').textContent  = lineDisplayName;
+          document.getElementById('line-linked-info').style.display = 'block';
+        }
+      } catch(e) { console.error('LINE auth error:', e); }
+      return true;
+    }
+  </script>
 </body>
 </html>
