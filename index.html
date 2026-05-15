@@ -1260,7 +1260,22 @@
             プライバシーポリシー（ページ下部に記載）を読み、個人情報の取り扱いに同意します。
           </span>
         </label>
-        <div class="btn-actions">
+              <!-- ▼ LINE前日リマインド連携（任意） -->
+      <div class="line-connect-section">
+        <p>📱 <strong>前日リマインドをLINEで受け取る</strong>（任意）</p>
+        <p class="line-connect-sub">ご予約の前日9時にLINEでお知らせします</p>
+        <div id="r-line-not-connected">
+          <button type="button" id="r-line-login-btn" class="btn-line-connect" onclick="startLineLoginReg()">
+            💚 LINEで連携する
+          </button>
+        </div>
+        <div id="r-line-linked-info" style="display:none">
+          <span class="line-user-badge">✅ LINE連携済み：<span id="r-line-display-name"></span></span>
+          <button type="button" class="btn-line-cancel" onclick="cancelLineLink()">解除</button>
+        </div>
+      </div>
+      <!-- ▲ LINE連携 -->
+<div class="btn-actions">
           <button class="btn btn-secondary" onclick="navigateTo('page-member-login')">← 戻る</button>
           <button class="btn btn-primary" id="register-btn" onclick="submitRegister()">登録して次へ →</button>
         </div>
@@ -3244,6 +3259,74 @@
       } catch(e) { console.error('LINE auth error:', e); }
       return true;
     }
-  </script>
+  
+    /* ── 会員登録ページ用 LINE 連携 ─────────────────── */
+
+    /** 会員登録ページから LINE ログイン開始 */
+    function startLineLoginReg() {
+      sessionStorage.setItem('lineLoginFromPage', 'page-member-register');
+      sessionStorage.setItem('lineLoginRegFormState', JSON.stringify({
+        name:    document.getElementById('r-name')?.value    || '',
+        phone:   document.getElementById('r-phone')?.value   || '',
+        email:   document.getElementById('r-email')?.value   || '',
+        consent: document.getElementById('register-consent')?.checked || false
+      }));
+      startLineLogin();
+    }
+
+    /** navigateTo をラップ：LINE コールバック後を page-member-register へ誘導 */
+    (function patchNavigateToForReg() {
+      const orig = navigateTo;
+      window.navigateTo = function(pageId) {
+        const fromPage = sessionStorage.getItem('lineLoginFromPage');
+        if (pageId === 'page-personal' && fromPage === 'page-member-register') {
+          sessionStorage.removeItem('lineLoginFromPage');
+          const saved = sessionStorage.getItem('lineLoginRegFormState');
+          if (saved) {
+            try {
+              const st = JSON.parse(saved);
+              const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+              set('r-name',  st.name);
+              set('r-phone', st.phone);
+              set('r-email', st.email);
+              const cb = document.getElementById('register-consent');
+              if (cb) cb.checked = !!st.consent;
+            } catch(e) {}
+            sessionStorage.removeItem('lineLoginRegFormState');
+          }
+          return orig('page-member-register');
+        }
+        return orig(pageId);
+      };
+    })();
+
+    /** line-linked-info の表示を r- 要素にミラー（LINE連携状態を同期） */
+    (function initRegLineSync() {
+      function doSync() {
+        const src    = document.getElementById('line-linked-info');
+        const srcBtn = document.getElementById('line-login-btn');
+        const srcNm  = document.getElementById('line-display-name');
+        const tgt    = document.getElementById('r-line-linked-info');
+        const tgtBtn = document.getElementById('r-line-login-btn');
+        const tgtNm  = document.getElementById('r-line-display-name');
+        if (!src || !tgt) return;
+        const sync = () => {
+          tgt.style.display = src.style.display;
+          if (tgtBtn && srcBtn) tgtBtn.style.display = srcBtn.style.display;
+          if (tgtNm  && srcNm)  tgtNm.textContent    = srcNm.textContent;
+        };
+        sync();
+        const obs = new MutationObserver(sync);
+        obs.observe(src,    { attributes: true, attributeFilter: ['style'] });
+        if (srcBtn) obs.observe(srcBtn, { attributes: true, attributeFilter: ['style'] });
+        if (srcNm)  obs.observe(srcNm,  { childList: true, characterData: true, subtree: true });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', doSync);
+      } else {
+        doSync();
+      }
+    })();
+</script>
 </body>
 </html>
