@@ -1,9 +1,10 @@
+// updated: 2026-05-15
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 
 const LINE_CHANNEL_ACCESS_TOKEN =
   'WeY8NGZzIV/NM65obLnwdIplo6t9hyfaRIsH4HKWOF0eZccbxyl78W6uV2d46ZIIWYLiGpjrBffmXn07lUH6urxH7uKLaONXvxcUtIYBu9JuJWPEAlFgFddptVW+ygXwokERqvksnFdupkCe8daW6wdB04t89/1O/w1cDnyilFU=';
 
-const LINE_USER_ID = '2004832726';
+const LINE_USER_ID = Deno.env.get('LINE_USER_ID') ?? '';
 
 // 日付フォーマット（YYYY-MM-DD → YYYY年M月D日）
 function formatDate(s: string): string {
