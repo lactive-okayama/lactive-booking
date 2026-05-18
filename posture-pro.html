@@ -565,6 +565,75 @@ input, textarea, select { font-size: 16px !important; } /* prevents iOS zoom on 
 
 /* ── Annotation canvas sizing helper ── */
 .canvas-outer { overflow: hidden; width: 100%; background: #111; }
+
+/* ── Angle step indicator ── */
+.angle-status {
+  display: none; padding: 7px 14px; background: rgba(59,130,246,.12);
+  border-bottom: 1px solid rgba(59,130,246,.25); font-size: 12px;
+  color: #93C5FD; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.angle-status.show { display: flex; }
+.as-step {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+.as-done    { background: #3B82F6; color: #fff; }
+.as-current { background: #93C5FD; color: #1e3a5f; animation: pulse .8s infinite alternate; }
+.as-pending { background: #334155; color: #64748B; }
+@keyframes pulse { from { opacity:.7; } to { opacity:1; } }
+
+/* ── Grid controls inline ── */
+.grid-controls { display: none; align-items: center; gap: 6px; }
+.grid-controls.show { display: flex; }
+.grid-slider {
+  -webkit-appearance: none; appearance: none; height: 4px; border-radius: 2px;
+  background: #334155; width: 72px; outline: none; cursor: pointer;
+}
+.grid-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--rose); cursor: pointer;
+}
+
+/* ── Measurement panel ── */
+.measure-panel { background: #0F172A; border-top: 1px solid #1E293B; }
+.measure-header {
+  padding: 8px 14px; display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none;
+}
+.measure-header-title { font-size: 12px; color: #64748B; font-weight: 500; flex: 1; }
+.measure-toggle { font-size: 11px; color: #475569; }
+.measure-body { display: none; border-top: 1px solid #1E293B; }
+.measure-body.open { display: block; }
+.measure-row {
+  display: grid; grid-template-columns: 24px auto 1fr auto auto;
+  gap: 8px; align-items: center; padding: 9px 14px;
+  border-bottom: 1px solid #1E293B; font-size: 12px;
+}
+.measure-row:last-child { border-bottom: none; }
+.m-idx  { color: #334155; font-size: 10px; font-weight: 600; }
+.m-type { color: #64748B; font-size: 11px; white-space: nowrap; }
+.m-val  { font-size: 20px; font-weight: 700; color: #F8FAFC; text-align: center; }
+.m-ref  { font-size: 10px; color: #475569; text-align: right; }
+.m-ok   { color: #22C55E; font-size: 13px; }
+.m-warn { color: #F59E0B; font-size: 13px; }
+.m-bad  { color: #EF4444; font-size: 13px; }
+
+/* ── Clinical reference table ── */
+.ref-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ref-table th {
+  font-size: 10px; color: var(--text2); font-weight: 600; padding: 6px 12px;
+  border-bottom: 2px solid var(--border); text-align: left;
+  letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+}
+.ref-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; line-height: 1.6; }
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-site { font-weight: 500; font-size: 13px; }
+.ref-view { font-size: 10px; color: #3B82F6; background: #EFF6FF; border-radius: 4px; padding: 1px 6px; white-space: nowrap; }
+.ref-normal { font-size: 11px; color: #16A34A; background: #F0FDF4; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.ref-concern { font-size: 11px; color: #B45309; background: #FFFBEB; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.ref-alert  { font-size: 11px; color: #DC2626; background: #FEF2F2; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.ref-fix { font-size: 12px; color: var(--text2); line-height: 1.7; }
 </style>
 </head>
 <body>
@@ -712,21 +781,44 @@ input, textarea, select { font-size: 16px !important; } /* prevents iOS zoom on 
           </div>
           <!-- Toolbar -->
           <div class="ann-toolbar" id="ann-toolbar">
+            <!-- 描画ツール -->
             <div class="ann-tool-group">
-              <button class="tool-btn active" id="tool-plumb" title="垂直基準線" onclick="setTool('plumb')">⬍</button>
-              <button class="tool-btn" id="tool-hline" title="水平基準線" onclick="setTool('hline')">⬌</button>
-              <button class="tool-btn" id="tool-line" title="直線" onclick="setTool('line')">╱</button>
-              <button class="tool-btn" id="tool-arrow" title="矢印" onclick="setTool('arrow')">↗</button>
-              <button class="tool-btn" id="tool-circle" title="円マーカー" onclick="setTool('circle')">○</button>
-              <button class="tool-btn" id="tool-freehand" title="フリーハンド" onclick="setTool('freehand')">✏️</button>
-              <button class="tool-btn" id="tool-text" title="テキスト" onclick="setTool('text')">T</button>
+              <button class="tool-btn active" id="tool-plumb"    title="垂直基準線（重心線）" onclick="setTool('plumb')">⬍</button>
+              <button class="tool-btn"        id="tool-hline"    title="水平基準線（左右高さ比較）" onclick="setTool('hline')">⬌</button>
+              <button class="tool-btn"        id="tool-line"     title="直線" onclick="setTool('line')">╱</button>
+              <button class="tool-btn"        id="tool-arrow"    title="矢印" onclick="setTool('arrow')">↗</button>
+              <button class="tool-btn"        id="tool-circle"   title="円マーカー" onclick="setTool('circle')">○</button>
+              <button class="tool-btn"        id="tool-freehand" title="フリーハンド" onclick="setTool('freehand')">✏️</button>
+              <button class="tool-btn"        id="tool-text"     title="テキスト" onclick="setTool('text')">T</button>
             </div>
             <div class="ann-sep"></div>
+            <!-- 計測ツール -->
+            <div class="ann-tool-group">
+              <button class="tool-btn" id="tool-angle"     title="分度器（3点クリックで角度測定）" onclick="setTool('angle')" style="font-size:18px">📐</button>
+              <button class="tool-btn" id="tool-angleline" title="傾斜線（引いた線の水平からの角度を自動表示）" onclick="setTool('angleline')" style="font-size:18px">📏</button>
+            </div>
+            <div class="ann-sep"></div>
+            <!-- グリッド -->
+            <div class="ann-tool-group" style="align-items:center;gap:6px">
+              <button class="tool-btn" id="tool-grid" title="グリッド表示（正方形の格子で歪みを確認）" onclick="toggleGrid()">⊞</button>
+              <div class="grid-controls" id="grid-controls">
+                <select class="stroke-select" title="格子の密度" onchange="setGridDensity(this.value)">
+                  <option value="3">粗</option>
+                  <option value="6" selected>中</option>
+                  <option value="9">細</option>
+                </select>
+                <input type="range" class="grid-slider" id="grid-opacity-slider"
+                  min="10" max="60" value="25" title="透明度"
+                  oninput="setGridOpacity(this.value)">
+              </div>
+            </div>
+            <div class="ann-sep"></div>
+            <!-- カラー -->
             <div class="ann-tool-group" style="align-items:center;gap:8px">
-              <div class="color-btn active" style="background:#EF4444" data-color="#EF4444" onclick="setColor(this)" title="赤"></div>
-              <div class="color-btn" style="background:#F59E0B" data-color="#F59E0B" onclick="setColor(this)" title="オレンジ"></div>
-              <div class="color-btn" style="background:#3B82F6" data-color="#3B82F6" onclick="setColor(this)" title="青"></div>
-              <div class="color-btn" style="background:#22C55E" data-color="#22C55E" onclick="setColor(this)" title="緑"></div>
+              <div class="color-btn active" style="background:#EF4444" data-color="#EF4444" onclick="setColor(this)" title="赤（要修正）"></div>
+              <div class="color-btn" style="background:#F59E0B" data-color="#F59E0B" onclick="setColor(this)" title="オレンジ（注意）"></div>
+              <div class="color-btn" style="background:#3B82F6" data-color="#3B82F6" onclick="setColor(this)" title="青（基準線）"></div>
+              <div class="color-btn" style="background:#22C55E" data-color="#22C55E" onclick="setColor(this)" title="緑（良好）"></div>
               <div class="color-btn" style="background:#FFFFFF;border:2px solid #475569" data-color="#FFFFFF" onclick="setColor(this)" title="白"></div>
             </div>
             <div class="ann-sep"></div>
@@ -742,6 +834,18 @@ input, textarea, select { font-size: 16px !important; } /* prevents iOS zoom on 
               <button class="tool-btn" title="取り消し" onclick="annUndo()">↩</button>
               <button class="tool-btn" title="全消去" onclick="annClear()">🗑</button>
             </div>
+          </div>
+          <!-- 分度器ガイド（3点角度測定のステップ表示） -->
+          <div class="angle-status" id="angle-status">
+            <span class="as-step as-pending" id="as-1">1</span>
+            <span id="as-label-1">頂点をタップ</span>
+            <span style="color:#334155">›</span>
+            <span class="as-step as-pending" id="as-2">2</span>
+            <span id="as-label-2">第1辺の先端をタップ</span>
+            <span style="color:#334155">›</span>
+            <span class="as-step as-pending" id="as-3">3</span>
+            <span id="as-label-3">第2辺の先端をタップ</span>
+            <button onclick="resetAngleTool()" style="margin-left:auto;background:none;border:none;color:#475569;cursor:pointer;font-size:12px">リセット ✕</button>
           </div>
           <!-- Canvas panels -->
           <div class="photo-panel active" id="panel-front">
@@ -802,6 +906,16 @@ input, textarea, select { font-size: 16px !important; } /* prevents iOS zoom on 
               </div>
             </div>
           </div>
+          <!-- 測定値パネル（角度ツール使用時に自動表示） -->
+          <div class="measure-panel" id="measure-panel">
+            <div class="measure-header" onclick="toggleMeasurePanel()">
+              <span style="font-size:14px">📐</span>
+              <span class="measure-header-title">測定値一覧</span>
+              <span class="measure-toggle" id="measure-count">0件</span>
+              <span class="measure-toggle" id="measure-chevron">▾</span>
+            </div>
+            <div class="measure-body" id="measure-body"></div>
+          </div>
         </div>
 
         <!-- Assessment -->
@@ -857,6 +971,110 @@ input, textarea, select { font-size: 16px !important; } /* prevents iOS zoom on 
           <div class="form-card-header"><span class="form-card-title">🏷 セッションタグ</span></div>
           <div class="form-card-body">
             <div style="display:flex;flex-wrap:wrap;gap:8px" id="tag-btns"></div>
+          </div>
+        </div>
+
+        <!-- 姿勢評価基準表 -->
+        <div class="form-card">
+          <div class="form-card-header" style="cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+            <span class="form-card-title">📋 姿勢評価基準表（計測ガイド）</span>
+            <span style="font-size:12px;color:var(--text2)">タップで開閉</span>
+          </div>
+          <div style="display:none;overflow-x:auto">
+            <table class="ref-table">
+              <thead>
+                <tr>
+                  <th>部位・項目</th>
+                  <th>撮影方向</th>
+                  <th>計測ツール</th>
+                  <th>正常値</th>
+                  <th>要注意</th>
+                  <th>改善アプローチ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="ref-site">頭部前方変位</span><br><span style="font-size:11px;color:var(--text2)">耳垂〜肩峰の距離</span></td>
+                  <td><span class="ref-view">側面</span></td>
+                  <td><span class="ref-view">垂直基準線</span></td>
+                  <td><span class="ref-normal">0 cm（同一垂直線上）</span></td>
+                  <td><span class="ref-concern">2–4 cm</span> <span class="ref-alert">&gt;4 cm</span></td>
+                  <td class="ref-fix">チンタック・胸椎伸展・胸筋ストレッチ</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">肩の高さの左右差</span></td>
+                  <td><span class="ref-view">正面</span></td>
+                  <td><span class="ref-view">水平基準線</span></td>
+                  <td><span class="ref-normal">&lt; 5 mm</span></td>
+                  <td><span class="ref-concern">5–15 mm</span> <span class="ref-alert">&gt;15 mm</span></td>
+                  <td class="ref-fix">体幹側方筋の左右バランス・荷物の持ち方</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">骨盤傾斜角</span><br><span style="font-size:11px;color:var(--text2)">ASIS左右の高さ差</span></td>
+                  <td><span class="ref-view">正面</span></td>
+                  <td><span class="ref-view">傾斜線📏</span></td>
+                  <td><span class="ref-normal">&lt; 3°</span></td>
+                  <td><span class="ref-concern">3–5°</span> <span class="ref-alert">&gt;5°</span></td>
+                  <td class="ref-fix">腰方形筋・腸腰筋の左右差改善・足を組む習慣をやめる</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">体幹側方傾斜</span></td>
+                  <td><span class="ref-view">正面</span></td>
+                  <td><span class="ref-view">傾斜線📏</span></td>
+                  <td><span class="ref-normal">&lt; 3°</span></td>
+                  <td><span class="ref-concern">3–5°</span> <span class="ref-alert">&gt;5°</span></td>
+                  <td class="ref-fix">弱側の体幹強化・重心分布の再教育</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">胸椎後弯角</span><br><span style="font-size:11px;color:var(--text2)">胸椎全体の丸み</span></td>
+                  <td><span class="ref-view">側面</span></td>
+                  <td><span class="ref-view">分度器📐</span></td>
+                  <td><span class="ref-normal">20–40°</span></td>
+                  <td><span class="ref-concern">40–50°</span> <span class="ref-alert">&gt;50°（過度な猫背）</span></td>
+                  <td class="ref-fix">胸椎伸展・肩甲骨内転強化・呼吸の改善</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">腰椎前弯角</span></td>
+                  <td><span class="ref-view">側面</span></td>
+                  <td><span class="ref-view">分度器📐</span></td>
+                  <td><span class="ref-normal">30–50°</span></td>
+                  <td><span class="ref-concern">&gt;55°（過前弯）</span> <span class="ref-alert">&lt;20°（平背）</span></td>
+                  <td class="ref-fix">腸腰筋伸張・腹横筋活性化・ブリッジエクサ</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">脊椎側弯（Cobb角）</span></td>
+                  <td><span class="ref-view">正面</span></td>
+                  <td><span class="ref-view">分度器📐</span></td>
+                  <td><span class="ref-normal">&lt; 10°</span></td>
+                  <td><span class="ref-concern">10–24°（軽度）</span> <span class="ref-alert">25–44°（中等度）→専門医へ</span></td>
+                  <td class="ref-fix">凹側の体幹伸張・凸側の筋力強化・呼吸アプローチ</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">膝外反角（Q角）</span><br><span style="font-size:11px;color:var(--text2)">ASIS〜膝蓋骨〜脛骨粗面</span></td>
+                  <td><span class="ref-view">正面</span></td>
+                  <td><span class="ref-view">分度器📐</span></td>
+                  <td><span class="ref-normal">♀&lt;20° ♂&lt;15°</span></td>
+                  <td><span class="ref-concern">♀20–25° ♂15–20°</span> <span class="ref-alert">それ以上</span></td>
+                  <td class="ref-fix">臀筋・外転筋強化・足部アーチサポート</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">足部回内角</span><br><span style="font-size:11px;color:var(--text2)">距骨下関節のアライメント</span></td>
+                  <td><span class="ref-view">後面</span></td>
+                  <td><span class="ref-view">傾斜線📏</span></td>
+                  <td><span class="ref-normal">0–4°（軽度外反）</span></td>
+                  <td><span class="ref-concern">&gt;5°（過回内）</span> <span class="ref-alert">&lt;0°（回外）</span></td>
+                  <td class="ref-fix">足底筋強化・インソール検討・足首可動域改善</td>
+                </tr>
+                <tr>
+                  <td><span class="ref-site">頸椎前弯角</span></td>
+                  <td><span class="ref-view">側面</span></td>
+                  <td><span class="ref-view">分度器📐</span></td>
+                  <td><span class="ref-normal">20–40°</span></td>
+                  <td><span class="ref-concern">&lt;15°（ストレートネック）</span> <span class="ref-alert">&gt;45°（過前弯）</span></td>
+                  <td class="ref-fix">チンタック・頸部深部筋強化・枕の高さ調整</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -1487,40 +1705,84 @@ function saveSession() {
 }
 
 /* ════════════════════════════════════════════
+   UTILITY: angle calculation
+════════════════════════════════════════════ */
+function angleAtApex(apex, p1, p2) {
+  const v1 = { x: p1.x - apex.x, y: p1.y - apex.y };
+  const v2 = { x: p2.x - apex.x, y: p2.y - apex.y };
+  const dot  = v1.x*v2.x + v1.y*v2.y;
+  const mag1 = Math.hypot(v1.x, v1.y);
+  const mag2 = Math.hypot(v2.x, v2.y);
+  if (!mag1 || !mag2) return 0;
+  return Math.acos(Math.max(-1, Math.min(1, dot/(mag1*mag2)))) * 180/Math.PI;
+}
+
+function angleFromH(x1, y1, x2, y2) {
+  return Math.atan2(Math.abs(y2-y1), Math.abs(x2-x1)) * 180/Math.PI;
+}
+
+function drawLabel(ctx, text, cx, cy, color) {
+  ctx.save();
+  ctx.font = 'bold 15px -apple-system,sans-serif';
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = 'rgba(0,0,0,.72)';
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(cx-tw/2-5, cy-15, tw+10, 22, 4)
+                : ctx.fillRect(cx-tw/2-5, cy-15, tw+10, 22);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fillText(text, cx-tw/2, cy);
+  ctx.restore();
+}
+
+/* ════════════════════════════════════════════
    ANNOTATOR CLASS
 ════════════════════════════════════════════ */
 class Annotator {
   constructor(photoCanvas, drawCanvas) {
-    this.pc = photoCanvas;
-    this.dc = drawCanvas;
+    this.pc   = photoCanvas;
+    this.dc   = drawCanvas;
     this.pctx = photoCanvas.getContext('2d');
     this.dctx = drawCanvas.getContext('2d');
+
     this.annotations = [];
     this.originalSrc = null;
-    this.img = null;
+    this.img  = null;
     this.tool = 'plumb';
-    this.color = '#EF4444';
+    this.color  = '#EF4444';
     this.strokeW = 3;
+
+    // Grid state
+    this.gridOn      = false;
+    this.gridCols    = 6;
+    this.gridRows    = 9;
+    this.gridOpacity = 0.25;
+
+    // Drawing state
     this.drawing = false;
     this.sx = 0; this.sy = 0;
     this.fpts = [];
 
-    const events = {
-      mousedown: e => this.onDown(e),
-      mousemove: e => this.onMove(e),
-      mouseup:   e => this.onUp(e),
-      mouseleave: e => this.onUp(e),
-    };
-    Object.entries(events).forEach(([ev, fn]) => drawCanvas.addEventListener(ev, fn));
-    drawCanvas.addEventListener('touchstart',  e => { e.preventDefault(); this.onDown(e.touches[0]); }, { passive: false });
-    drawCanvas.addEventListener('touchmove',   e => { e.preventDefault(); this.onMove(e.touches[0]); }, { passive: false });
-    drawCanvas.addEventListener('touchend',    e => { e.preventDefault(); this.onUp(e.changedTouches[0]); }, { passive: false });
+    // Angle tool state machine: 0=idle, 1=apex set, 2=ray1 set
+    this.angleState = 0;
+    this.angleApex  = null;
+    this.angleRay1  = null;
+
+    const on = (ev, fn) => drawCanvas.addEventListener(ev, fn);
+    on('mousedown',  e => this.onDown(e));
+    on('mousemove',  e => this.onMove(e));
+    on('mouseup',    e => this.onUp(e));
+    on('mouseleave', e => this.onUp(e));
+    on('touchstart', e => { e.preventDefault(); this.onDown(e.touches[0]); },       { passive:false });
+    on('touchmove',  e => { e.preventDefault(); this.onMove(e.touches[0]); },       { passive:false });
+    on('touchend',   e => { e.preventDefault(); this.onUp(e.changedTouches[0]); },  { passive:false });
   }
 
   pos(e) {
-    const r = this.dc.getBoundingClientRect();
-    const sx = this.dc.width / r.width, sy = this.dc.height / r.height;
-    return { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy };
+    const r  = this.dc.getBoundingClientRect();
+    const sx = this.dc.width  / r.width;
+    const sy = this.dc.height / r.height;
+    return { x: (e.clientX - r.left)*sx, y: (e.clientY - r.top)*sy };
   }
 
   loadSrc(src) {
@@ -1530,15 +1792,15 @@ class Annotator {
         this.img = img;
         this.originalSrc = src;
         const maxW = this.pc.parentElement.parentElement.clientWidth;
-        const maxH = Math.floor(window.innerHeight * 0.62);
-        let w = img.width, h = img.height;
-        const scale = Math.min(1, maxW/w, maxH/h);
-        w = Math.round(w * scale); h = Math.round(h * scale);
-        this.pc.width = this.dc.width = w;
+        const maxH = Math.floor(window.innerHeight * 0.65);
+        const scale = Math.min(1, maxW/img.width, maxH/img.height);
+        const w = Math.round(img.width*scale);
+        const h = Math.round(img.height*scale);
+        this.pc.width  = this.dc.width  = w;
         this.pc.height = this.dc.height = h;
-        this.pc.style.width = this.dc.style.width = w + 'px';
-        this.pc.style.height = this.dc.style.height = h + 'px';
-        this.pc.parentElement.style.height = h + 'px';
+        this.pc.style.width  = this.dc.style.width  = w+'px';
+        this.pc.style.height = this.dc.style.height = h+'px';
+        this.pc.parentElement.style.height = h+'px';
         this.pctx.drawImage(img, 0, 0, w, h);
         this.redrawAnnotations();
         resolve();
@@ -1547,109 +1809,265 @@ class Annotator {
     });
   }
 
+  /* ── Redraw ── */
   redrawAnnotations() {
     const ctx = this.dctx;
     ctx.clearRect(0, 0, this.dc.width, this.dc.height);
+    // Grid first (behind everything)
+    if (this.gridOn) this.drawGrid(ctx);
+    // All saved annotations
     this.annotations.forEach(a => this.drawAnn(ctx, a));
+    // In-progress angle points
+    if (this.angleState >= 1 && this.angleApex) this.drawAngleDot(ctx, this.angleApex, '1');
+    if (this.angleState >= 2 && this.angleRay1) {
+      this.drawAngleDot(ctx, this.angleRay1, '2');
+      ctx.save();
+      ctx.strokeStyle = this.color; ctx.lineWidth = this.strokeW;
+      ctx.setLineDash([6,4]); ctx.globalAlpha = .5;
+      ctx.beginPath(); ctx.moveTo(this.angleApex.x, this.angleApex.y);
+      ctx.lineTo(this.angleRay1.x, this.angleRay1.y); ctx.stroke();
+      ctx.restore();
+    }
+    renderMeasurements();
   }
 
+  drawAngleDot(ctx, p, label) {
+    ctx.save();
+    ctx.fillStyle = this.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 9px sans-serif';
+    ctx.fillText(label, p.x-3, p.y+3);
+    ctx.restore();
+  }
+
+  drawGrid(ctx) {
+    const W = this.dc.width, H = this.dc.height;
+    // Make square cells based on shorter axis
+    const cellSize = Math.min(W, H) / this.gridCols;
+    const cols = Math.ceil(W / cellSize);
+    const rows = Math.ceil(H / cellSize);
+    ctx.save();
+    ctx.strokeStyle = '#3B82F6';
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = this.gridOpacity;
+    ctx.setLineDash([4, 4]);
+    for (let c = 1; c < cols; c++) {
+      ctx.beginPath(); ctx.moveTo(c*cellSize, 0); ctx.lineTo(c*cellSize, H); ctx.stroke();
+    }
+    for (let r = 1; r < rows; r++) {
+      ctx.beginPath(); ctx.moveTo(0, r*cellSize); ctx.lineTo(W, r*cellSize); ctx.stroke();
+    }
+    // Thicker center cross
+    ctx.globalAlpha = this.gridOpacity * 1.6;
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ── Draw one annotation ── */
   drawAnn(ctx, a) {
     ctx.save();
     ctx.strokeStyle = a.color; ctx.fillStyle = a.color;
     ctx.lineWidth = a.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     const W = this.dc.width, H = this.dc.height;
-    switch(a.type) {
+
+    switch (a.type) {
+
       case 'plumb':
-        ctx.globalAlpha = .85; ctx.setLineDash([12, 6]);
+        ctx.globalAlpha = .88; ctx.setLineDash([12, 6]);
         ctx.beginPath(); ctx.moveTo(a.x, 0); ctx.lineTo(a.x, H); ctx.stroke();
         ctx.setLineDash([]); ctx.globalAlpha = 1;
-        // label
-        ctx.font = `bold 11px sans-serif`; ctx.fillStyle = a.color;
-        ctx.fillText('▼', a.x - 6, 14);
+        // Arrow top
+        ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = a.color;
+        ctx.fillText('▼', a.x-6, 16);
         break;
+
       case 'hline':
-        ctx.globalAlpha = .85; ctx.setLineDash([12, 6]);
+        ctx.globalAlpha = .88; ctx.setLineDash([12, 6]);
         ctx.beginPath(); ctx.moveTo(0, a.y); ctx.lineTo(W, a.y); ctx.stroke();
         ctx.setLineDash([]); ctx.globalAlpha = 1;
+        // Level indicator
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('◀', 2, a.y+4);
+        ctx.fillText('▶', W-14, a.y+4);
         break;
+
       case 'line':
-        ctx.beginPath(); ctx.moveTo(a.x1, a.y1); ctx.lineTo(a.x2, a.y2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(a.x1,a.y1); ctx.lineTo(a.x2,a.y2); ctx.stroke();
         break;
+
       case 'arrow':
         this.drawArrow(ctx, a.x1, a.y1, a.x2, a.y2, a.w);
         break;
+
       case 'circle':
         ctx.beginPath(); ctx.arc(a.cx, a.cy, a.r, 0, Math.PI*2); ctx.stroke();
+        // Center cross
+        ctx.lineWidth = Math.max(1, a.w*0.5);
+        ctx.beginPath(); ctx.moveTo(a.cx-6,a.cy); ctx.lineTo(a.cx+6,a.cy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(a.cx,a.cy-6); ctx.lineTo(a.cx,a.cy+6); ctx.stroke();
         break;
+
       case 'freehand':
         if (a.pts.length < 2) break;
         ctx.beginPath(); ctx.moveTo(a.pts[0].x, a.pts[0].y);
         a.pts.forEach(p => ctx.lineTo(p.x, p.y)); ctx.stroke();
         break;
-      case 'text':
-        ctx.font = `bold 18px sans-serif`;
+
+      case 'text': {
+        ctx.font = 'bold 18px -apple-system,sans-serif';
         const tw = ctx.measureText(a.text).width;
-        ctx.fillStyle = 'rgba(0,0,0,.55)';
-        ctx.fillRect(a.x - 3, a.y - 18, tw + 6, 22);
+        ctx.fillStyle = 'rgba(0,0,0,.6)';
+        ctx.fillRect(a.x-3, a.y-18, tw+6, 22);
         ctx.fillStyle = a.color;
         ctx.fillText(a.text, a.x, a.y);
         break;
+      }
+
+      /* ── 傾斜線：角度を自動ラベル ── */
+      case 'angleline': {
+        ctx.beginPath(); ctx.moveTo(a.x1,a.y1); ctx.lineTo(a.x2,a.y2); ctx.stroke();
+        // End dots
+        ctx.fillStyle = a.color;
+        ctx.beginPath(); ctx.arc(a.x1,a.y1,4,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(a.x2,a.y2,4,0,Math.PI*2); ctx.fill();
+        const deg = angleFromH(a.x1,a.y1,a.x2,a.y2);
+        drawLabel(ctx, `${deg.toFixed(1)}°`, (a.x1+a.x2)/2, (a.y1+a.y2)/2-16, a.color);
+        break;
+      }
+
+      /* ── 分度器：3点角度 ── */
+      case 'angle': {
+        const ax=a.ax, ay=a.ay;
+        // Two rays
+        ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(a.rx1,a.ry1); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(a.rx2,a.ry2); ctx.stroke();
+        // Endpoint dots
+        ctx.fillStyle = a.color;
+        [{ x:a.rx1,y:a.ry1 },{ x:a.rx2,y:a.ry2 }].forEach(p => {
+          ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill();
+        });
+        // Apex dot
+        ctx.beginPath(); ctx.arc(ax,ay,6,0,Math.PI*2); ctx.fill();
+        // Arc
+        const ang1 = Math.atan2(a.ry1-ay, a.rx1-ax);
+        const ang2 = Math.atan2(a.ry2-ay, a.rx2-ax);
+        const arcR = Math.min(
+          Math.hypot(a.rx1-ax, a.ry1-ay),
+          Math.hypot(a.rx2-ax, a.ry2-ay)
+        ) * 0.35;
+        let aStart = ang1, aEnd = ang2;
+        if (aEnd < aStart) [aStart, aEnd] = [aEnd, aStart];
+        // Pick shorter arc
+        const span = aEnd - aStart;
+        ctx.lineWidth = Math.max(1.5, a.w*0.7);
+        ctx.globalAlpha = .8;
+        ctx.beginPath();
+        if (span <= Math.PI) ctx.arc(ax, ay, arcR, aStart, aEnd);
+        else ctx.arc(ax, ay, arcR, aEnd, aStart + Math.PI*2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        // Degree label
+        const midAng = (aStart + aEnd) / 2 + (span > Math.PI ? Math.PI : 0);
+        const lx = ax + (arcR + 22) * Math.cos(midAng);
+        const ly = ay + (arcR + 22) * Math.sin(midAng);
+        drawLabel(ctx, `${a.deg.toFixed(1)}°`, lx, ly, a.color);
+        break;
+      }
     }
     ctx.restore();
   }
 
   drawArrow(ctx, x1, y1, x2, y2, w) {
     const angle = Math.atan2(y2-y1, x2-x1);
-    const hlen = Math.max(14, w * 4);
-    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    const hlen  = Math.max(14, w*4);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
     ctx.beginPath();
-    ctx.moveTo(x2, y2);
-    ctx.lineTo(x2 - hlen * Math.cos(angle - Math.PI/6), y2 - hlen * Math.sin(angle - Math.PI/6));
-    ctx.lineTo(x2 - hlen * Math.cos(angle + Math.PI/6), y2 - hlen * Math.sin(angle + Math.PI/6));
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2 - hlen*Math.cos(angle-Math.PI/6), y2 - hlen*Math.sin(angle-Math.PI/6));
+    ctx.lineTo(x2 - hlen*Math.cos(angle+Math.PI/6), y2 - hlen*Math.sin(angle+Math.PI/6));
     ctx.closePath(); ctx.fill();
   }
 
+  /* ── Input handlers ── */
   onDown(e) {
     const p = this.pos(e);
-    this.sx = p.x; this.sy = p.y;
-    this.drawing = true;
+
+    // Instant tools
     if (this.tool === 'plumb') {
       this.annotations.push({ type:'plumb', x:p.x, color:this.color, w:this.strokeW });
-      this.redrawAnnotations(); this.drawing = false; return;
+      this.redrawAnnotations(); return;
     }
     if (this.tool === 'hline') {
       this.annotations.push({ type:'hline', y:p.y, color:this.color, w:this.strokeW });
-      this.redrawAnnotations(); this.drawing = false; return;
+      this.redrawAnnotations(); return;
     }
     if (this.tool === 'text') {
       const txt = prompt('テキストを入力:');
       if (txt) { this.annotations.push({ type:'text', x:p.x, y:p.y, text:txt, color:this.color, w:1 }); this.redrawAnnotations(); }
-      this.drawing = false; return;
+      return;
     }
-    if (this.tool === 'freehand') this.fpts = [{ x:p.x, y:p.y }];
+
+    // 分度器（3-click state machine）
+    if (this.tool === 'angle') {
+      if (this.angleState === 0) {
+        this.angleApex = p; this.angleState = 1;
+        updateAngleStatus(1);
+      } else if (this.angleState === 1) {
+        this.angleRay1 = p; this.angleState = 2;
+        updateAngleStatus(2);
+      } else {
+        const deg = angleAtApex(this.angleApex, this.angleRay1, p);
+        this.annotations.push({
+          type:'angle',
+          ax:this.angleApex.x, ay:this.angleApex.y,
+          rx1:this.angleRay1.x, ry1:this.angleRay1.y,
+          rx2:p.x, ry2:p.y,
+          deg, color:this.color, w:this.strokeW
+        });
+        this.angleState = 0; this.angleApex = null; this.angleRay1 = null;
+        updateAngleStatus(0);
+        this.redrawAnnotations();
+      }
+      this.redrawAnnotations();
+      return;
+    }
+
+    this.drawing = true;
+    this.sx = p.x; this.sy = p.y;
+    if (this.tool === 'freehand') this.fpts = [p];
   }
 
   onMove(e) {
     if (!this.drawing) return;
     const p = this.pos(e);
     if (this.tool === 'freehand') {
-      this.fpts.push({ x:p.x, y:p.y });
+      this.fpts.push(p);
       this.redrawAnnotations();
       const ctx = this.dctx;
-      ctx.save(); ctx.strokeStyle = this.color; ctx.lineWidth = this.strokeW; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(this.fpts[0].x, this.fpts[0].y);
-      this.fpts.forEach(pt => ctx.lineTo(pt.x, pt.y)); ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.strokeStyle=this.color; ctx.lineWidth=this.strokeW; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(this.fpts[0].x,this.fpts[0].y);
+      this.fpts.forEach(pt => ctx.lineTo(pt.x,pt.y)); ctx.stroke(); ctx.restore();
       return;
     }
-    // Preview other shapes
     this.redrawAnnotations();
     const ctx = this.dctx;
-    ctx.save(); ctx.strokeStyle = this.color; ctx.fillStyle = this.color; ctx.lineWidth = this.strokeW; ctx.lineCap = 'round';
-    if (this.tool === 'line') { ctx.beginPath(); ctx.moveTo(this.sx, this.sy); ctx.lineTo(p.x, p.y); ctx.stroke(); }
-    if (this.tool === 'arrow') this.drawArrow(ctx, this.sx, this.sy, p.x, p.y, this.strokeW);
-    if (this.tool === 'circle') {
-      const r = Math.hypot(p.x-this.sx, p.y-this.sy);
-      ctx.beginPath(); ctx.arc(this.sx, this.sy, r, 0, Math.PI*2); ctx.stroke();
+    ctx.save(); ctx.strokeStyle=this.color; ctx.fillStyle=this.color;
+    ctx.lineWidth=this.strokeW; ctx.lineCap='round';
+    if (this.tool==='line'||this.tool==='angleline') {
+      ctx.beginPath(); ctx.moveTo(this.sx,this.sy); ctx.lineTo(p.x,p.y); ctx.stroke();
+      if (this.tool==='angleline') {
+        const deg = angleFromH(this.sx,this.sy,p.x,p.y);
+        drawLabel(ctx, `${deg.toFixed(1)}°`, (this.sx+p.x)/2, (this.sy+p.y)/2-16, this.color);
+      }
+    }
+    if (this.tool==='arrow')  this.drawArrow(ctx, this.sx,this.sy, p.x,p.y, this.strokeW);
+    if (this.tool==='circle') {
+      const r = Math.hypot(p.x-this.sx,p.y-this.sy);
+      ctx.beginPath(); ctx.arc(this.sx,this.sy,r,0,Math.PI*2); ctx.stroke();
     }
     ctx.restore();
   }
@@ -1658,32 +2076,45 @@ class Annotator {
     if (!this.drawing) return;
     this.drawing = false;
     const p = this.pos(e);
-    if (this.tool === 'freehand' && this.fpts.length > 2) {
+    if (this.tool==='freehand' && this.fpts.length>2) {
       this.annotations.push({ type:'freehand', pts:[...this.fpts], color:this.color, w:this.strokeW });
-    } else if (this.tool === 'line') {
-      this.annotations.push({ type:'line', x1:this.sx, y1:this.sy, x2:p.x, y2:p.y, color:this.color, w:this.strokeW });
-    } else if (this.tool === 'arrow') {
-      this.annotations.push({ type:'arrow', x1:this.sx, y1:this.sy, x2:p.x, y2:p.y, color:this.color, w:this.strokeW });
-    } else if (this.tool === 'circle') {
-      const r = Math.hypot(p.x-this.sx, p.y-this.sy);
-      if (r > 4) this.annotations.push({ type:'circle', cx:this.sx, cy:this.sy, r, color:this.color, w:this.strokeW });
+    } else if (this.tool==='angleline') {
+      const deg = angleFromH(this.sx,this.sy,p.x,p.y);
+      this.annotations.push({ type:'angleline', x1:this.sx,y1:this.sy,x2:p.x,y2:p.y, deg, color:this.color, w:this.strokeW });
+    } else if (this.tool==='line') {
+      this.annotations.push({ type:'line', x1:this.sx,y1:this.sy,x2:p.x,y2:p.y, color:this.color, w:this.strokeW });
+    } else if (this.tool==='arrow') {
+      this.annotations.push({ type:'arrow', x1:this.sx,y1:this.sy,x2:p.x,y2:p.y, color:this.color, w:this.strokeW });
+    } else if (this.tool==='circle') {
+      const r = Math.hypot(p.x-this.sx,p.y-this.sy);
+      if (r>4) this.annotations.push({ type:'circle', cx:this.sx,cy:this.sy,r, color:this.color, w:this.strokeW });
     }
     this.redrawAnnotations();
   }
 
-  undo() { if (this.annotations.length) { this.annotations.pop(); this.redrawAnnotations(); } }
-  clear() { if (confirm('全ての書き込みを消去しますか？')) { this.annotations = []; this.redrawAnnotations(); } }
+  undo() {
+    if (this.angleState > 0) { this.angleState=0; this.angleApex=null; this.angleRay1=null; updateAngleStatus(0); this.redrawAnnotations(); return; }
+    if (this.annotations.length) { this.annotations.pop(); this.redrawAnnotations(); }
+  }
+  clear() {
+    if (!confirm('全ての書き込みを消去しますか？')) return;
+    this.annotations=[]; this.angleState=0; this.angleApex=null; this.angleRay1=null;
+    updateAngleStatus(0); this.redrawAnnotations();
+  }
 
-  getAnnotations() { return JSON.parse(JSON.stringify(this.annotations)); }
-  setAnnotations(anns) { this.annotations = anns||[]; this.redrawAnnotations(); }
+  getMeasurements() {
+    return this.annotations.filter(a => a.type==='angle'||a.type==='angleline');
+  }
+
+  getAnnotations()      { return JSON.parse(JSON.stringify(this.annotations)); }
+  setAnnotations(anns)  { this.annotations=anns||[]; this.redrawAnnotations(); }
 
   exportMerged() {
     const tmp = document.createElement('canvas');
-    tmp.width = this.pc.width; tmp.height = this.pc.height;
+    tmp.width=this.pc.width; tmp.height=this.pc.height;
     const ctx = tmp.getContext('2d');
-    ctx.drawImage(this.pc, 0, 0);
-    ctx.drawImage(this.dc, 0, 0);
-    return tmp.toDataURL('image/jpeg', 0.82);
+    ctx.drawImage(this.pc,0,0); ctx.drawImage(this.dc,0,0);
+    return tmp.toDataURL('image/jpeg',0.85);
   }
 }
 
@@ -1773,6 +2204,96 @@ function annUndo() {
 function annClear() {
   const ann = state.currentAnnotators[state.activeTab];
   if (ann) ann.clear();
+}
+
+/* ── Angle tool helpers ── */
+function updateAngleStatus(s) {
+  const bar = document.querySelector('.angle-status');
+  if (!bar) return;
+  bar.style.display = s > 0 ? 'flex' : 'none';
+  ['as-1','as-2','as-3'].forEach((cls, i) => {
+    const el = bar.querySelector('.' + cls);
+    if (el) el.classList.toggle('done', i < s);
+  });
+}
+
+function resetAngleTool() {
+  const ann = state.currentAnnotators[state.activeTab];
+  if (!ann) return;
+  ann.angleState = 0; ann.angleApex = null; ann.angleRay1 = null;
+  ann.redraw();
+  updateAngleStatus(0);
+}
+
+/* ── Grid helpers ── */
+function toggleGrid() {
+  const ann = state.currentAnnotators[state.activeTab];
+  if (!ann) return;
+  ann.gridOn = !ann.gridOn;
+  const btn = document.getElementById('tool-grid');
+  if (btn) btn.classList.toggle('active', ann.gridOn);
+  const ctrl = document.querySelector('.grid-controls');
+  if (ctrl) ctrl.style.display = ann.gridOn ? 'flex' : 'none';
+  ann.redraw();
+}
+
+function setGridDensity(val) {
+  const ann = state.currentAnnotators[state.activeTab];
+  if (!ann) return;
+  ann.gridCols = parseInt(val);
+  ann.redraw();
+}
+
+function setGridOpacity(val) {
+  const ann = state.currentAnnotators[state.activeTab];
+  if (!ann) return;
+  ann.gridOpacity = parseInt(val) / 100;
+  ann.redraw();
+}
+
+/* ── Measurement panel ── */
+const CLINICAL_REF = {
+  '頭部前方変位':   { ok:[0,25], warn:[25,40], unit:'mm', label:'頭部前方変位' },
+  '肩の高さ差':     { ok:[0,5],  warn:[5,15],  unit:'mm', label:'肩の高さ差' },
+  '骨盤傾斜角':     { ok:[5,15], warn:[15,25], unit:'°',  label:'骨盤傾斜角' },
+  '体幹側方傾斜':   { ok:[0,3],  warn:[3,7],   unit:'°',  label:'体幹側方傾斜' },
+  '胸椎後弯角':     { ok:[20,45],warn:[45,60], unit:'°',  label:'胸椎後弯角' },
+  '腰椎前弯角':     { ok:[30,50],warn:[50,65], unit:'°',  label:'腰椎前弯角' },
+  '脊椎側弯':       { ok:[0,10], warn:[10,25], unit:'°',  label:'脊椎側弯Cobb角' },
+  '膝外反角':       { ok:[0,15], warn:[15,20], unit:'°',  label:'膝外反角Q角' },
+  '足部回内角':     { ok:[0,6],  warn:[6,12],  unit:'°',  label:'足部回内角' },
+  '頸椎前弯角':     { ok:[20,40],warn:[40,55], unit:'°',  label:'頸椎前弯角' },
+};
+
+function renderMeasurements() {
+  const ann = state.currentAnnotators[state.activeTab];
+  const body = document.getElementById('measure-body');
+  if (!body) return;
+  if (!ann) { body.innerHTML = '<p style="font-size:12px;color:var(--text2);padding:8px">写真を開くと計測値が表示されます</p>'; return; }
+  const items = ann.getMeasurements();
+  if (!items.length) { body.innerHTML = '<p style="font-size:12px;color:var(--text2);padding:8px">角度ツールで計測すると結果がここに表示されます</p>'; return; }
+  body.innerHTML = items.map((a, i) => {
+    const deg = typeof a.deg === 'number' ? a.deg : null;
+    const typeLabel = a.type === 'angle' ? '2線角' : '水平角';
+    let statusIcon = '', statusClass = 'm-ok';
+    if (deg !== null) {
+      if (deg < 5) { statusIcon = '✓'; statusClass = 'm-ok'; }
+      else if (deg < 20) { statusIcon = '△'; statusClass = 'm-warn'; }
+      else { statusIcon = '✕'; statusClass = 'm-bad'; }
+    }
+    return `<div class="measure-row">
+      <span class="m-idx">${i+1}</span>
+      <span class="m-type">${typeLabel}</span>
+      <span class="m-val">${deg !== null ? deg.toFixed(1) : '—'}°</span>
+      <span class="m-ref"></span>
+      <span class="${statusClass}">${statusIcon}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleMeasurePanel() {
+  const body = document.getElementById('measure-body');
+  if (body) body.classList.toggle('open');
 }
 
 /* ════════════════════════════════════════════
