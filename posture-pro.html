@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Lactive Pro — 姿勢分析ツール</title>
+<style>
+/* ── Variables ── */
+:root {
+  --sb: #0F172A;
+  --sb2: #1E293B;
+  --sb-text: #94A3B8;
+  --sb-active: #B5607A;
+  --bg: #F1F5F9;
+  --card: #FFFFFF;
+  --text: #0F172A;
+  --text2: #64748B;
+  --border: #E2E8F0;
+  --rose: #B5607A;
+  --rose-dk: #8B3F5A;
+  --rose-lt: #F2D9E3;
+  --gold: #C9A46A;
+  --danger: #EF4444;
+  --danger-lt: #FEF2F2;
+  --warn: #F59E0B;
+  --warn-lt: #FFFBEB;
+  --ok: #22C55E;
+  --ok-lt: #F0FDF4;
+  --info: #3B82F6;
+  --info-lt: #EFF6FF;
+  --r: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.14);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif; font-size: 14px; color: var(--text); background: var(--sb); }
+input, textarea, select, button { font-family: inherit; font-size: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ── PIN Screen ── */
+#pin-screen {
+  position: fixed; inset: 0; background: var(--sb);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
+}
+.pin-logo { font-size: 13px; letter-spacing: .25em; color: var(--rose); text-transform: uppercase; margin-bottom: 8px; }
+.pin-title { font-size: 22px; color: #F8FAFC; font-weight: 300; letter-spacing: .05em; margin-bottom: 36px; }
+.pin-dots { display: flex; gap: 14px; margin-bottom: 32px; }
+.pin-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid #475569; transition: background .15s, border-color .15s;
+}
+.pin-dot.filled { background: var(--rose); border-color: var(--rose); }
+.pin-pad { display: grid; grid-template-columns: repeat(3,72px); gap: 12px; }
+.pin-btn {
+  width: 72px; height: 72px; border-radius: 50%; border: none;
+  background: #1E293B; color: #F8FAFC; font-size: 22px; font-weight: 300;
+  cursor: pointer; transition: background .15s;
+}
+.pin-btn:active { background: #334155; }
+.pin-btn.pin-del { font-size: 18px; background: transparent; color: var(--sb-text); }
+.pin-error { color: var(--danger); font-size: 13px; margin-top: 16px; min-height: 20px; }
+.pin-hint { color: #475569; font-size: 12px; margin-top: 24px; }
+
+/* ── App Shell ── */
+#app { display: none; flex-direction: row; height: 100vh; }
+
+/* ── Sidebar ── */
+#sidebar {
+  width: 240px; flex-shrink: 0; background: var(--sb); display: flex; flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,.04);
+}
+.sb-header {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.sb-logo { font-size: 11px; letter-spacing: .22em; color: var(--rose); text-transform: uppercase; margin-bottom: 4px; }
+.sb-subtitle { font-size: 10px; color: #334155; letter-spacing: .08em; }
+.sb-search-wrap { padding: 12px 12px 8px; }
+.sb-search {
+  width: 100%; background: #1E293B; border: 1px solid #334155;
+  border-radius: 8px; padding: 8px 12px; color: #E2E8F0; font-size: 13px;
+  outline: none;
+}
+.sb-search::placeholder { color: #475569; }
+.sb-section-label { padding: 8px 16px 4px; font-size: 10px; color: #475569; letter-spacing: .12em; text-transform: uppercase; }
+.sb-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+.sb-list::-webkit-scrollbar { width: 4px; }
+.sb-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+.sb-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: 8px; cursor: pointer; transition: background .15s; color: var(--sb-text);
+  margin-bottom: 2px;
+}
+.sb-item:hover { background: #1E293B; color: #E2E8F0; }
+.sb-item.active { background: rgba(181,96,122,.15); color: #F8B4C8; }
+.sb-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #1E293B;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0; color: var(--rose);
+  border: 1px solid rgba(181,96,122,.3);
+}
+.sb-item-info { flex: 1; min-width: 0; }
+.sb-item-name { font-size: 13px; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-item-meta { font-size: 11px; color: #475569; margin-top: 1px; }
+.sb-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,.06); display: flex; flex-direction: column; gap: 6px; }
+.sb-btn {
+  width: 100%; padding: 9px 12px; border-radius: 8px; border: none;
+  font-size: 13px; cursor: pointer; transition: background .15s; text-align: center;
+}
+.sb-btn-primary { background: var(--rose); color: #fff; }
+.sb-btn-primary:hover { background: var(--rose-dk); }
+.sb-btn-ghost { background: transparent; color: #475569; border: 1px solid #334155; }
+.sb-btn-ghost:hover { color: #E2E8F0; border-color: #475569; }
+
+/* ── Main Panel ── */
+#main-panel { flex: 1; background: var(--bg); overflow-y: auto; display: flex; flex-direction: column; }
+#main-panel::-webkit-scrollbar { width: 6px; }
+#main-panel::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ── Views ── */
+.view { display: none; flex: 1; }
+.view.active { display: flex; flex-direction: column; }
+
+/* ── View: Home ── */
+#view-home { align-items: center; justify-content: center; gap: 12px; padding: 40px; }
+.home-icon { font-size: 56px; opacity: .3; }
+.home-text { font-size: 15px; color: var(--text2); text-align: center; line-height: 1.7; }
+
+/* ── View header ── */
+.view-header {
+  background: var(--card); border-bottom: 1px solid var(--border);
+  padding: 16px 24px; display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0; position: sticky; top: 0; z-index: 10;
+}
+.view-header h1 { font-size: 17px; font-weight: 600; flex: 1; }
+.view-header-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.hdr-btns { display: flex; gap: 8px; flex-shrink: 0; }
+.btn {
+  padding: 8px 16px; border-radius: 8px; border: none;
+  font-size: 13px; cursor: pointer; transition: all .15s; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--rose); color: #fff; }
+.btn-primary:hover { background: var(--rose-dk); }
+.btn-danger { background: var(--danger-lt); color: var(--danger); }
+.btn-danger:hover { background: #FEE2E2; }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: #CBD5E1; background: var(--bg); }
+.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+.btn-icon { padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); cursor: pointer; font-size: 16px; transition: background .15s; }
+.btn-icon:hover { background: var(--bg); }
+
+/* ── View: Client Detail ── */
+.view-body { padding: 20px 24px; flex: 1; }
+.client-meta-card {
+  background: var(--card); border-radius: var(--r); padding: 20px;
+  box-shadow: var(--shadow); margin-bottom: 20px;
+  display: flex; gap: 20px; align-items: flex-start;
+}
+.client-avatar-lg {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--rose-lt); color: var(--rose-dk);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 700; flex-shrink: 0;
+}
+.client-info-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center; }
+.ci-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
+.ci-val { font-size: 13px; color: var(--text); }
+.client-memo-box {
+  flex: 1; background: var(--bg); border-radius: 8px; padding: 12px;
+  font-size: 13px; color: var(--text2); line-height: 1.7; white-space: pre-wrap;
+}
+
+.sessions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 14px; }
+.session-card {
+  background: var(--card); border-radius: var(--r); overflow: hidden;
+  box-shadow: var(--shadow); cursor: pointer; transition: transform .15s, box-shadow .15s;
+  border: 2px solid transparent;
+}
+.session-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.session-card.compare-selected { border-color: var(--rose); }
+.session-thumb {
+  height: 140px; background: var(--bg); display: flex; gap: 2px; overflow: hidden;
+}
+.session-thumb-half { flex: 1; background: #CBD5E1; overflow: hidden; }
+.session-thumb-half img { width: 100%; height: 100%; object-fit: cover; }
+.session-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 24px; opacity: .3; }
+.session-info { padding: 12px; }
+.session-date { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.session-num { font-size: 11px; color: var(--text2); }
+.session-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.tag {
+  font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 500;
+  white-space: nowrap;
+}
+.tag-danger { background: var(--danger-lt); color: var(--danger); }
+.tag-warn   { background: var(--warn-lt);   color: var(--warn);   }
+.tag-ok     { background: var(--ok-lt);     color: #16A34A;       }
+.tag-info   { background: var(--info-lt);   color: var(--info);   }
+.tag-gray   { background: var(--bg);        color: var(--text2);  border: 1px solid var(--border); }
+
+/* ── Session New / Detail views ── */
+.session-form { padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+.form-card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+.form-card-header {
+  padding: 14px 18px; background: var(--bg); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.form-card-title { font-size: 14px; font-weight: 600; }
+.form-card-body { padding: 16px 18px; }
+
+/* Photo tabs */
+.photo-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.photo-tab {
+  flex: 1; padding: 12px; text-align: center; font-size: 13px; font-weight: 500;
+  color: var(--text2); border: none; background: transparent; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all .15s; margin-bottom: -1px;
+}
+.photo-tab.active { color: var(--rose); border-bottom-color: var(--rose); }
+
+.photo-panel { display: none; }
+.photo-panel.active { display: block; }
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: var(--r);
+  padding: 40px 20px; text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s; background: var(--bg);
+}
+.upload-zone:hover { border-color: var(--rose); background: var(--rose-lt); }
+.upload-zone input[type=file] { display: none; }
+.upload-icon { font-size: 36px; margin-bottom: 12px; opacity: .5; }
+.upload-label { font-size: 14px; color: var(--text2); margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: #94A3B8; }
+
+/* Annotation area */
+.ann-wrap { position: relative; background: #000; }
+.ann-toolbar {
+  display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px;
+  background: #1E293B; align-items: center;
+}
+.ann-tool-group { display: flex; gap: 3px; }
+.ann-sep { width: 1px; background: #334155; margin: 0 4px; align-self: stretch; }
+.tool-btn {
+  width: 36px; height: 36px; border-radius: 8px; border: none;
+  background: #334155; color: #94A3B8;
+  cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s; position: relative; flex-shrink: 0;
+}
+.tool-btn:hover { background: #475569; color: #E2E8F0; }
+.tool-btn.active { background: var(--rose); color: #fff; }
+.tool-btn[title]:hover::after {
+  content: attr(title); position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%); background: #0F172A; color: #E2E8F0;
+  font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; z-index: 10;
+}
+.color-btn {
+  width: 24px; height: 24px; border-radius: 50%; border: 3px solid transparent;
+  cursor: pointer; transition: border-color .15s, transform .15s; flex-shrink: 0;
+}
+.color-btn.active { border-color: #E2E8F0; transform: scale(1.15); }
+.stroke-select {
+  background: #334155; border: none; color: #94A3B8;
+  border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer;
+}
+
+.canvas-container {
+  position: relative; cursor: crosshair; line-height: 0;
+  touch-action: none; user-select: none;
+}
+.canvas-container canvas { position: absolute; top: 0; left: 0; }
+#canvas-photo { position: relative; }
+#canvas-draw { cursor: crosshair; }
+.canvas-placeholder {
+  height: 300px; display: flex; align-items: center; justify-content: center;
+  color: #475569; font-size: 14px;
+}
+
+/* ── Assessment Table ── */
+.assess-table { width: 100%; border-collapse: collapse; }
+.assess-table th {
+  font-size: 11px; color: var(--text2); font-weight: 500; text-align: left;
+  padding: 8px 12px; border-bottom: 2px solid var(--border); white-space: nowrap;
+}
+.assess-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.assess-table tr:last-child td { border-bottom: none; }
+.assess-label { font-size: 13px; white-space: nowrap; }
+.rating-btns { display: flex; gap: 6px; }
+.rating-btn {
+  padding: 4px 10px; border-radius: 99px; border: 1.5px solid var(--border);
+  font-size: 11px; font-weight: 500; cursor: pointer; background: transparent;
+  transition: all .15s; white-space: nowrap;
+}
+.rating-btn[data-r="1"].active { background: var(--ok-lt); border-color: #86EFAC; color: #16A34A; }
+.rating-btn[data-r="2"].active { background: var(--warn-lt); border-color: #FCD34D; color: #B45309; }
+.rating-btn[data-r="3"].active { background: var(--danger-lt); border-color: #FCA5A5; color: var(--danger); }
+.assess-note { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; color: var(--text); background: var(--bg); outline: none; resize: none; height: 34px; line-height: 1.4; }
+.assess-note:focus { border-color: var(--rose); }
+
+/* ── Correction Points ── */
+.correction-list { display: flex; flex-direction: column; gap: 8px; }
+.correction-item {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+  background: var(--bg); border-radius: 8px; border: 1px solid var(--border);
+}
+.correction-cat {
+  font-size: 10px; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; margin-top: 2px;
+  font-weight: 600; letter-spacing: .04em;
+}
+.cat-immediate { background: var(--danger-lt); color: var(--danger); }
+.cat-session   { background: var(--warn-lt); color: #B45309; }
+.cat-homework  { background: var(--info-lt); color: var(--info); }
+.correction-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.5; }
+.correction-del { background: none; border: none; color: #CBD5E1; cursor: pointer; font-size: 16px; flex-shrink: 0; transition: color .15s; }
+.correction-del:hover { color: var(--danger); }
+.correction-add-row { display: flex; gap: 8px; margin-top: 10px; }
+.cat-select {
+  border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px;
+  font-size: 12px; background: var(--card); color: var(--text); outline: none;
+}
+.correction-input {
+  flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px;
+  font-size: 13px; color: var(--text); background: var(--card); outline: none;
+}
+.correction-input:focus { border-color: var(--rose); }
+
+/* ── Private Notes ── */
+.private-textarea {
+  width: 100%; min-height: 100px; border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; font-size: 13px; color: var(--text); background: #FAFAFA;
+  outline: none; resize: vertical; line-height: 1.7;
+}
+.private-textarea:focus { border-color: var(--rose); }
+.private-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #0F172A; color: #94A3B8; font-size: 11px;
+  padding: 3px 10px; border-radius: 99px;
+}
+
+/* ── Compare View ── */
+.compare-wrap { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.compare-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.compare-col-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 8px; text-align: center; }
+.compare-select { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; background: var(--card); color: var(--text); outline: none; }
+.compare-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.compare-photo-block { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+.compare-photo-label { padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border); }
+.compare-photo-img { width: 100%; display: block; }
+.compare-assess { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+.compare-assess-title { padding: 14px 18px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--border); }
+.compare-table { width: 100%; border-collapse: collapse; }
+.compare-table th { font-size: 11px; color: var(--text2); padding: 8px 16px; border-bottom: 1px solid var(--border); font-weight: 500; text-align: left; }
+.compare-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+.compare-table tr:last-child td { border-bottom: none; }
+.rating-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
+.r-none { background: var(--bg); color: var(--text2); }
+.r-1 { background: var(--ok-lt); color: #16A34A; }
+.r-2 { background: var(--warn-lt); color: #B45309; }
+.r-3 { background: var(--danger-lt); color: var(--danger); }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border-radius: 14px; width: 100%; max-width: 440px;
+  box-shadow: var(--shadow-lg); animation: slide-up .25s ease;
+}
+@keyframes slide-up { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-header {
+  padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-size: 16px; font-weight: 600; }
+.modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text2); line-height: 1; }
+.modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+.form-row { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--text2); }
+.form-input {
+  border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+  font-size: 14px; color: var(--text); background: var(--bg); outline: none;
+  transition: border-color .15s;
+}
+.form-input:focus { border-color: var(--rose); background: var(--card); }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── Section Labels ── */
+.section-label {
+  font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: .08em;
+  text-transform: uppercase; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── Utilities ── */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-8 { gap: 8px; }
+.mt-16 { margin-top: 16px; }
+.text-sm { font-size: 12px; }
+.text-muted { color: var(--text2); }
+.font-600 { font-weight: 600; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text2); }
+.empty-icon { font-size: 40px; opacity: .3; margin-bottom: 12px; }
+
+/* ── Scrollbar ── */
+.view-body::-webkit-scrollbar { width: 6px; }
+.view-body::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ── iOS safe areas ── */
+#app { padding-bottom: env(safe-area-inset-bottom); }
+#pin-screen { padding-bottom: env(safe-area-inset-bottom); }
+.view-header { padding-top: max(16px, env(safe-area-inset-top)); }
+
+/* ── Touch: prevent double-tap zoom, remove tap highlight ── */
+button, a, label, .sb-item, .session-card, .pain-btn, .rating-btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+input, textarea, select { font-size: 16px !important; } /* prevents iOS zoom on focus */
+
+/* ── Mobile sidebar overlay ── */
+#sidebar-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  z-index: 199; -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+}
+#sidebar-overlay.open { display: block; }
+
+/* ── Mobile hamburger ── */
+#mob-menu-btn {
+  display: none; background: none; border: none;
+  color: var(--sb-text); font-size: 22px; cursor: pointer;
+  padding: 8px; border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Upload zone: two-button layout ── */
+.upload-zone-inner {
+  padding: 28px 16px; display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+}
+.upload-btns { display: flex; gap: 12px; }
+.upload-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 18px 24px; cursor: pointer;
+  transition: border-color .15s, background .15s; min-width: 120px;
+  font-family: inherit;
+}
+.upload-btn:active { background: var(--rose-lt); border-color: var(--rose); }
+.upload-btn-icon { font-size: 32px; }
+.upload-btn-label { font-size: 13px; color: var(--text2); font-weight: 500; }
+.upload-hint { font-size: 11px; color: #94A3B8; }
+
+/* ── Re-shoot button (shown when photo loaded) ── */
+.photo-redo-bar {
+  display: flex; gap: 8px; padding: 8px 12px;
+  background: #0F172A; align-items: center;
+}
+.photo-redo-bar span { flex: 1; font-size: 12px; color: #94A3B8; }
+
+/* ── Camera Modal ── */
+#camera-modal {
+  position: fixed; inset: 0; z-index: 500;
+  background: #000; display: none; flex-direction: column;
+}
+#camera-modal.open { display: flex; }
+
+.cam-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; padding-top: max(14px, env(safe-area-inset-top));
+  background: rgba(0,0,0,.7); position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+}
+.cam-title { color: #fff; font-size: 15px; font-weight: 500; }
+.cam-close {
+  background: rgba(255,255,255,.15); border: none; color: #fff;
+  width: 36px; height: 36px; border-radius: 50%; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#cam-video {
+  width: 100%; height: 100%; object-fit: cover;
+  -webkit-playsinline: true;
+}
+
+.cam-preview-wrap {
+  display: none; width: 100%; height: 100%;
+  align-items: center; justify-content: center; background: #000;
+}
+.cam-preview-wrap.show { display: flex; }
+#cam-preview-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.cam-footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 20px 24px; padding-bottom: max(20px, env(safe-area-inset-bottom));
+  background: rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.cam-shutter {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: #fff; border: 4px solid rgba(255,255,255,.4);
+  cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.3);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .1s;
+}
+.cam-shutter:active { transform: scale(.92); }
+.cam-flip {
+  width: 50px; height: 50px; border-radius: 50%;
+  background: rgba(255,255,255,.15); border: none; color: #fff; font-size: 22px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.cam-action-btns {
+  display: flex; flex-direction: column; gap: 8px; flex: 1;
+}
+.cam-use-btn {
+  background: var(--rose); color: #fff; border: none; border-radius: 10px;
+  padding: 12px 20px; font-size: 15px; font-weight: 600; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.cam-retake-btn {
+  background: rgba(255,255,255,.15); color: #fff; border: none; border-radius: 10px;
+  padding: 10px 20px; font-size: 14px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Tool buttons: bigger on mobile ── */
+@media (max-width: 768px) {
+  .tool-btn { width: 42px; height: 42px; font-size: 18px; }
+  .color-btn { width: 30px; height: 30px; }
+  .ann-toolbar { gap: 6px; padding: 10px 12px; overflow-x: auto; flex-wrap: nowrap; }
+  .ann-tool-group { flex-shrink: 0; }
+}
+
+/* ── Responsive: mobile sidebar ── */
+@media (max-width: 700px) {
+  #sidebar {
+    position: fixed; left: -260px; top: 0; bottom: 0; width: 260px; z-index: 200;
+    transition: left .3s ease; box-shadow: none;
+  }
+  #sidebar.open { left: 0; box-shadow: var(--shadow-lg); }
+  #mob-menu-btn { display: flex; align-items: center; justify-content: center; }
+  #app { height: 100%; height: -webkit-fill-available; }
+  .compare-selectors, .compare-photos { grid-template-columns: 1fr; }
+  .session-form { padding: 12px; gap: 14px; }
+  .view-body { padding: 14px; }
+  .view-header { padding: 12px 16px; }
+  .view-header h1 { font-size: 15px; }
+  .hdr-btns .btn-sm { padding: 7px 10px; font-size: 12px; }
+}
+
+/* ── Scrollbar ── */
+.view-body::-webkit-scrollbar { width: 6px; }
+.view-body::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+/* ── Annotation canvas sizing helper ── */
+.canvas-outer { overflow: hidden; width: 100%; background: #111; }
+</style>
+</head>
+<body>
+
+<!-- ════════════ PIN SCREEN ════════════ -->
+<div id="pin-screen">
+  <div class="pin-logo">Lactive Pro</div>
+  <div class="pin-title">姿勢分析ツール</div>
+  <div class="pin-dots" id="pin-dots">
+    <div class="pin-dot"></div>
+    <div class="pin-dot"></div>
+    <div class="pin-dot"></div>
+    <div class="pin-dot"></div>
+  </div>
+  <div class="pin-pad">
+    <button class="pin-btn" onclick="pinInput('1')">1</button>
+    <button class="pin-btn" onclick="pinInput('2')">2</button>
+    <button class="pin-btn" onclick="pinInput('3')">3</button>
+    <button class="pin-btn" onclick="pinInput('4')">4</button>
+    <button class="pin-btn" onclick="pinInput('5')">5</button>
+    <button class="pin-btn" onclick="pinInput('6')">6</button>
+    <button class="pin-btn" onclick="pinInput('7')">7</button>
+    <button class="pin-btn" onclick="pinInput('8')">8</button>
+    <button class="pin-btn" onclick="pinInput('9')">9</button>
+    <button class="pin-btn pin-del" onclick="pinDel()">⌫</button>
+    <button class="pin-btn" onclick="pinInput('0')">0</button>
+    <button class="pin-btn pin-del" onclick="pinClear()">✕</button>
+  </div>
+  <div class="pin-error" id="pin-error"></div>
+  <div class="pin-hint" id="pin-hint"></div>
+</div>
+
+<!-- ════════════ CAMERA MODAL ════════════ -->
+<div id="camera-modal">
+  <div class="cam-header">
+    <button class="cam-close" onclick="closeCamera()">✕</button>
+    <span class="cam-title" id="cam-title">📷 正面写真を撮影</span>
+    <div style="width:36px"></div>
+  </div>
+
+  <!-- Live view -->
+  <video id="cam-video" autoplay playsinline muted></video>
+
+  <!-- Preview after capture -->
+  <div class="cam-preview-wrap" id="cam-preview-wrap">
+    <img id="cam-preview-img" alt="撮影プレビュー">
+  </div>
+
+  <!-- Footer: shooting state -->
+  <div class="cam-footer" id="cam-footer-shoot">
+    <button class="cam-flip" onclick="flipCamera()" title="カメラ切替">🔄</button>
+    <button class="cam-shutter" onclick="capturePhoto()" aria-label="撮影"></button>
+    <div style="width:50px"></div>
+  </div>
+
+  <!-- Footer: preview state -->
+  <div class="cam-footer" id="cam-footer-preview" style="display:none">
+    <button class="cam-retake-btn" onclick="retakePhoto()">撮り直す</button>
+    <button class="cam-use-btn" onclick="usePhoto()">この写真を使用 →</button>
+  </div>
+</div>
+
+<!-- Sidebar overlay (mobile) -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- ════════════ APP ════════════ -->
+<div id="app">
+
+  <!-- Sidebar -->
+  <!-- Mobile header bar -->
+  <div id="mob-topbar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:100;background:var(--sb);padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));border-bottom:1px solid rgba(255,255,255,.06);align-items:center;gap:12px">
+    <button id="mob-menu-btn" onclick="toggleSidebar()" style="display:flex">☰</button>
+    <span style="color:#E2E8F0;font-size:14px;font-weight:500;letter-spacing:.08em">Lactive Pro</span>
+  </div>
+
+  <aside id="sidebar">
+    <div class="sb-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="sb-logo">Lactive Pro</div>
+        <div class="sb-subtitle">POSTURE ASSESSMENT</div>
+      </div>
+      <button id="mob-close-sidebar" onclick="closeSidebar()" style="display:none;background:none;border:none;color:#94A3B8;font-size:20px;cursor:pointer;padding:4px">✕</button>
+    </div>
+    <div class="sb-search-wrap">
+      <input class="sb-search" id="client-search" placeholder="🔍 顧客を検索..." oninput="filterClients(this.value)">
+    </div>
+    <div class="sb-section-label">顧客リスト</div>
+    <div class="sb-list" id="sb-client-list"></div>
+    <div class="sb-footer">
+      <button class="sb-btn sb-btn-primary" onclick="openClientModal()">＋ 新規顧客を追加</button>
+      <button class="sb-btn sb-btn-ghost" onclick="openSettings()">⚙ 設定</button>
+    </div>
+  </aside>
+
+  <!-- Main Panel -->
+  <main id="main-panel">
+
+    <!-- Home -->
+    <div class="view active" id="view-home">
+      <div class="home-icon">🦴</div>
+      <div class="home-text">顧客を選択するか、すぐに分析を始めてください</div>
+      <button class="btn btn-primary" style="margin-top:24px;padding:12px 28px;font-size:15px" onclick="openNewSession()">＋ 今すぐ分析を開始する</button>
+      <div style="margin-top:12px;font-size:12px;color:#64748B">顧客登録なしでも利用できます</div>
+    </div>
+
+    <!-- Client Detail -->
+    <div class="view" id="view-client">
+      <div class="view-header">
+        <div style="flex:1">
+          <h1 id="cd-name">—</h1>
+          <div class="view-header-sub" id="cd-sub">—</div>
+        </div>
+        <div class="hdr-btns">
+          <button class="btn btn-ghost btn-sm" onclick="openCompare()">📊 比較</button>
+          <button class="btn btn-primary btn-sm" onclick="openNewSession()">＋ 新規セッション</button>
+          <button class="btn-icon" onclick="openClientModal(state.activeClientId)" title="編集">✏️</button>
+        </div>
+      </div>
+      <div class="view-body">
+        <div class="client-meta-card" id="cd-meta"></div>
+        <div class="section-label">セッション履歴</div>
+        <div class="sessions-grid" id="cd-sessions"></div>
+      </div>
+    </div>
+
+    <!-- New Session -->
+    <div class="view" id="view-session-new">
+      <div class="view-header">
+        <div style="flex:1">
+          <h1 id="ns-title">新規セッション</h1>
+          <div class="view-header-sub" id="ns-client-name">—</div>
+        </div>
+        <div class="hdr-btns">
+          <button class="btn btn-ghost btn-sm" onclick="state.activeClientId ? showClientView() : showView('view-home')">キャンセル</button>
+          <button class="btn btn-primary btn-sm" onclick="saveSession()">💾 保存</button>
+        </div>
+      </div>
+      <div class="session-form" id="ns-form">
+
+        <!-- Photos -->
+        <div class="form-card">
+          <div class="photo-tabs">
+            <button class="photo-tab active" onclick="switchPhotoTab('front', this)">正面写真</button>
+            <button class="photo-tab" onclick="switchPhotoTab('side', this)">側面写真</button>
+          </div>
+          <!-- Toolbar -->
+          <div class="ann-toolbar" id="ann-toolbar">
+            <div class="ann-tool-group">
+              <button class="tool-btn active" id="tool-plumb" title="垂直基準線" onclick="setTool('plumb')">⬍</button>
+              <button class="tool-btn" id="tool-hline" title="水平基準線" onclick="setTool('hline')">⬌</button>
+              <button class="tool-btn" id="tool-line" title="直線" onclick="setTool('line')">╱</button>
+              <button class="tool-btn" id="tool-arrow" title="矢印" onclick="setTool('arrow')">↗</button>
+              <button class="tool-btn" id="tool-circle" title="円マーカー" onclick="setTool('circle')">○</button>
+              <button class="tool-btn" id="tool-freehand" title="フリーハンド" onclick="setTool('freehand')">✏️</button>
+              <button class="tool-btn" id="tool-text" title="テキスト" onclick="setTool('text')">T</button>
+            </div>
+            <div class="ann-sep"></div>
+            <div class="ann-tool-group" style="align-items:center;gap:8px">
+              <div class="color-btn active" style="background:#EF4444" data-color="#EF4444" onclick="setColor(this)" title="赤"></div>
+              <div class="color-btn" style="background:#F59E0B" data-color="#F59E0B" onclick="setColor(this)" title="オレンジ"></div>
+              <div class="color-btn" style="background:#3B82F6" data-color="#3B82F6" onclick="setColor(this)" title="青"></div>
+              <div class="color-btn" style="background:#22C55E" data-color="#22C55E" onclick="setColor(this)" title="緑"></div>
+              <div class="color-btn" style="background:#FFFFFF;border:2px solid #475569" data-color="#FFFFFF" onclick="setColor(this)" title="白"></div>
+            </div>
+            <div class="ann-sep"></div>
+            <div class="ann-tool-group">
+              <select class="stroke-select" onchange="setStroke(this.value)">
+                <option value="2">細</option>
+                <option value="3" selected>中</option>
+                <option value="5">太</option>
+              </select>
+            </div>
+            <div class="ann-sep"></div>
+            <div class="ann-tool-group">
+              <button class="tool-btn" title="取り消し" onclick="annUndo()">↩</button>
+              <button class="tool-btn" title="全消去" onclick="annClear()">🗑</button>
+            </div>
+          </div>
+          <!-- Canvas panels -->
+          <div class="photo-panel active" id="panel-front">
+            <div id="upload-zone-front" class="upload-zone" style="cursor:default;padding:0">
+              <input type="file" id="file-front" accept="image/*" onchange="loadPhoto('front', this)" style="display:none">
+              <div class="upload-zone-inner">
+                <div class="upload-btns">
+                  <button class="upload-btn" onclick="openCamera('front')">
+                    <span class="upload-btn-icon">📷</span>
+                    <span class="upload-btn-label">カメラ撮影</span>
+                  </button>
+                  <button class="upload-btn" onclick="document.getElementById('file-front').click()">
+                    <span class="upload-btn-icon">🖼</span>
+                    <span class="upload-btn-label">ライブラリ</span>
+                  </button>
+                </div>
+                <div class="upload-hint">正面からまっすぐ立った状態を撮影してください</div>
+              </div>
+            </div>
+            <div class="canvas-outer" id="canvas-outer-front" style="display:none">
+              <div class="photo-redo-bar">
+                <span>正面写真</span>
+                <button class="btn btn-ghost btn-sm" onclick="openCamera('front')">📷 撮り直す</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('file-front').click()">🖼 変更</button>
+              </div>
+              <div class="canvas-container" id="canvas-container-front">
+                <canvas id="canvas-photo-front"></canvas>
+                <canvas id="canvas-draw-front"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="photo-panel" id="panel-side">
+            <div id="upload-zone-side" class="upload-zone" style="cursor:default;padding:0">
+              <input type="file" id="file-side" accept="image/*" onchange="loadPhoto('side', this)" style="display:none">
+              <div class="upload-zone-inner">
+                <div class="upload-btns">
+                  <button class="upload-btn" onclick="openCamera('side')">
+                    <span class="upload-btn-icon">📷</span>
+                    <span class="upload-btn-label">カメラ撮影</span>
+                  </button>
+                  <button class="upload-btn" onclick="document.getElementById('file-side').click()">
+                    <span class="upload-btn-icon">🖼</span>
+                    <span class="upload-btn-label">ライブラリ</span>
+                  </button>
+                </div>
+                <div class="upload-hint">真横から立った状態を撮影してください</div>
+              </div>
+            </div>
+            <div class="canvas-outer" id="canvas-outer-side" style="display:none">
+              <div class="photo-redo-bar">
+                <span>側面写真</span>
+                <button class="btn btn-ghost btn-sm" onclick="openCamera('side')">📷 撮り直す</button>
+                <button class="btn btn-ghost btn-sm" onclick="document.getElementById('file-side').click()">🖼 変更</button>
+              </div>
+              <div class="canvas-container" id="canvas-container-side">
+                <canvas id="canvas-photo-side"></canvas>
+                <canvas id="canvas-draw-side"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assessment -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <span class="form-card-title">🦴 部位別アセスメント</span>
+          </div>
+          <div class="form-card-body" style="padding:0">
+            <table class="assess-table" id="assess-table">
+              <thead>
+                <tr>
+                  <th>部位</th>
+                  <th>評価</th>
+                  <th style="width:99%">所見メモ</th>
+                </tr>
+              </thead>
+              <tbody id="assess-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Correction Points -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <span class="form-card-title">🔴 修正ポイント <span class="private-badge">🔒 非公開</span></span>
+          </div>
+          <div class="form-card-body">
+            <div class="correction-list" id="correction-list"></div>
+            <div class="correction-add-row">
+              <select class="cat-select" id="new-correction-cat">
+                <option value="immediate">即時修正</option>
+                <option value="session">セッション中</option>
+                <option value="homework">ホームワーク</option>
+              </select>
+              <input class="correction-input" id="new-correction-text" placeholder="修正ポイントを入力..." onkeydown="if(event.key==='Enter')addCorrection()">
+              <button class="btn btn-primary btn-sm" onclick="addCorrection()">追加</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Private Notes -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <span class="form-card-title">📝 プライベートメモ <span class="private-badge">🔒 非公開</span></span>
+          </div>
+          <div class="form-card-body">
+            <textarea class="private-textarea" id="private-notes" placeholder="顧客には見せないメモ。触察結果、主観的印象、次回への申し送りなど..."></textarea>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="form-card">
+          <div class="form-card-header"><span class="form-card-title">🏷 セッションタグ</span></div>
+          <div class="form-card-body">
+            <div style="display:flex;flex-wrap:wrap;gap:8px" id="tag-btns"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Session Detail (read-only) -->
+    <div class="view" id="view-session-detail">
+      <div class="view-header">
+        <div style="flex:1">
+          <h1 id="sd-title">セッション詳細</h1>
+          <div class="view-header-sub" id="sd-sub">—</div>
+        </div>
+        <div class="hdr-btns">
+          <button class="btn btn-danger btn-sm" onclick="deleteSession()">🗑 削除</button>
+          <button class="btn btn-ghost btn-sm" onclick="editSession()">✏️ 編集</button>
+          <button class="btn btn-ghost btn-sm" id="sd-back-btn">← 戻る</button>
+        </div>
+      </div>
+      <div class="view-body">
+        <div id="sd-content"></div>
+      </div>
+    </div>
+
+    <!-- Before/After Compare -->
+    <div class="view" id="view-compare">
+      <div class="view-header">
+        <div style="flex:1">
+          <h1 id="cmp-title">ビフォーアフター比較</h1>
+          <div class="view-header-sub" id="cmp-sub">2つのセッションを選択してください</div>
+        </div>
+        <div class="hdr-btns">
+          <button class="btn btn-ghost btn-sm" onclick="showClientView()">← 戻る</button>
+        </div>
+      </div>
+      <div class="compare-wrap">
+        <div class="compare-selectors">
+          <div>
+            <div class="compare-col-label">⬅ ビフォー</div>
+            <select class="compare-select" id="cmp-sel-a" onchange="renderCompare()"></select>
+          </div>
+          <div>
+            <div class="compare-col-label">アフター ➡</div>
+            <select class="compare-select" id="cmp-sel-b" onchange="renderCompare()"></select>
+          </div>
+        </div>
+        <div id="cmp-content"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════════════ MODAL: Client Form ════════════ -->
+<div class="modal-overlay" id="modal-client">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-client-title">新規顧客登録</span>
+      <button class="modal-close" onclick="closeModal('modal-client')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">氏名 *</label>
+          <input class="form-input" id="f-name" placeholder="山田 花子">
+        </div>
+        <div class="form-row">
+          <label class="form-label">フリガナ</label>
+          <input class="form-input" id="f-kana" placeholder="ヤマダ ハナコ">
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">生年</label>
+          <input class="form-input" id="f-year" type="number" placeholder="1985" min="1920" max="2010">
+        </div>
+        <div class="form-row">
+          <label class="form-label">性別</label>
+          <select class="form-input" id="f-gender">
+            <option value="">—</option>
+            <option value="女性">女性</option>
+            <option value="男性">男性</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">プライベートメモ</label>
+        <textarea class="form-input" id="f-memo" rows="3" placeholder="既往歴、主訴、注意事項など（顧客には表示されません）"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-client')">キャンセル</button>
+      <button class="btn btn-danger btn-sm" id="btn-delete-client" onclick="deleteClient()" style="display:none">削除</button>
+      <button class="btn btn-primary" onclick="saveClient()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ MODAL: Settings ════════════ -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">設定</span>
+      <button class="modal-close" onclick="closeModal('modal-settings')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">PINを変更</label>
+        <input class="form-input" id="new-pin" type="password" maxlength="4" placeholder="新しい4桁のPIN">
+      </div>
+      <div class="form-row">
+        <label class="form-label">ストレージ使用量</label>
+        <div style="font-size:13px;color:var(--text2)" id="storage-info">計算中...</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-settings')">閉じる</button>
+      <button class="btn btn-primary" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════════ */
+const DEFAULT_PIN = '1234';
+const MAX_IMG_W = 1000;
+const STORAGE_KEY = 'lacpro_v1';
+
+const BODY_REGIONS = [
+  { key:'head',      label:'頭部・頸部' },
+  { key:'shoulder',  label:'肩・肩甲帯' },
+  { key:'thoracic',  label:'胸椎' },
+  { key:'lumbar',    label:'腰椎・骨盤' },
+  { key:'hip',       label:'股関節' },
+  { key:'knee',      label:'膝関節' },
+  { key:'foot',      label:'足部・足首' },
+  { key:'core',      label:'体幹安定性' },
+];
+
+const RATING_LABELS = { 0:'—', 1:'良好', 2:'要注意', 3:'改善優先' };
+
+const SESSION_TAGS = ['前傾猫背','巻き肩','骨盤前傾','骨盤後傾','左右非対称','X脚','O脚','扁平足','腰痛','肩こり','体幹弱化','良好'];
+
+const CAT_LABELS = { immediate:'即時修正', session:'セッション中', homework:'ホームワーク' };
+const CAT_CLASS  = { immediate:'cat-immediate', session:'cat-session', homework:'cat-homework' };
+
+/* ════════════════════════════════════════════
+   STORAGE
+════════════════════════════════════════════ */
+function loadDB() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : { pin: DEFAULT_PIN, clients: [] };
+  } catch(e) { return { pin: DEFAULT_PIN, clients: [] }; }
+}
+
+function saveDB() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+  catch(e) { alert('保存エラー: ストレージ容量が不足している可能性があります。古いセッションを削除してください。'); }
+}
+
+function uuid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let db = loadDB();
+const state = {
+  activeClientId: null,
+  activeSessionId: null,
+  activeTab: 'front',
+  currentAnnotators: { front: null, side: null },
+  currentAssessment: {},
+  currentCorrections: [],
+  currentSelectedTags: [],
+  editingSessionId: null,
+};
+
+/* ════════════════════════════════════════════
+   PIN
+════════════════════════════════════════════ */
+let pinBuffer = '';
+
+function pinInput(digit) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += digit;
+  updatePinDots();
+  if (pinBuffer.length === 4) checkPin();
+}
+
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updatePinDots();
+}
+
+function pinClear() {
+  pinBuffer = '';
+  updatePinDots();
+}
+
+function updatePinDots() {
+  document.querySelectorAll('.pin-dot').forEach((d, i) => {
+    d.classList.toggle('filled', i < pinBuffer.length);
+  });
+}
+
+function checkPin() {
+  if (pinBuffer === db.pin) {
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    initApp();
+  } else {
+    document.getElementById('pin-error').textContent = 'PINが違います';
+    pinBuffer = '';
+    updatePinDots();
+    setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 1500);
+  }
+}
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+function initApp() {
+  // First-time hint
+  if (db.pin === DEFAULT_PIN) {
+    document.getElementById('pin-hint').textContent = '初期PIN: 1234 (設定から変更できます)';
+  }
+  renderSidebar();
+  renderTagButtons();
+  renderAssessTable();
+}
+
+/* ════════════════════════════════════════════
+   SIDEBAR
+════════════════════════════════════════════ */
+function renderSidebar(filter = '') {
+  const list = document.getElementById('sb-client-list');
+  const clients = db.clients.filter(c =>
+    !filter || c.name.includes(filter) || (c.kana||'').includes(filter)
+  );
+  if (clients.length === 0) {
+    list.innerHTML = '<div style="padding:20px 12px;color:#475569;font-size:12px;text-align:center">顧客がいません</div>';
+    return;
+  }
+  list.innerHTML = clients.map(c => {
+    const last = c.sessions.length ? c.sessions[c.sessions.length-1].date : '—';
+    const initials = c.name.replace(/\s/g,'').slice(0,2);
+    return `<div class="sb-item ${state.activeClientId===c.id?'active':''}" onclick="selectClient('${c.id}')">
+      <div class="sb-avatar">${initials}</div>
+      <div class="sb-item-info">
+        <div class="sb-item-name">${c.name}</div>
+        <div class="sb-item-meta">${c.sessions.length}回 · 最終: ${last}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterClients(val) { renderSidebar(val); }
+
+/* ════════════════════════════════════════════
+   CLIENT MANAGEMENT
+════════════════════════════════════════════ */
+let editingClientId = null;
+
+function openClientModal(clientId = null) {
+  editingClientId = clientId;
+  const modal = document.getElementById('modal-client');
+  const title = document.getElementById('modal-client-title');
+  const delBtn = document.getElementById('btn-delete-client');
+  if (clientId) {
+    const c = db.clients.find(x => x.id === clientId);
+    if (!c) return;
+    title.textContent = '顧客情報の編集';
+    document.getElementById('f-name').value = c.name;
+    document.getElementById('f-kana').value = c.kana || '';
+    document.getElementById('f-year').value = c.birthYear || '';
+    document.getElementById('f-gender').value = c.gender || '';
+    document.getElementById('f-memo').value = c.memo || '';
+    delBtn.style.display = 'inline-flex';
+  } else {
+    title.textContent = '新規顧客登録';
+    ['f-name','f-kana','f-year','f-gender','f-memo'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    delBtn.style.display = 'none';
+  }
+  modal.classList.add('open');
+}
+
+function saveClient() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('氏名は必須です'); return; }
+  if (editingClientId) {
+    const c = db.clients.find(x => x.id === editingClientId);
+    c.name = name;
+    c.kana = document.getElementById('f-kana').value.trim();
+    c.birthYear = document.getElementById('f-year').value || null;
+    c.gender = document.getElementById('f-gender').value;
+    c.memo = document.getElementById('f-memo').value.trim();
+  } else {
+    db.clients.push({
+      id: uuid(), name,
+      kana: document.getElementById('f-kana').value.trim(),
+      birthYear: document.getElementById('f-year').value || null,
+      gender: document.getElementById('f-gender').value,
+      memo: document.getElementById('f-memo').value.trim(),
+      createdAt: new Date().toISOString().slice(0,10),
+      sessions: []
+    });
+  }
+  saveDB();
+  closeModal('modal-client');
+  renderSidebar();
+  if (editingClientId) showClientView(editingClientId);
+}
+
+function deleteClient() {
+  if (!editingClientId) return;
+  const c = db.clients.find(x => x.id === editingClientId);
+  if (!confirm(`「${c.name}」を削除します。全セッションデータも削除されます。よろしいですか？`)) return;
+  db.clients = db.clients.filter(x => x.id !== editingClientId);
+  saveDB();
+  closeModal('modal-client');
+  state.activeClientId = null;
+  renderSidebar();
+  showView('view-home');
+}
+
+/* ════════════════════════════════════════════
+   CLIENT VIEW
+════════════════════════════════════════════ */
+function selectClient(id) {
+  state.activeClientId = id;
+  renderSidebar();
+  showClientView(id);
+}
+
+function showClientView(id = state.activeClientId) {
+  if (!id) return;
+  state.activeClientId = id;
+  const c = db.clients.find(x => x.id === id);
+  if (!c) return;
+
+  document.getElementById('cd-name').textContent = c.name;
+  const age = c.birthYear ? `${new Date().getFullYear()-c.birthYear}歳` : '';
+  document.getElementById('cd-sub').textContent = [c.kana, age, c.gender, `${c.sessions.length}セッション`].filter(Boolean).join(' · ');
+
+  document.getElementById('cd-meta').innerHTML = `
+    <div class="client-avatar-lg">${c.name.replace(/\s/g,'').slice(0,2)}</div>
+    <div class="client-info-grid">
+      <span class="ci-label">氏名</span><span class="ci-val font-600">${c.name}</span>
+      ${c.kana ? `<span class="ci-label">フリガナ</span><span class="ci-val">${c.kana}</span>` : ''}
+      ${c.birthYear ? `<span class="ci-label">生年</span><span class="ci-val">${c.birthYear}年生 (${new Date().getFullYear()-c.birthYear}歳)</span>` : ''}
+      ${c.gender ? `<span class="ci-label">性別</span><span class="ci-val">${c.gender}</span>` : ''}
+      <span class="ci-label">登録日</span><span class="ci-val">${c.createdAt||'—'}</span>
+      <span class="ci-label">セッション数</span><span class="ci-val font-600">${c.sessions.length}回</span>
+    </div>
+    ${c.memo ? `<div class="client-memo-box" style="flex:1">${c.memo}</div>` : ''}
+  `;
+
+  const sessionsEl = document.getElementById('cd-sessions');
+  if (c.sessions.length === 0) {
+    sessionsEl.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📋</div><p>まだセッションがありません<br>「＋ 新規セッション」から追加してください</p></div>';
+  } else {
+    sessionsEl.innerHTML = [...c.sessions].reverse().map((s, i) => {
+      const num = c.sessions.length - i;
+      const frontSrc = s.photos?.front?.original;
+      const sideSrc = s.photos?.side?.original;
+      const tags = (s.tags||[]).map(t => {
+        const cls = t==='良好'?'tag-ok': ['腰痛','肩こり'].includes(t)?'tag-danger':'tag-warn';
+        return `<span class="tag ${cls}">${t}</span>`;
+      }).join('');
+      const criticals = Object.values(s.assessment||{}).filter(a => a.rating===3).length;
+      return `<div class="session-card" onclick="showSessionDetail('${s.id}')">
+        <div class="session-thumb">
+          <div class="session-thumb-half">${frontSrc?`<img src="${frontSrc}" loading="lazy">` : '<div class="session-thumb-placeholder">👤</div>'}</div>
+          <div class="session-thumb-half">${sideSrc?`<img src="${sideSrc}" loading="lazy">` : '<div class="session-thumb-placeholder">👤</div>'}</div>
+        </div>
+        <div class="session-info">
+          <div class="session-date">${s.date||'—'}</div>
+          <div class="session-num">第${num}回セッション ${criticals>0?`<span style="color:var(--danger)">● 改善優先${criticals}件</span>`:''}</div>
+          <div class="session-tags">${tags}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  showView('view-client');
+}
+
+/* ════════════════════════════════════════════
+   SESSION DETAIL
+════════════════════════════════════════════ */
+function showSessionDetail(sessionId) {
+  const client = db.clients.find(c => c.id === state.activeClientId);
+  if (!client) return;
+  const session = client.sessions.find(s => s.id === sessionId);
+  if (!session) return;
+  state.activeSessionId = sessionId;
+
+  const num = client.sessions.indexOf(session) + 1;
+  document.getElementById('sd-title').textContent = `${session.date} — 第${num}回セッション`;
+  document.getElementById('sd-sub').textContent = client.name;
+  document.getElementById('sd-back-btn').onclick = () => showClientView();
+
+  // Build content
+  const photos = session.photos || {};
+  const photosFront = photos.front;
+  const photosSide = photos.side;
+  const assess = session.assessment || {};
+  const corrections = session.correctionPoints || [];
+  const tags = session.tags || [];
+
+  const assessRows = BODY_REGIONS.map(r => {
+    const a = assess[r.key] || {};
+    const rcls = a.rating ? `r-${a.rating}` : 'r-none';
+    const rlbl = RATING_LABELS[a.rating||0];
+    return `<tr>
+      <td>${r.label}</td>
+      <td><span class="rating-badge ${rcls}">${rlbl}</span></td>
+      <td style="color:var(--text2);font-size:12px">${a.note||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  const correctionHTML = corrections.length ? corrections.map(cp =>
+    `<div class="correction-item">
+      <span class="correction-cat ${CAT_CLASS[cp.category]||''}">${CAT_LABELS[cp.category]||cp.category}</span>
+      <span class="correction-text">${cp.text}</span>
+    </div>`
+  ).join('') : '<p style="color:var(--text2);font-size:13px">なし</p>';
+
+  const tagsHTML = tags.map(t => `<span class="tag tag-gray">${t}</span>`).join(' ');
+
+  document.getElementById('sd-content').innerHTML = `
+    <!-- Photos -->
+    <div class="section-label">写真・アノテーション</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="form-card">
+        <div class="form-card-header"><span class="form-card-title">正面</span></div>
+        ${photosFront?.original ? `<img src="${photosFront.original}" style="width:100%;display:block">` : '<div class="canvas-placeholder">写真なし</div>'}
+      </div>
+      <div class="form-card">
+        <div class="form-card-header"><span class="form-card-title">側面</span></div>
+        ${photosSide?.original ? `<img src="${photosSide.original}" style="width:100%;display:block">` : '<div class="canvas-placeholder">写真なし</div>'}
+      </div>
+    </div>
+
+    <!-- Assessment -->
+    <div class="section-label">部位別アセスメント</div>
+    <div class="form-card" style="margin-bottom:20px">
+      <table class="compare-table">
+        <thead><tr><th>部位</th><th>評価</th><th>所見</th></tr></thead>
+        <tbody>${assessRows}</tbody>
+      </table>
+    </div>
+
+    <!-- Corrections -->
+    <div class="section-label">修正ポイント <span class="private-badge">🔒 非公開</span></div>
+    <div class="form-card" style="margin-bottom:20px">
+      <div class="form-card-body">
+        <div class="correction-list">${correctionHTML}</div>
+      </div>
+    </div>
+
+    <!-- Private Notes -->
+    <div class="section-label">プライベートメモ <span class="private-badge">🔒 非公開</span></div>
+    <div class="form-card" style="margin-bottom:20px">
+      <div class="form-card-body">
+        <div style="font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap">${session.privateNotes||'なし'}</div>
+      </div>
+    </div>
+
+    ${tags.length ? `<div class="section-label">タグ</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px">${tagsHTML}</div>` : ''}
+  `;
+
+  showView('view-session-detail');
+}
+
+function deleteSession() {
+  if (!confirm('このセッションを削除しますか？')) return;
+  const client = db.clients.find(c => c.id === state.activeClientId);
+  client.sessions = client.sessions.filter(s => s.id !== state.activeSessionId);
+  saveDB();
+  showClientView();
+}
+
+function editSession() {
+  const client = db.clients.find(c => c.id === state.activeClientId);
+  const session = client.sessions.find(s => s.id === state.activeSessionId);
+  if (!session) return;
+  openNewSession(session);
+}
+
+/* ════════════════════════════════════════════
+   NEW SESSION
+════════════════════════════════════════════ */
+function openNewSession(editSession = null) {
+  const client = db.clients.find(c => c.id === state.activeClientId);
+
+  state.editingSessionId = editSession ? editSession.id : null;
+  const sessionNum = client ? (editSession ? (client.sessions.indexOf(editSession)+1) : (client.sessions.length + 1)) : null;
+
+  document.getElementById('ns-title').textContent = editSession ? `セッション編集 — ${editSession.date}` : sessionNum ? `新規セッション — 第${sessionNum}回` : '新規セッション';
+  document.getElementById('ns-client-name').textContent = client ? client.name : '顧客未登録';
+
+  // Reset form
+  resetNewSessionForm();
+
+  // If editing, load existing data
+  if (editSession) {
+    // Load assessment
+    BODY_REGIONS.forEach(r => {
+      const a = editSession.assessment?.[r.key] || {};
+      state.currentAssessment[r.key] = { rating: a.rating||0, note: a.note||'' };
+      if (a.rating) {
+        const btn = document.querySelector(`.rating-btn[data-region="${r.key}"][data-r="${a.rating}"]`);
+        if (btn) { btn.classList.add('active'); }
+      }
+      const noteEl = document.getElementById(`assess-note-${r.key}`);
+      if (noteEl) noteEl.value = a.note||'';
+    });
+    // Load corrections
+    state.currentCorrections = JSON.parse(JSON.stringify(editSession.correctionPoints || []));
+    renderCorrections();
+    // Load notes
+    document.getElementById('private-notes').value = editSession.privateNotes || '';
+    // Load tags
+    state.currentSelectedTags = [...(editSession.tags||[])];
+    renderTagButtons();
+  }
+
+  // Switch to new session view
+  switchPhotoTab('front');
+  showView('view-session-new');
+
+  // Set up annotators after view is visible
+  setTimeout(() => {
+    initAnnotators();
+    if (editSession) {
+      // Load existing photos if any
+      const fp = editSession.photos?.front;
+      const sp = editSession.photos?.side;
+      if (fp?.original) {
+        loadPhotoFromSrc('front', fp.original, fp.annotations||[]);
+      }
+      if (sp?.original) {
+        loadPhotoFromSrc('side', sp.original, sp.annotations||[]);
+      }
+    }
+  }, 50);
+}
+
+function resetNewSessionForm() {
+  state.currentAssessment = {};
+  state.currentCorrections = [];
+  state.currentSelectedTags = [];
+  document.getElementById('private-notes').value = '';
+  document.getElementById('correction-list').innerHTML = '';
+
+  // Reset assessment table
+  BODY_REGIONS.forEach(r => {
+    state.currentAssessment[r.key] = { rating: 0, note: '' };
+    document.querySelectorAll(`.rating-btn[data-region="${r.key}"]`).forEach(b => b.classList.remove('active'));
+    const noteEl = document.getElementById(`assess-note-${r.key}`);
+    if (noteEl) noteEl.value = '';
+  });
+
+  // Reset photo uploads
+  ['front','side'].forEach(side => {
+    document.getElementById(`upload-zone-${side}`).style.display = '';
+    document.getElementById(`canvas-outer-${side}`).style.display = 'none';
+    const fileEl = document.getElementById(`file-${side}`);
+    if (fileEl) fileEl.value = '';
+  });
+
+  renderTagButtons();
+}
+
+function saveSession() {
+  // 顧客未選択の場合は「未登録」クライアントへ自動保存
+  let client = db.clients.find(c => c.id === state.activeClientId);
+  if (!client) {
+    let anon = db.clients.find(c => c.id === '__anon__');
+    if (!anon) {
+      anon = { id: '__anon__', name: '未登録', kana: '', birthYear: null, gender: '', memo: '顧客未登録のセッション', createdAt: new Date().toISOString().slice(0,10), sessions: [] };
+      db.clients.push(anon);
+    }
+    state.activeClientId = '__anon__';
+    client = anon;
+  }
+
+  // Collect photos
+  const photos = {};
+  ['front','side'].forEach(side => {
+    const ann = state.currentAnnotators[side];
+    if (ann && ann.originalSrc) {
+      photos[side] = {
+        original: ann.exportMerged(),
+        annotations: ann.getAnnotations()
+      };
+    }
+  });
+
+  // Build session object
+  const sessionData = {
+    id: state.editingSessionId || uuid(),
+    date: new Date().toISOString().slice(0,10),
+    photos,
+    assessment: JSON.parse(JSON.stringify(state.currentAssessment)),
+    correctionPoints: JSON.parse(JSON.stringify(state.currentCorrections)),
+    privateNotes: document.getElementById('private-notes').value.trim(),
+    tags: [...state.currentSelectedTags]
+  };
+
+  if (state.editingSessionId) {
+    const idx = client.sessions.findIndex(s => s.id === state.editingSessionId);
+    if (idx >= 0) client.sessions[idx] = sessionData;
+  } else {
+    client.sessions.push(sessionData);
+  }
+
+  saveDB();
+  renderSidebar();
+  showClientView();
+}
+
+/* ════════════════════════════════════════════
+   ANNOTATOR CLASS
+════════════════════════════════════════════ */
+class Annotator {
+  constructor(photoCanvas, drawCanvas) {
+    this.pc = photoCanvas;
+    this.dc = drawCanvas;
+    this.pctx = photoCanvas.getContext('2d');
+    this.dctx = drawCanvas.getContext('2d');
+    this.annotations = [];
+    this.originalSrc = null;
+    this.img = null;
+    this.tool = 'plumb';
+    this.color = '#EF4444';
+    this.strokeW = 3;
+    this.drawing = false;
+    this.sx = 0; this.sy = 0;
+    this.fpts = [];
+
+    const events = {
+      mousedown: e => this.onDown(e),
+      mousemove: e => this.onMove(e),
+      mouseup:   e => this.onUp(e),
+      mouseleave: e => this.onUp(e),
+    };
+    Object.entries(events).forEach(([ev, fn]) => drawCanvas.addEventListener(ev, fn));
+    drawCanvas.addEventListener('touchstart',  e => { e.preventDefault(); this.onDown(e.touches[0]); }, { passive: false });
+    drawCanvas.addEventListener('touchmove',   e => { e.preventDefault(); this.onMove(e.touches[0]); }, { passive: false });
+    drawCanvas.addEventListener('touchend',    e => { e.preventDefault(); this.onUp(e.changedTouches[0]); }, { passive: false });
+  }
+
+  pos(e) {
+    const r = this.dc.getBoundingClientRect();
+    const sx = this.dc.width / r.width, sy = this.dc.height / r.height;
+    return { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy };
+  }
+
+  loadSrc(src) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        this.img = img;
+        this.originalSrc = src;
+        const maxW = this.pc.parentElement.parentElement.clientWidth;
+        const maxH = Math.floor(window.innerHeight * 0.62);
+        let w = img.width, h = img.height;
+        const scale = Math.min(1, maxW/w, maxH/h);
+        w = Math.round(w * scale); h = Math.round(h * scale);
+        this.pc.width = this.dc.width = w;
+        this.pc.height = this.dc.height = h;
+        this.pc.style.width = this.dc.style.width = w + 'px';
+        this.pc.style.height = this.dc.style.height = h + 'px';
+        this.pc.parentElement.style.height = h + 'px';
+        this.pctx.drawImage(img, 0, 0, w, h);
+        this.redrawAnnotations();
+        resolve();
+      };
+      img.src = src;
+    });
+  }
+
+  redrawAnnotations() {
+    const ctx = this.dctx;
+    ctx.clearRect(0, 0, this.dc.width, this.dc.height);
+    this.annotations.forEach(a => this.drawAnn(ctx, a));
+  }
+
+  drawAnn(ctx, a) {
+    ctx.save();
+    ctx.strokeStyle = a.color; ctx.fillStyle = a.color;
+    ctx.lineWidth = a.w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const W = this.dc.width, H = this.dc.height;
+    switch(a.type) {
+      case 'plumb':
+        ctx.globalAlpha = .85; ctx.setLineDash([12, 6]);
+        ctx.beginPath(); ctx.moveTo(a.x, 0); ctx.lineTo(a.x, H); ctx.stroke();
+        ctx.setLineDash([]); ctx.globalAlpha = 1;
+        // label
+        ctx.font = `bold 11px sans-serif`; ctx.fillStyle = a.color;
+        ctx.fillText('▼', a.x - 6, 14);
+        break;
+      case 'hline':
+        ctx.globalAlpha = .85; ctx.setLineDash([12, 6]);
+        ctx.beginPath(); ctx.moveTo(0, a.y); ctx.lineTo(W, a.y); ctx.stroke();
+        ctx.setLineDash([]); ctx.globalAlpha = 1;
+        break;
+      case 'line':
+        ctx.beginPath(); ctx.moveTo(a.x1, a.y1); ctx.lineTo(a.x2, a.y2); ctx.stroke();
+        break;
+      case 'arrow':
+        this.drawArrow(ctx, a.x1, a.y1, a.x2, a.y2, a.w);
+        break;
+      case 'circle':
+        ctx.beginPath(); ctx.arc(a.cx, a.cy, a.r, 0, Math.PI*2); ctx.stroke();
+        break;
+      case 'freehand':
+        if (a.pts.length < 2) break;
+        ctx.beginPath(); ctx.moveTo(a.pts[0].x, a.pts[0].y);
+        a.pts.forEach(p => ctx.lineTo(p.x, p.y)); ctx.stroke();
+        break;
+      case 'text':
+        ctx.font = `bold 18px sans-serif`;
+        const tw = ctx.measureText(a.text).width;
+        ctx.fillStyle = 'rgba(0,0,0,.55)';
+        ctx.fillRect(a.x - 3, a.y - 18, tw + 6, 22);
+        ctx.fillStyle = a.color;
+        ctx.fillText(a.text, a.x, a.y);
+        break;
+    }
+    ctx.restore();
+  }
+
+  drawArrow(ctx, x1, y1, x2, y2, w) {
+    const angle = Math.atan2(y2-y1, x2-x1);
+    const hlen = Math.max(14, w * 4);
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - hlen * Math.cos(angle - Math.PI/6), y2 - hlen * Math.sin(angle - Math.PI/6));
+    ctx.lineTo(x2 - hlen * Math.cos(angle + Math.PI/6), y2 - hlen * Math.sin(angle + Math.PI/6));
+    ctx.closePath(); ctx.fill();
+  }
+
+  onDown(e) {
+    const p = this.pos(e);
+    this.sx = p.x; this.sy = p.y;
+    this.drawing = true;
+    if (this.tool === 'plumb') {
+      this.annotations.push({ type:'plumb', x:p.x, color:this.color, w:this.strokeW });
+      this.redrawAnnotations(); this.drawing = false; return;
+    }
+    if (this.tool === 'hline') {
+      this.annotations.push({ type:'hline', y:p.y, color:this.color, w:this.strokeW });
+      this.redrawAnnotations(); this.drawing = false; return;
+    }
+    if (this.tool === 'text') {
+      const txt = prompt('テキストを入力:');
+      if (txt) { this.annotations.push({ type:'text', x:p.x, y:p.y, text:txt, color:this.color, w:1 }); this.redrawAnnotations(); }
+      this.drawing = false; return;
+    }
+    if (this.tool === 'freehand') this.fpts = [{ x:p.x, y:p.y }];
+  }
+
+  onMove(e) {
+    if (!this.drawing) return;
+    const p = this.pos(e);
+    if (this.tool === 'freehand') {
+      this.fpts.push({ x:p.x, y:p.y });
+      this.redrawAnnotations();
+      const ctx = this.dctx;
+      ctx.save(); ctx.strokeStyle = this.color; ctx.lineWidth = this.strokeW; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(this.fpts[0].x, this.fpts[0].y);
+      this.fpts.forEach(pt => ctx.lineTo(pt.x, pt.y)); ctx.stroke(); ctx.restore();
+      return;
+    }
+    // Preview other shapes
+    this.redrawAnnotations();
+    const ctx = this.dctx;
+    ctx.save(); ctx.strokeStyle = this.color; ctx.fillStyle = this.color; ctx.lineWidth = this.strokeW; ctx.lineCap = 'round';
+    if (this.tool === 'line') { ctx.beginPath(); ctx.moveTo(this.sx, this.sy); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+    if (this.tool === 'arrow') this.drawArrow(ctx, this.sx, this.sy, p.x, p.y, this.strokeW);
+    if (this.tool === 'circle') {
+      const r = Math.hypot(p.x-this.sx, p.y-this.sy);
+      ctx.beginPath(); ctx.arc(this.sx, this.sy, r, 0, Math.PI*2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  onUp(e) {
+    if (!this.drawing) return;
+    this.drawing = false;
+    const p = this.pos(e);
+    if (this.tool === 'freehand' && this.fpts.length > 2) {
+      this.annotations.push({ type:'freehand', pts:[...this.fpts], color:this.color, w:this.strokeW });
+    } else if (this.tool === 'line') {
+      this.annotations.push({ type:'line', x1:this.sx, y1:this.sy, x2:p.x, y2:p.y, color:this.color, w:this.strokeW });
+    } else if (this.tool === 'arrow') {
+      this.annotations.push({ type:'arrow', x1:this.sx, y1:this.sy, x2:p.x, y2:p.y, color:this.color, w:this.strokeW });
+    } else if (this.tool === 'circle') {
+      const r = Math.hypot(p.x-this.sx, p.y-this.sy);
+      if (r > 4) this.annotations.push({ type:'circle', cx:this.sx, cy:this.sy, r, color:this.color, w:this.strokeW });
+    }
+    this.redrawAnnotations();
+  }
+
+  undo() { if (this.annotations.length) { this.annotations.pop(); this.redrawAnnotations(); } }
+  clear() { if (confirm('全ての書き込みを消去しますか？')) { this.annotations = []; this.redrawAnnotations(); } }
+
+  getAnnotations() { return JSON.parse(JSON.stringify(this.annotations)); }
+  setAnnotations(anns) { this.annotations = anns||[]; this.redrawAnnotations(); }
+
+  exportMerged() {
+    const tmp = document.createElement('canvas');
+    tmp.width = this.pc.width; tmp.height = this.pc.height;
+    const ctx = tmp.getContext('2d');
+    ctx.drawImage(this.pc, 0, 0);
+    ctx.drawImage(this.dc, 0, 0);
+    return tmp.toDataURL('image/jpeg', 0.82);
+  }
+}
+
+/* ════════════════════════════════════════════
+   ANNOTATION SETUP
+════════════════════════════════════════════ */
+function initAnnotators() {
+  ['front','side'].forEach(side => {
+    const pc = document.getElementById(`canvas-photo-${side}`);
+    const dc = document.getElementById(`canvas-draw-${side}`);
+    if (!pc || !dc) return;
+    state.currentAnnotators[side] = new Annotator(pc, dc);
+    state.currentAnnotators[side].tool = 'plumb';
+  });
+}
+
+function switchPhotoTab(tab, btnEl) {
+  state.activeTab = tab;
+  document.querySelectorAll('.photo-tab').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+  else document.querySelector(`.photo-tab:first-child`)?.classList.add('active');
+  document.querySelectorAll('.photo-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${tab}`)?.classList.add('active');
+}
+
+function triggerUpload(side) {
+  document.getElementById(`file-${side}`).click();
+}
+
+function loadPhoto(side, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      // Compress
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1, MAX_IMG_W / img.width, 1500 / img.height);
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.82);
+      loadPhotoFromSrc(side, compressed, []);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadPhotoFromSrc(side, src, annotations) {
+  document.getElementById(`upload-zone-${side}`).style.display = 'none';
+  document.getElementById(`canvas-outer-${side}`).style.display = '';
+  const ann = state.currentAnnotators[side];
+  if (!ann) return;
+  ann.loadSrc(src).then(() => {
+    if (annotations.length) ann.setAnnotations(annotations);
+  });
+}
+
+/* ── Tool controls ── */
+let currentTool = 'plumb';
+function setTool(tool) {
+  currentTool = tool;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tool-${tool}`)?.classList.add('active');
+  Object.values(state.currentAnnotators).forEach(a => { if (a) a.tool = tool; });
+}
+
+function setColor(el) {
+  document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const c = el.dataset.color;
+  Object.values(state.currentAnnotators).forEach(a => { if (a) a.color = c; });
+}
+
+function setStroke(val) {
+  const w = parseInt(val);
+  Object.values(state.currentAnnotators).forEach(a => { if (a) a.strokeW = w; });
+}
+
+function annUndo() {
+  const ann = state.currentAnnotators[state.activeTab];
+  if (ann) ann.undo();
+}
+
+function annClear() {
+  const ann = state.currentAnnotators[state.activeTab];
+  if (ann) ann.clear();
+}
+
+/* ════════════════════════════════════════════
+   ASSESSMENT TABLE
+════════════════════════════════════════════ */
+function renderAssessTable() {
+  document.getElementById('assess-tbody').innerHTML = BODY_REGIONS.map(r => `
+    <tr>
+      <td class="assess-label">${r.label}</td>
+      <td>
+        <div class="rating-btns">
+          <button class="rating-btn" data-region="${r.key}" data-r="1" onclick="setRating('${r.key}',1,this)">良好</button>
+          <button class="rating-btn" data-region="${r.key}" data-r="2" onclick="setRating('${r.key}',2,this)">要注意</button>
+          <button class="rating-btn" data-region="${r.key}" data-r="3" onclick="setRating('${r.key}',3,this)">改善優先</button>
+        </div>
+      </td>
+      <td><textarea class="assess-note" id="assess-note-${r.key}" placeholder="所見メモ..." oninput="setAssessNote('${r.key}',this.value)"></textarea></td>
+    </tr>`).join('');
+}
+
+function setRating(region, rating, btn) {
+  document.querySelectorAll(`.rating-btn[data-region="${region}"]`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (!state.currentAssessment[region]) state.currentAssessment[region] = { rating:0, note:'' };
+  state.currentAssessment[region].rating = rating;
+}
+
+function setAssessNote(region, val) {
+  if (!state.currentAssessment[region]) state.currentAssessment[region] = { rating:0, note:'' };
+  state.currentAssessment[region].note = val;
+}
+
+/* ════════════════════════════════════════════
+   CORRECTION POINTS
+════════════════════════════════════════════ */
+function addCorrection() {
+  const text = document.getElementById('new-correction-text').value.trim();
+  if (!text) return;
+  const cat = document.getElementById('new-correction-cat').value;
+  state.currentCorrections.push({ id: uuid(), category: cat, text });
+  document.getElementById('new-correction-text').value = '';
+  renderCorrections();
+}
+
+function removeCorrection(id) {
+  state.currentCorrections = state.currentCorrections.filter(c => c.id !== id);
+  renderCorrections();
+}
+
+function renderCorrections() {
+  const el = document.getElementById('correction-list');
+  if (!el) return;
+  if (state.currentCorrections.length === 0) {
+    el.innerHTML = '<p style="color:var(--text2);font-size:13px;padding:4px 0">修正ポイントがまだありません</p>';
+    return;
+  }
+  el.innerHTML = state.currentCorrections.map(cp => `
+    <div class="correction-item">
+      <span class="correction-cat ${CAT_CLASS[cp.category]||''}">${CAT_LABELS[cp.category]||cp.category}</span>
+      <span class="correction-text">${cp.text}</span>
+      <button class="correction-del" onclick="removeCorrection('${cp.id}')">×</button>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════
+   TAGS
+════════════════════════════════════════════ */
+function renderTagButtons() {
+  const el = document.getElementById('tag-btns');
+  if (!el) return;
+  el.innerHTML = SESSION_TAGS.map(t => {
+    const sel = state.currentSelectedTags.includes(t);
+    const cls = sel ? (t==='良好'?'tag-ok':['腰痛','肩こり'].includes(t)?'tag-danger':'tag-warn') : 'tag-gray';
+    return `<button class="tag ${cls}" onclick="toggleTag('${t}',this)" style="cursor:pointer;border:none;font-size:13px;padding:5px 12px">${t}</button>`;
+  }).join('');
+}
+
+function toggleTag(t, btn) {
+  const idx = state.currentSelectedTags.indexOf(t);
+  if (idx >= 0) state.currentSelectedTags.splice(idx, 1);
+  else state.currentSelectedTags.push(t);
+  renderTagButtons();
+}
+
+/* ════════════════════════════════════════════
+   BEFORE / AFTER COMPARE
+════════════════════════════════════════════ */
+function openCompare() {
+  const client = db.clients.find(c => c.id === state.activeClientId);
+  if (!client || client.sessions.length < 2) {
+    alert('比較するにはセッションが2つ以上必要です');
+    return;
+  }
+  document.getElementById('cmp-title').textContent = `ビフォーアフター比較 — ${client.name}`;
+
+  const sessions = client.sessions;
+  const options = sessions.map((s, i) => `<option value="${s.id}">第${i+1}回 (${s.date})</option>`).join('');
+
+  const selA = document.getElementById('cmp-sel-a');
+  const selB = document.getElementById('cmp-sel-b');
+  selA.innerHTML = options;
+  selB.innerHTML = options;
+  selA.value = sessions[0].id;
+  selB.value = sessions[sessions.length-1].id;
+
+  renderCompare();
+  showView('view-compare');
+}
+
+function renderCompare() {
+  const client = db.clients.find(c => c.id === state.activeClientId);
+  if (!client) return;
+  const sidA = document.getElementById('cmp-sel-a').value;
+  const sidB = document.getElementById('cmp-sel-b').value;
+  const sA = client.sessions.find(s => s.id === sidA);
+  const sB = client.sessions.find(s => s.id === sidB);
+  if (!sA || !sB) return;
+
+  const numA = client.sessions.indexOf(sA)+1;
+  const numB = client.sessions.indexOf(sB)+1;
+
+  const photoBlock = (label, s) => {
+    const front = s.photos?.front?.original;
+    const side  = s.photos?.side?.original;
+    return `<div class="compare-photo-block">
+      <div class="compare-photo-label">${label}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr">
+        <div>${front ? `<img src="${front}" class="compare-photo-img">` : '<div style="height:180px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px">写真なし</div>'}</div>
+        <div>${side  ? `<img src="${side}"  class="compare-photo-img">` : '<div style="height:180px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px">写真なし</div>'}</div>
+      </div>
+    </div>`;
+  };
+
+  const assessRows = BODY_REGIONS.map(r => {
+    const a = (sA.assessment||{})[r.key] || {};
+    const b = (sB.assessment||{})[r.key] || {};
+    const ra = a.rating||0, rb = b.rating||0;
+    let arrow = '';
+    if (ra > 0 && rb > 0) {
+      if (rb < ra) arrow = '<span style="color:var(--ok)">↑改善</span>';
+      else if (rb > ra) arrow = '<span style="color:var(--danger)">↓悪化</span>';
+      else arrow = '<span style="color:var(--text2)">→同等</span>';
+    }
+    return `<tr>
+      <td class="assess-label">${r.label}</td>
+      <td><span class="rating-badge r-${ra}">${RATING_LABELS[ra]}</span></td>
+      <td><span class="rating-badge r-${rb}">${RATING_LABELS[rb]}</span></td>
+      <td style="font-size:12px">${arrow}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('cmp-content').innerHTML = `
+    <div class="compare-photos" style="margin-bottom:16px">
+      ${photoBlock(`ビフォー — 第${numA}回 (${sA.date})`, sA)}
+      ${photoBlock(`アフター — 第${numB}回 (${sB.date})`, sB)}
+    </div>
+    <div class="compare-assess">
+      <div class="compare-assess-title">部位別評価の変化</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>部位</th>
+            <th>ビフォー (第${numA}回)</th>
+            <th>アフター (第${numB}回)</th>
+            <th>変化</th>
+          </tr>
+        </thead>
+        <tbody>${assessRows}</tbody>
+      </table>
+    </div>
+    ${sB.privateNotes ? `
+    <div class="form-card" style="margin-top:16px">
+      <div class="form-card-header">
+        <span class="form-card-title">📝 最新セッションのプライベートメモ <span class="private-badge">🔒 非公開</span></span>
+      </div>
+      <div class="form-card-body">
+        <div style="font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap">${sB.privateNotes}</div>
+      </div>
+    </div>` : ''}
+  `;
+}
+
+/* ════════════════════════════════════════════
+   SETTINGS
+════════════════════════════════════════════ */
+function openSettings() {
+  document.getElementById('new-pin').value = '';
+  const used = new Blob([localStorage.getItem(STORAGE_KEY)||'']).size;
+  const kb = (used / 1024).toFixed(1);
+  const mb = (used / 1048576).toFixed(2);
+  document.getElementById('storage-info').textContent = `${kb} KB / ~5 MB 使用中 (${mb} MB)`;
+  document.getElementById('modal-settings').classList.add('open');
+}
+
+function saveSettings() {
+  const newPin = document.getElementById('new-pin').value.trim();
+  if (newPin) {
+    if (!/^\d{4}$/.test(newPin)) { alert('PINは4桁の数字で入力してください'); return; }
+    db.pin = newPin;
+    saveDB();
+    alert('PINを変更しました');
+  }
+  closeModal('modal-settings');
+}
+
+/* ════════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════════ */
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  document.getElementById('main-panel').scrollTop = 0;
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// Prevent zoom on double-tap for tool buttons
+document.querySelectorAll('.tool-btn, .color-btn, .rating-btn').forEach(el => {
+  el.addEventListener('touchend', e => e.preventDefault());
+});
+
+/* ════════════════════════════════════════════
+   PIN HINT
+════════════════════════════════════════════ */
+if (db.pin === DEFAULT_PIN) {
+  document.getElementById('pin-hint').textContent = '初期PIN: 1234 ｜ 設定から変更できます';
+}
+
+/* ════════════════════════════════════════════
+   MOBILE SIDEBAR
+════════════════════════════════════════════ */
+function isMobile() { return window.innerWidth <= 700; }
+
+function applyMobileLayout() {
+  const mob = isMobile();
+  document.getElementById('mob-topbar').style.display = mob ? 'flex' : 'none';
+  document.getElementById('mob-close-sidebar').style.display = mob ? 'block' : 'none';
+  // Offset main panel on mobile for top bar
+  document.getElementById('main-panel').style.paddingTop = mob ? '52px' : '0';
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
+window.addEventListener('resize', applyMobileLayout);
+applyMobileLayout();
+
+/* ════════════════════════════════════════════
+   CAMERA
+════════════════════════════════════════════ */
+const cam = {
+  side: 'front',          // which photo slot
+  facingMode: 'environment',
+  stream: null,
+  capturedDataUrl: null,
+};
+
+async function openCamera(side) {
+  // iOS fallback: if getUserMedia not available, use file input with capture
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const input = document.getElementById(`file-${side}`);
+    input.setAttribute('capture', 'environment');
+    input.click();
+    return;
+  }
+
+  cam.side = side;
+  cam.capturedDataUrl = null;
+  cam.facingMode = 'environment';
+
+  const titles = { front: '📷 正面写真を撮影', side: '📷 側面写真を撮影' };
+  document.getElementById('cam-title').textContent = titles[side] || '📷 撮影';
+
+  // Reset UI to shooting state
+  document.getElementById('cam-preview-wrap').classList.remove('show');
+  document.getElementById('cam-video').style.display = '';
+  document.getElementById('cam-footer-shoot').style.display = '';
+  document.getElementById('cam-footer-preview').style.display = 'none';
+
+  document.getElementById('camera-modal').classList.add('open');
+
+  await startStream();
+}
+
+async function startStream() {
+  stopStream();
+  const video = document.getElementById('cam-video');
+  try {
+    const constraints = {
+      video: {
+        facingMode: cam.facingMode,
+        width:  { ideal: 1920 },
+        height: { ideal: 1080 },
+      },
+      audio: false,
+    };
+    cam.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = cam.stream;
+    // iOS requires explicit play()
+    await video.play();
+  } catch (err) {
+    console.warn('Camera error:', err);
+    closeCamera();
+    // Fall back to file input
+    const input = document.getElementById(`file-${cam.side}`);
+    input.setAttribute('capture', 'environment');
+    input.click();
+  }
+}
+
+function stopStream() {
+  if (cam.stream) {
+    cam.stream.getTracks().forEach(t => t.stop());
+    cam.stream = null;
+  }
+}
+
+async function flipCamera() {
+  cam.facingMode = cam.facingMode === 'environment' ? 'user' : 'environment';
+  await startStream();
+}
+
+function capturePhoto() {
+  const video = document.getElementById('cam-video');
+  if (!video.videoWidth) return;
+
+  // Draw video frame to offscreen canvas
+  const canvas = document.createElement('canvas');
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+
+  // Mirror if front camera
+  if (cam.facingMode === 'user') {
+    const mCtx = canvas.getContext('2d');
+    mCtx.translate(canvas.width, 0);
+    mCtx.scale(-1, 1);
+    mCtx.drawImage(video, 0, 0);
+  }
+
+  cam.capturedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+  // Show preview
+  document.getElementById('cam-preview-img').src = cam.capturedDataUrl;
+  document.getElementById('cam-preview-wrap').classList.add('show');
+  document.getElementById('cam-video').style.display = 'none';
+  document.getElementById('cam-footer-shoot').style.display = 'none';
+  document.getElementById('cam-footer-preview').style.display = '';
+
+  // Pause stream (keep alive for retake)
+  video.pause();
+}
+
+function retakePhoto() {
+  cam.capturedDataUrl = null;
+  document.getElementById('cam-preview-wrap').classList.remove('show');
+  document.getElementById('cam-video').style.display = '';
+  document.getElementById('cam-footer-shoot').style.display = '';
+  document.getElementById('cam-footer-preview').style.display = 'none';
+  document.getElementById('cam-video').play();
+}
+
+function usePhoto() {
+  if (!cam.capturedDataUrl) return;
+  const src = cam.capturedDataUrl;
+  closeCamera();
+
+  // Compress and load into annotator
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const scale  = Math.min(1, 1000 / img.width, 1500 / img.height);
+    canvas.width  = Math.round(img.width  * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    const compressed = canvas.toDataURL('image/jpeg', 0.82);
+    loadPhotoFromSrc(cam.side, compressed, []);
+  };
+  img.src = src;
+}
+
+function closeCamera() {
+  stopStream();
+  document.getElementById('camera-modal').classList.remove('open');
+  cam.capturedDataUrl = null;
+}
+
+// Close camera on back gesture (popstate) on iOS
+window.addEventListener('popstate', () => {
+  if (document.getElementById('camera-modal').classList.contains('open')) {
+    closeCamera();
+  }
+});
+</script>
+</body>
+</html>
