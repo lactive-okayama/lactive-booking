@@ -564,6 +564,91 @@
       border-radius: var(--radius-sm); line-height: 1.7;
     }
 
+    /* 部分的に時間制限のある日のカレンダー表示 */
+    .holiday-cal-day.partial {
+      background: #FFF4D5; border-color: #F0C040;
+    }
+    .holiday-cal-day.partial .holiday-day-num { color: #A06808; }
+    .holiday-cal-day.partial .partial-mark {
+      font-size: .58rem; color: #A06808; font-weight: 700;
+    }
+
+    /* 営業時間設定モーダル */
+    .dayedit-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      z-index: 600; display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .dayedit-card {
+      background: var(--white); border-radius: var(--radius);
+      max-width: 480px; width: 100%; max-height: 90vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+    }
+    .dayedit-header {
+      padding: 14px 18px; border-bottom: 1.5px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .dayedit-header h3 {
+      font-size: 1rem; font-weight: 700; color: var(--orange-deep);
+    }
+    .dayedit-body { padding: 16px 18px; overflow-y: auto; }
+    .dayedit-section { margin-bottom: 20px; }
+    .dayedit-section-title {
+      font-size: .86rem; font-weight: 700; color: var(--text);
+      margin-bottom: 8px;
+      padding-bottom: 5px; border-bottom: 2px solid var(--orange-light);
+    }
+    .dayedit-full-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; background: var(--bg);
+      border-radius: var(--radius-sm);
+    }
+    .dayedit-full-row input[type="checkbox"] {
+      width: 18px; height: 18px; accent-color: var(--orange); cursor: pointer;
+    }
+    .dayedit-reason-row {
+      margin-top: 8px; display: flex; gap: 6px;
+    }
+    .dayedit-reason-row input {
+      flex: 1; padding: 9px 11px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-size: .86rem; font-family: inherit;
+    }
+    .dayedit-reason-row input:focus { border-color: var(--orange); outline: none; }
+    .dayedit-time-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+    }
+    @media (max-width: 460px) { .dayedit-time-grid { grid-template-columns: repeat(3, 1fr); } }
+    .dayedit-time-chip {
+      padding: 10px 4px; border: 1.5px solid var(--orange);
+      border-radius: var(--radius-sm); background: var(--orange-pale);
+      font-size: .82rem; font-family: inherit;
+      cursor: pointer; transition: all .15s; text-align: center;
+      color: var(--orange-deep); font-weight: 600;
+    }
+    .dayedit-time-chip:hover { background: var(--orange-light); }
+    .dayedit-time-chip.blocked {
+      background: #EEEEEE; border-color: #CCCCCC; color: #999999;
+      text-decoration: line-through; font-weight: 400;
+    }
+    .dayedit-time-chip.blocked:hover { background: #DDDDDD; }
+    .dayedit-time-chip.disabled-by-full {
+      background: #F8F8F8; border-color: #DDDDDD; color: #BBBBBB;
+      pointer-events: none; text-decoration: none;
+    }
+    .dayedit-hint {
+      font-size: .72rem; color: var(--text-light); margin-top: 8px;
+      line-height: 1.6;
+    }
+    .dayedit-save-btn {
+      padding: 6px 14px; font-size: .8rem; font-weight: 600;
+      background: var(--white); color: var(--orange-deep);
+      border: 1.5px solid var(--orange); border-radius: var(--radius-sm);
+      cursor: pointer; transition: all .15s; font-family: inherit;
+      flex-shrink: 0;
+    }
+    .dayedit-save-btn:hover { background: var(--orange); color: #fff; }
+
     /* ───────────────────────────────
        カレンダービュー（管理画面）
     ─────────────────────────────── */
@@ -1526,8 +1611,43 @@
       <div id="admin-holiday-error" class="alert alert-error"></div>
       <div class="holiday-cal-grid" id="holiday-cal-grid"></div>
       <div class="holiday-help">
-        💡 日付をクリックすると休業日に設定できます（理由の入力欄が表示されます）。<br>
-        休業日（オレンジ表示）をもう一度クリックすると解除できます。
+        💡 日付をクリックすると営業時間設定モーダルが開きます。<br>
+        ・<strong>終日休業</strong>（オレンジ）：その日全体を予約不可にします<br>
+        ・<strong>時間帯指定</strong>（黄色「○枠不可」）：特定の時間帯だけ予約不可にできます
+      </div>
+    </div>
+  </div>
+
+  <!-- ▼ 営業時間設定モーダル（休業日設定タブ用） -->
+  <div id="dayedit-modal" class="dayedit-modal" style="display:none;" onclick="if(event.target===this)closeDayEditor()">
+    <div class="dayedit-card">
+      <div class="dayedit-header">
+        <h3 id="dayedit-title">-</h3>
+        <button class="day-modal-close" onclick="closeDayEditor()" aria-label="閉じる">×</button>
+      </div>
+      <div class="dayedit-body">
+        <div id="dayedit-error" class="alert alert-error"></div>
+
+        <div class="dayedit-section">
+          <div class="dayedit-section-title">終日休業</div>
+          <div class="dayedit-full-row">
+            <input type="checkbox" id="dayedit-full-checkbox" onchange="onFullHolidayToggle()">
+            <label for="dayedit-full-checkbox" style="flex:1;font-size:.88rem;cursor:pointer;">この日を終日休業日にする</label>
+          </div>
+          <div class="dayedit-reason-row">
+            <input type="text" id="dayedit-reason" placeholder="理由（任意・空欄可）">
+            <button class="dayedit-save-btn" onclick="saveFullHolidayReason()">理由を保存</button>
+          </div>
+        </div>
+
+        <div class="dayedit-section">
+          <div class="dayedit-section-title">時間帯ごとの予約不可設定</div>
+          <div class="dayedit-time-grid" id="dayedit-time-grid"></div>
+          <div class="dayedit-hint">
+            ・クリックで切替（オレンジ：予約可能 / グレー：予約不可）<br>
+            ・「終日休業」をオンにしている場合は時間帯設定は無効です
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2030,8 +2150,12 @@
         showAlert('datetime-alert', `この日は休業日のためご予約いただけません${reason}。別の日程をお選びください。`);
         return;
       }
-      const bookedTimes = await fetchBookedTimes(date);
-      renderTimeSlots(bookedTimes);
+      const [bookedTimes, blockedTimes] = await Promise.all([
+        fetchBookedTimes(date),
+        fetchBlockedTimes(date).catch(() => [])
+      ]);
+      const unavailable = Array.from(new Set([...bookedTimes, ...blockedTimes]));
+      renderTimeSlots(unavailable);
     } catch (e) {
       console.error('時間帯取得エラー:', e);
       renderTimeSlots([]); // エラー時は全枠を選択可能として表示
@@ -2129,11 +2253,14 @@
       return;
     }
     // 確定時に再度重複チェック（二重送信防止）
-    const bookedNow = await fetchBookedTimes(date).catch(() => []);
-    if (bookedNow.includes(time)) {
-      showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
-      const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
-      renderTimeSlots(bookedTimesRefresh);
+    const [bookedNow, blockedNow] = await Promise.all([
+      fetchBookedTimes(date).catch(() => []),
+      fetchBlockedTimes(date).catch(() => [])
+    ]);
+    const unavailableNow = new Set([...bookedNow, ...blockedNow]);
+    if (unavailableNow.has(time)) {
+      showAlert('datetime-alert', '選択した時間帯はご予約いただけません。別の時間帯をお選びください。');
+      renderTimeSlots(Array.from(unavailableNow));
       document.getElementById('dt-time').value = '';
       return;
     }
@@ -2600,8 +2727,12 @@
     hideAlert('admin-holiday-error');
 
     let holidays = {};
+    let blockedByDate = {};
     try {
-      holidays = await fetchHolidaysForMonth(holidayViewYear, holidayViewMonth);
+      [holidays, blockedByDate] = await Promise.all([
+        fetchHolidaysForMonth(holidayViewYear, holidayViewMonth),
+        fetchBlockedTimesForMonth(holidayViewYear, holidayViewMonth)
+      ]);
     } catch (e) {
       console.error('❌ [renderHolidayCalendar] エラー:', e);
       showAlert('admin-holiday-error', `休業日データの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
@@ -2631,18 +2762,25 @@
       const isPast    = dateObj < today;
       const isToday   = dateObj.getTime() === today.getTime();
       const isHoliday = holidays[dateStr] !== undefined;
+      const blockedCount = (blockedByDate[dateStr] || []).length;
+      const isPartial = !isHoliday && blockedCount > 0;
 
       const classes = ['holiday-cal-day'];
       if (isPast)    classes.push('past');
       if (isToday)   classes.push('today');
       if (isHoliday) classes.push('holiday');
+      if (isPartial) classes.push('partial');
 
-      const onclick = isPast ? '' : `onclick="toggleHoliday('${dateStr}', this)"`;
-      const reason  = isHoliday && holidays[dateStr]
-        ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
+      const onclick = isPast ? '' : `onclick="openDayEditor('${dateStr}')"`;
+      let mark = '';
+      if (isHoliday && holidays[dateStr]) {
+        mark = `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>`;
+      } else if (isPartial) {
+        mark = `<span class="partial-mark">${blockedCount}枠不可</span>`;
+      }
       html += `<div class="${classes.join(' ')}" ${onclick}>
         <span class="holiday-day-num">${d}</span>
-        ${reason}
+        ${mark}
       </div>`;
     }
 
@@ -2688,6 +2826,199 @@
       } finally {
         hideLoading();
       }
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 営業時間設定（時間帯ブロック）
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  let _dayEditDate = '';
+  let _dayEditFullHoliday = false;
+  let _dayEditBlockedTimes = new Set();
+
+  /** 指定日の blocked_times を取得（時間の配列） */
+  async function fetchBlockedTimes(date) {
+    const { data, error } = await sbClient
+      .from('blocked_times')
+      .select('time')
+      .eq('date', date);
+    if (error) {
+      // テーブルが未作成の場合は空配列でフォールバック
+      if (error.code === '42P01') return [];
+      throwSupabaseError('時間ブロック取得', error);
+    }
+    return (data || []).map(b => b.time);
+  }
+
+  /** 指定月の blocked_times を取得（map: dateStr -> [times]） */
+  async function fetchBlockedTimesForMonth(year, month) {
+    const mm  = String(month + 1).padStart(2, '0');
+    const ld  = new Date(year, month + 1, 0).getDate();
+    const start = `${year}-${mm}-01`;
+    const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
+    const { data, error } = await sbClient
+      .from('blocked_times')
+      .select('date, time')
+      .gte('date', start)
+      .lte('date', end);
+    if (error) {
+      if (error.code === '42P01') return {};
+      throwSupabaseError('時間ブロック月取得', error);
+    }
+    const map = {};
+    (data || []).forEach(b => {
+      if (!map[b.date]) map[b.date] = [];
+      map[b.date].push(b.time);
+    });
+    return map;
+  }
+
+  /** 営業時間設定モーダルを開く */
+  async function openDayEditor(dateStr) {
+    _dayEditDate = dateStr;
+    const [y, m, d] = dateStr.split('-');
+    document.getElementById('dayedit-title').textContent =
+      `${y}年${parseInt(m)}月${parseInt(d)}日 の営業時間設定`;
+    hideAlert('dayedit-error');
+    showLoading('読み込み中...');
+    try {
+      const [holiday, blocked] = await Promise.all([
+        checkIsHoliday(dateStr).catch(() => null),
+        fetchBlockedTimes(dateStr).catch(() => [])
+      ]);
+      _dayEditFullHoliday = holiday !== null;
+      _dayEditBlockedTimes = new Set(blocked);
+      document.getElementById('dayedit-full-checkbox').checked = _dayEditFullHoliday;
+      document.getElementById('dayedit-reason').value = (holiday && holiday.reason) || '';
+      renderDayEditTimeGrid();
+    } catch (e) {
+      console.error('openDayEditor error:', e);
+      showAlert('dayedit-error', '読み込みに失敗しました。');
+    } finally {
+      hideLoading();
+    }
+    document.getElementById('dayedit-modal').style.display = 'flex';
+  }
+
+  function closeDayEditor() {
+    document.getElementById('dayedit-modal').style.display = 'none';
+    renderHolidayCalendar(); // 閉じたらカレンダーを更新
+  }
+
+  function renderDayEditTimeGrid() {
+    const grid = document.getElementById('dayedit-time-grid');
+    let html = '';
+    for (const t of ALL_TIMES) {
+      const isBlocked = _dayEditBlockedTimes.has(t);
+      let cls = 'dayedit-time-chip';
+      if (_dayEditFullHoliday) cls += ' disabled-by-full';
+      else if (isBlocked)      cls += ' blocked';
+      html += `<button type="button" class="${cls}" onclick="toggleBlockedTimeChip('${t}')">${t}</button>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  async function toggleBlockedTimeChip(time) {
+    if (_dayEditFullHoliday) return;
+    hideAlert('dayedit-error');
+    const isBlocked = _dayEditBlockedTimes.has(time);
+    showLoading('保存中...');
+    try {
+      if (isBlocked) {
+        const { error } = await sbClient
+          .from('blocked_times')
+          .delete()
+          .eq('date', _dayEditDate)
+          .eq('time', time);
+        if (error) throwSupabaseError('時間ブロック解除', error);
+        _dayEditBlockedTimes.delete(time);
+      } else {
+        const { data, error } = await sbClient
+          .from('blocked_times')
+          .insert({ date: _dayEditDate, time })
+          .select();
+        if (error) throwSupabaseError('時間ブロック登録', error);
+        if (!data || data.length === 0) {
+          showAlert('dayedit-error',
+            'blocked_times テーブルへの INSERT が拒否されました（テーブル未作成または RLS をご確認ください）');
+          return;
+        }
+        _dayEditBlockedTimes.add(time);
+      }
+      renderDayEditTimeGrid();
+    } catch (e) {
+      console.error('toggleBlockedTimeChip error:', e);
+      const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : `（${e.message}）`;
+      showAlert('dayedit-error', `時間帯設定の更新に失敗しました。${detail}`);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  async function onFullHolidayToggle() {
+    const checked = document.getElementById('dayedit-full-checkbox').checked;
+    const reason  = document.getElementById('dayedit-reason').value.trim();
+    hideAlert('dayedit-error');
+    showLoading('保存中...');
+    try {
+      if (checked) {
+        // UPSERT 風（既存があれば理由を更新、なければ insert）
+        const { data: existing } = await sbClient
+          .from('holidays').select('date').eq('date', _dayEditDate).maybeSingle();
+        if (existing) {
+          const { error } = await sbClient
+            .from('holidays').update({ reason: reason || null }).eq('date', _dayEditDate);
+          if (error) throwSupabaseError('休業日更新', error);
+        } else {
+          const { data, error } = await sbClient
+            .from('holidays').insert({ date: _dayEditDate, reason: reason || null }).select();
+          if (error) throwSupabaseError('休業日登録', error);
+          if (!data || data.length === 0) {
+            showAlert('dayedit-error', 'holidays への INSERT が拒否されました（RLS確認）');
+            document.getElementById('dayedit-full-checkbox').checked = false;
+            return;
+          }
+        }
+        _dayEditFullHoliday = true;
+      } else {
+        const { error } = await sbClient.from('holidays').delete().eq('date', _dayEditDate);
+        if (error) throwSupabaseError('休業日解除', error);
+        _dayEditFullHoliday = false;
+      }
+      renderDayEditTimeGrid();
+    } catch (e) {
+      console.error('onFullHolidayToggle error:', e);
+      document.getElementById('dayedit-full-checkbox').checked = !checked;
+      const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
+      showAlert('dayedit-error', `休業日の更新に失敗しました。${detail}`);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  async function saveFullHolidayReason() {
+    if (!_dayEditFullHoliday) {
+      showAlert('dayedit-error', '先に「終日休業」をオンにしてください。');
+      return;
+    }
+    const reason = document.getElementById('dayedit-reason').value.trim();
+    hideAlert('dayedit-error');
+    showLoading('保存中...');
+    try {
+      const { error } = await sbClient
+        .from('holidays').update({ reason: reason || null }).eq('date', _dayEditDate);
+      if (error) throwSupabaseError('理由更新', error);
+      // 視覚フィードバック
+      const btn = document.querySelector('.dayedit-save-btn');
+      if (btn) {
+        const orig = btn.textContent; btn.textContent = '✓ 保存しました';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      }
+    } catch (e) {
+      console.error('saveFullHolidayReason error:', e);
+      showAlert('dayedit-error', `保存に失敗しました。${e.message || ''}`);
+    } finally {
+      hideLoading();
     }
   }
 
