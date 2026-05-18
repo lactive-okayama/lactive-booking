@@ -564,91 +564,6 @@
       border-radius: var(--radius-sm); line-height: 1.7;
     }
 
-    /* 部分的に時間制限のある日のカレンダー表示 */
-    .holiday-cal-day.partial {
-      background: #FFF4D5; border-color: #F0C040;
-    }
-    .holiday-cal-day.partial .holiday-day-num { color: #A06808; }
-    .holiday-cal-day.partial .partial-mark {
-      font-size: .58rem; color: #A06808; font-weight: 700;
-    }
-
-    /* 営業時間設定モーダル */
-    .dayedit-modal {
-      position: fixed; inset: 0; background: rgba(0,0,0,.45);
-      z-index: 600; display: flex; align-items: center; justify-content: center;
-      padding: 16px;
-    }
-    .dayedit-card {
-      background: var(--white); border-radius: var(--radius);
-      max-width: 480px; width: 100%; max-height: 90vh;
-      display: flex; flex-direction: column; overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0,0,0,.2);
-    }
-    .dayedit-header {
-      padding: 14px 18px; border-bottom: 1.5px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .dayedit-header h3 {
-      font-size: 1rem; font-weight: 700; color: var(--orange-deep);
-    }
-    .dayedit-body { padding: 16px 18px; overflow-y: auto; }
-    .dayedit-section { margin-bottom: 20px; }
-    .dayedit-section-title {
-      font-size: .86rem; font-weight: 700; color: var(--text);
-      margin-bottom: 8px;
-      padding-bottom: 5px; border-bottom: 2px solid var(--orange-light);
-    }
-    .dayedit-full-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; background: var(--bg);
-      border-radius: var(--radius-sm);
-    }
-    .dayedit-full-row input[type="checkbox"] {
-      width: 18px; height: 18px; accent-color: var(--orange); cursor: pointer;
-    }
-    .dayedit-reason-row {
-      margin-top: 8px; display: flex; gap: 6px;
-    }
-    .dayedit-reason-row input {
-      flex: 1; padding: 9px 11px; border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm); font-size: .86rem; font-family: inherit;
-    }
-    .dayedit-reason-row input:focus { border-color: var(--orange); outline: none; }
-    .dayedit-time-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-    }
-    @media (max-width: 460px) { .dayedit-time-grid { grid-template-columns: repeat(3, 1fr); } }
-    .dayedit-time-chip {
-      padding: 10px 4px; border: 1.5px solid var(--orange);
-      border-radius: var(--radius-sm); background: var(--orange-pale);
-      font-size: .82rem; font-family: inherit;
-      cursor: pointer; transition: all .15s; text-align: center;
-      color: var(--orange-deep); font-weight: 600;
-    }
-    .dayedit-time-chip:hover { background: var(--orange-light); }
-    .dayedit-time-chip.blocked {
-      background: #EEEEEE; border-color: #CCCCCC; color: #999999;
-      text-decoration: line-through; font-weight: 400;
-    }
-    .dayedit-time-chip.blocked:hover { background: #DDDDDD; }
-    .dayedit-time-chip.disabled-by-full {
-      background: #F8F8F8; border-color: #DDDDDD; color: #BBBBBB;
-      pointer-events: none; text-decoration: none;
-    }
-    .dayedit-hint {
-      font-size: .72rem; color: var(--text-light); margin-top: 8px;
-      line-height: 1.6;
-    }
-    .dayedit-save-btn {
-      padding: 6px 14px; font-size: .8rem; font-weight: 600;
-      background: var(--white); color: var(--orange-deep);
-      border: 1.5px solid var(--orange); border-radius: var(--radius-sm);
-      cursor: pointer; transition: all .15s; font-family: inherit;
-      flex-shrink: 0;
-    }
-    .dayedit-save-btn:hover { background: var(--orange); color: #fff; }
-
     /* ───────────────────────────────
        カレンダービュー（管理画面）
     ─────────────────────────────── */
@@ -732,6 +647,61 @@
     }
 
     /* 日別予約一覧モーダル */
+    /* 休業日設定モーダル */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 600;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-box {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+      width: 100%; max-width: 400px; overflow: hidden;
+    }
+    .holiday-modal-box { padding: 0; }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; border-bottom: 1.5px solid var(--border);
+      font-size: .95rem;
+    }
+    .modal-close-btn {
+      background: none; border: none; font-size: 1.2rem; cursor: pointer;
+      color: var(--text-light); line-height: 1; padding: 0 4px;
+    }
+    .modal-close-btn:hover { color: var(--danger); }
+    .modal-field { padding: 12px 18px 0; }
+    .modal-label { display: block; font-size: .8rem; color: var(--text-light); margin-bottom: 5px; font-weight: 600; }
+    .modal-input {
+      width: 100%; padding: 8px 10px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: .9rem; font-family: inherit;
+      box-sizing: border-box;
+    }
+    .modal-input:focus { outline: none; border-color: var(--orange); }
+    .hm-type-row { display: flex; gap: 20px; }
+    .hm-type-label { display: flex; align-items: center; gap: 6px; font-size: .9rem; cursor: pointer; }
+    .hm-time-row { display: flex; flex-direction: column; }
+    .hm-time-selects { display: flex; align-items: center; }
+    .hm-time-select {
+      padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-size: .9rem; font-family: inherit; background: var(--white); cursor: pointer;
+    }
+    .hm-time-select:focus { outline: none; border-color: var(--orange); }
+    .modal-actions {
+      display: flex; gap: 10px; justify-content: flex-end;
+      padding: 16px 18px;
+    }
+    /* 時間変更日スタイル（予約・管理両カレンダー共通） */
+    .holiday-cal-day.time-limit-day {
+      background: #fff8ee; border-color: #f7b731;
+    }
+    .holiday-cal-day.time-limit-day .holiday-day-num { color: #c8860a; }
+    #booking-cal-grid .holiday-cal-day.time-limit-day {
+      background: #fffbf4; border-color: #f7b731; cursor: pointer;
+    }
+    #booking-cal-grid .holiday-cal-day.time-limit-day:hover {
+      background: #fff3d6;
+    }
     .day-modal {
       position: fixed; inset: 0;
       background: rgba(0,0,0,.45); z-index: 500;
@@ -833,25 +803,15 @@
     .mypage-customer-num  { font-size: .8rem; color: var(--text-light); }
 
     .mypage-stats {
-      display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px;
     }
     .stat-card {
       background: linear-gradient(135deg, var(--orange), var(--orange-dark));
       border-radius: var(--radius); padding: 22px 16px; text-align: center;
       color: #fff; box-shadow: 0 4px 14px rgba(255,140,66,.4);
     }
-    .stat-card-sub-row {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    }
-    .stat-card-sub {
-      background: linear-gradient(135deg, var(--orange-light), var(--orange));
-      border-radius: var(--radius-sm); padding: 12px 10px; text-align: center;
-      color: #fff; box-shadow: 0 2px 8px rgba(255,140,66,.25);
-    }
-    .stat-num        { font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 7px; }
-    .stat-num-sub    { font-size: 1.6rem; font-weight: 700; line-height: 1; margin-bottom: 4px; color: var(--orange-deep); }
-    .stat-label      { font-size: .78rem; opacity: .9; letter-spacing: .04em; }
-    .stat-label-sub  { font-size: .72rem; color: var(--orange-dark); letter-spacing: .04em; }
+    .stat-num   { font-size: 2.4rem; font-weight: 700; line-height: 1; margin-bottom: 7px; }
+    .stat-label { font-size: .78rem; opacity: .9; letter-spacing: .04em; }
 
     .mypage-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 16px; }
 
@@ -994,16 +954,7 @@
     }
     .footer-links a:hover { color: var(--orange-dark); text-decoration: underline; }
     .footer-copy { font-size: .78rem; color: var(--text-light); }
-  
-      /* ── LINE連携セクション ── */
-      .line-connect-section { background:#f0fff4; border:1px solid #00b900; border-radius:8px; padding:12px 16px; margin-bottom:16px; }
-      .line-connect-section p { margin:0 0 4px; font-size:14px; }
-      .line-connect-sub { color:#666; font-size:12px !important; margin-top:2px !important; }
-      .line-user-badge { font-size:14px; color:#00b900; font-weight:500; }
-      .btn-line-cancel { background:none; border:none; color:#999; font-size:12px; cursor:pointer; text-decoration:underline; margin-left:8px; }
-      .btn-line-connect { background:#00b900; color:white; border:none; padding:8px 20px; border-radius:6px; font-size:14px; cursor:pointer; font-weight:500; }
-      .btn-line-connect:hover { background:#009900; }
-    </style>
+  </style>
 </head>
 <body>
 
@@ -1013,7 +964,8 @@
   <div class="loading-text" id="loading-text">処理中...</div>
 </div>
 
-<header>
+
+header>
   <div class="header-inner">
     <div class="logo" onclick="navigateTo('page-top')">
       <div class="logo-name">Lactive</div>
@@ -1058,7 +1010,7 @@
           </div>
           <div class="card-name">初回整体</div>
           <div class="card-duration">90分</div>
-          <div class="card-price">¥5,980</div>
+          <div class="card-price">¥1,980</div>
         </div>
         <div class="menu-card" onclick="startFirstFlow('first-pilates')">
           <div class="card-top">
@@ -1066,7 +1018,7 @@
             <span class="card-arrow">›</span>
           </div>
           <div class="card-name">初回ピラティス</div>
-          <div class="card-duration">50分</div>
+          <div class="card-duration">60分</div>
           <div class="card-price">¥1,980</div>
         </div>
       </div>
@@ -1182,7 +1134,7 @@
         <input type="text" id="q3" placeholder="例：3ヶ月前、1年前 など">
       </div>
       <div class="form-group">
-        <label>4. 施術中、身体を動かしていただくことがありますが問題ありませんか？<span class="req">*</span></label>
+        <label>4. 施術中、身体を動かしていただくことがありますが問題ありませんく？<span class="req">*</span></label>
         <div class="radio-group" id="q4-group">
           <label class="radio-item"><input type="radio" name="q4" value="問題ない"><span class="radio-label">問題ない</span></label>
           <label class="radio-item"><input type="radio" name="q4" value="少し不安"><span class="radio-label">少し不安</span></label>
@@ -1221,7 +1173,7 @@
         <input type="tel" id="p-phone" placeholder="090-0000-0000">
       </div>
       <div class="form-group">
-        <label>メールアドレス<span class="req">*</span></label>
+        <label>メール<span class="req">*</span></label>
         <input type="email" id="p-email" placeholder="example@email.com">
       </div>
       <label class="consent-box">
@@ -1230,22 +1182,7 @@
           プライバシーポリシー（ページ下部に記載）を読み、個人情報の取り扱いに同意します。
         </span>
       </label>
-      <!-- ▼ LINE前日リマインド連携（任意） -->
-      <div class="line-connect-section">
-        <p>📅 <strong>前日リマインドをLINEで受け取る</strong>（任意）</p>
-        <p class="line-connect-sub">ご予約の前日9時にLINEでお知らせします</p>
-        <div id="line-connect-status" style="margin-top:8px;">
-          <button type="button" id="line-login-btn" class="btn-line-connect" onclick="startLineLogin()">
-            🟢 LINEで連携する
-          </button>
-          <div id="line-linked-info" style="display:none;">
-            <span class="line-user-badge">✅ LINE連携済み：<span id="line-display-name"></span></span>
-            <button type="button" class="btn-line-cancel" onclick="cancelLineLink()">解除</button>
-          </div>
-        </div>
-      </div>
-      <!-- ▲ LINE連携 -->
-            <div class="btn-actions">
+      <div class="btn-actions">
         <button class="btn btn-secondary" onclick="personalBack()">← 戻る</button>
         <button class="btn btn-primary" onclick="submitPersonal()">次へ →</button>
       </div>
@@ -1261,6 +1198,7 @@
       </div>
       <div class="auth-choice">
         <div class="auth-option" onclick="navigateTo('page-member-login')">
+   ogin')">
           <div class="auth-option-title">🔑 顧客番号をお持ちの方</div>
           <div class="auth-option-sub">6桁の顧客番号でログインして予約します</div>
         </div>
@@ -1336,7 +1274,7 @@
           <input type="tel" id="r-phone" placeholder="090-0000-0000">
         </div>
         <div class="form-group">
-          <label>メールアドレス<span class="req">*</span></label>
+          <label>メール<span class="req">*</span></label>
           <input type="email" id="r-email" placeholder="example@email.com">
         </div>
         <label class="consent-box">
@@ -1345,24 +1283,9 @@
             プライバシーポリシー（ページ下部に記載）を読み、個人情報の取り扱いに同意します。
           </span>
         </label>
-              <!-- ▼ LINE前日リマインド連携（任意） -->
-      <div class="line-connect-section">
-        <p>📱 <strong>前日リマインドをLINEで受け取る</strong>（任意）</p>
-        <p class="line-connect-sub">ご予約の前日9時にLINEでお知らせします</p>
-        <div id="r-line-not-connected">
-          <button type="button" id="r-line-login-btn" class="btn-line-connect" onclick="startLineLoginReg()">
-            💚 LINEで連携する
-          </button>
-        </div>
-        <div id="r-line-linked-info" style="display:none">
-          <span class="line-user-badge">✅ LINE連携済み：<span id="r-line-display-name"></span></span>
-          <button type="button" class="btn-line-cancel" onclick="cancelLineLink()">解除</button>
-        </div>
-      </div>
-      <!-- ▲ LINE連携 -->
-<div class="btn-actions">
+        <div class="btn-actions">
           <button class="btn btn-secondary" onclick="navigateTo('page-member-login')">← 戻る</button>
-          <button class="btn btn-primary" id="register-btn" onclick="submitRegister()">登録して次へ →</button>
+          <but        <button class="btn btn-primary" id="register-btn" onclick="submitRegister()">登録して次へ →</button>
         </div>
       </div>
 
@@ -1401,7 +1324,7 @@
         </div>
         <div class="holiday-cal-grid" id="booking-cal-grid"></div>
         <div class="holiday-legend">
-          <span><span class="holiday-legend-swatch" style="background:#F0F0F0;border:1px solid #DDD;"></span>休業日・選択不可</span>
+          <span><span class="holiday-legend-swatch" style="background:#F0F0F0;border:1px solid #DDD;"></span>休業日・選択不叿</span>
           <span><span class="holiday-legend-swatch" style="background:var(--orange-pale);border:1.5px solid var(--orange);"></span>選択中</span>
         </div>
         <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日は選択できません</div>
@@ -1486,15 +1409,13 @@
           <div class="stat-num" id="mp-total">-</div>
           <div class="stat-label">総予約回数</div>
         </div>
-        <div class="stat-card-sub-row">
-          <div class="stat-card-sub">
-            <div class="stat-num-sub" id="mp-seitai">-</div>
-            <div class="stat-label-sub">整体 来院回数</div>
-          </div>
-          <div class="stat-card-sub">
-            <div class="stat-num-sub" id="mp-pilates">-</div>
-            <div class="stat-label-sub">ピラティス 来院回数</div>
-          </div>
+        <div class="stat-card">
+          <div class="stat-num" id="mp-seitai">-</div>
+          <div class="stat-label">整体 来院回数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="mp-pilates">-</div>
+          <div class="stat-label">ピラティス 来院回数</div>
         </div>
       </div>
       <div id="mypage-success" class="alert alert-success"></div>
@@ -1561,7 +1482,7 @@
           <select id="bf-menu" onchange="renderBookings()">
             <option value="">すべてのメニュー</option>
             <option>初回整体 90分</option>
-            <option>初回ピラティス 50分</option>
+            <option>初回ピラティス 60分</option>
             <option>整体（運動療法）30分</option>
             <option>マシンピラティス 40分</option>
             <option>マットピラティス 40分</option>
@@ -1611,43 +1532,48 @@
       <div id="admin-holiday-error" class="alert alert-error"></div>
       <div class="holiday-cal-grid" id="holiday-cal-grid"></div>
       <div class="holiday-help">
-        💡 日付をクリックすると営業時間設定モーダルが開きます。<br>
-        ・<strong>終日休業</strong>（オレンジ）：その日全体を予約不可にします<br>
-        ・<strong>時間帯指定</strong>（黄色「○枠不可」）：特定の時間帯だけ予約不可にできます
+        💡 日付ゐクリックして「完全休業」か「営業時間変更」を設定できます。<br>
+        オレンジ表示の日をっう一度クリックすると解除できます。
       </div>
     </div>
   </div>
 
-  <!-- ▼ 営業時間設定モーダル（休業日設定タブ用） -->
-  <div id="dayedit-modal" class="dayedit-modal" style="display:none;" onclick="if(event.target===this)closeDayEditor()">
-    <div class="dayedit-card">
-      <div class="dayedit-header">
-        <h3 id="dayedit-title">-</h3>
-        <button class="day-modal-close" onclick="closeDayEditor()" aria-label="閉じる">×</button>
+  <!-- ▼ 休業日設定モーダル -->
+  <div id="holiday-modal" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeHolidayModal()">
+    <div class="modal-box holiday-modal-box">
+      <div class="modal-header">
+        <span id="hm-date-label" style="font-weight:700;color:var(--orange-deep)"></span> の設定
+        <button class="modal-close-btn" onclick="closeHolidayModal()">✕</button>
       </div>
-      <div class="dayedit-body">
-        <div id="dayedit-error" class="alert alert-error"></div>
-
-        <div class="dayedit-section">
-          <div class="dayedit-section-title">終日休業</div>
-          <div class="dayedit-full-row">
-            <input type="checkbox" id="dayedit-full-checkbox" onchange="onFullHolidayToggle()">
-            <label for="dayedit-full-checkbox" style="flex:1;font-size:.88rem;cursor:pointer;">この日を終日休業日にする</label>
-          </div>
-          <div class="dayedit-reason-row">
-            <input type="text" id="dayedit-reason" placeholder="理由（任意・空欄可）">
-            <button class="dayedit-save-btn" onclick="saveFullHolidayReason()">理由を保存</button>
-          </div>
+      <input type="hidden" id="hm-date">
+      <div class="modal-field">
+        <label class="modal-label">理由（任意）</label>
+        <input type="text" id="hm-reason" class="modal-input" placeholder="例：研修、メンテナンスなど">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">種別</label>
+        <div class="hm-type-row">
+          <label class="hm-type-label">
+            <input type="radio" name="hm-type" id="hm-type-full" value="full" checked>
+            <span>完全休業</span>
+          </label>
+          <label class="hm-type-label">
+            <input type="radio" name="hm-type" id="hm-type-time" value="time">
+            <span>営業時間を変更</span>
+          </label>
         </div>
-
-        <div class="dayedit-section">
-          <div class="dayedit-section-title">時間帯ごとの予約不可設定</div>
-          <div class="dayedit-time-grid" id="dayedit-time-grid"></div>
-          <div class="dayedit-hint">
-            ・クリックで切替（オレンジ：予約可能 / グレー：予約不可）<br>
-            ・「終日休業」をオンにしている場合は時間帯設定は無効です
-          </div>
+      </div>
+      <div id="hm-time-row" class="modal-field hm-time-row" style="display:none;">
+        <label class="modal-label">営業時間</label>
+        <div class="hm-time-selects">
+          <select id="hm-open" class="hm-time-select"></select>
+          <span style="padding:0 6px;line-height:2.2;">〜</span>
+          <select id="hm-close" class="hm-time-select"></select>
         </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeHolidayModal()">キャンセル</button>
+        <button class="btn-primary" onclick="saveHolidayModal()">登録する</button>
       </div>
     </div>
   </div>
@@ -1670,7 +1596,7 @@
     <div class="footer-links">
       <a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>
     </div>
-    <div class="footer-copy">&copy; 2025 Lactive All Rights Reserved.</div>
+    <div class="footer-copy">&copy; 2024 Lactive All Rights Reserved.</div>
   </div>
 </footer>
 
@@ -1687,7 +1613,7 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Supabase 初期化
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // ※ 変数名を sbClient にすることで CDN の window.supabase グローバルとの衝突を回避
+  // ※ 変数名を sbClient にするこで CDN の window.supabase グローバルとの衝突を回避
   const sbClient = window.supabase.createClient(
     'https://wuthbgxzmvjeosugzfbs.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
@@ -1744,7 +1670,7 @@
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // ローディング制御
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function showLoading(msg = '処理中...') {
     document.getElementById('loading-text').textContent = msg;
     document.getElementById('loading-overlay').classList.add('show');
@@ -1793,7 +1719,7 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startFirstFlow(flow) {
     ST = {
-      flow, menu: flow === 'first-seitai' ? '初回整体 90分' : '初回ピラティス 50分',
+      flow, menu: flow === 'first-seitai' ? '初回整体 90分' : '初回ピラティス 60分',
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: ''
     };
@@ -2006,7 +1932,7 @@
 
   async function renderBookingCalendar() {
     document.getElementById('booking-month-label').textContent =
-      `${bookingViewYear}年${bookingViewMonth + 1}月`;
+      `${bookingViewYear}㹴${bookingViewMonth + 1}月`;
     const grid = document.getElementById('booking-cal-grid');
 
     let holidays = {};
@@ -2050,26 +1976,32 @@
       const isHoliday = holidays[dateStr] !== undefined;
       const isSelected = dateStr === selectedDate;
 
+      const holidayData   = holidays[dateStr];
+      const isTimeLimit   = isHoliday && (holidayData?.open_time || holidayData?.close_time);
+      const isFullHoliday = isHoliday && !isTimeLimit;
+
       const classes = ['holiday-cal-day'];
-      if (isPast)     classes.push('past');
-      if (isToday)    classes.push('today', 'today-disabled'); // 当日は予約不可
-      if (isHoliday)  classes.push('holiday-disabled');
-      if (isSelected) classes.push('selected-date');
+      if (isPast)         classes.push('past');
+      if (isToday)        classes.push('today', 'today-disabled'); // 当日は予約不可
+      if (isFullHoliday)  classes.push('holiday-disabled');
+      if (isTimeLimit)    classes.push('time-limit-day');
+      if (isSelected)     classes.push('selected-date');
 
       let onclick = '';
       if (isToday) {
-        // 当日：電話案内アラート
         onclick = `onclick="alertSameDayBooking()"`;
       } else if (!isPast) {
-        onclick = isHoliday
+        onclick = isFullHoliday
           ? `onclick="alertBookingHoliday()"`
           : `onclick="selectBookingDate('${dateStr}')"`;
       }
-      const reason = isHoliday && holidays[dateStr]
-        ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
+      const reason = isHoliday && holidayData?.reason
+        ? `<span class="holiday-day-reason">${esc(holidayData.reason)}</span>` : '';
+      const timeLimitLabel = isTimeLimit
+        ? `<span class="holiday-day-reason">${holidayData.open_time||'9:00'}〜${holidayData.close_time||'19:00'}</span>` : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>
         <span class="holiday-day-num">${d}</span>
-        ${reason}
+        ${reason}${timeLimitLabel}
       </div>`;
     }
 
@@ -2084,7 +2016,7 @@
   }
 
   function alertSameDayBooking() {
-    // 当日選択時：日付選択をリセットして電話案内を表示
+    // 当日選択時：日付選択をリセットしど電話案内を表示
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     _dateChangeLast = '';
@@ -2133,39 +2065,33 @@
     document.getElementById('time-slot-grid').style.display    = 'none';
     hideAlert('datetime-alert');
     try {
-      // 休業日チェック
+      // 休業日・時間変更日チェック
       const holiday = await checkIsHoliday(date);
-      if (holiday) {
-        // 日付選択をリセット
+      const isTimeLimit = holiday && (holiday.open_time || holiday.close_time);
+      const isFullHoliday = holiday && !isTimeLimit;
+      if (isFullHoliday) {
+        // 完全休業日：日付リセット＋エラー表示
         document.getElementById('dt-date').value = '';
         document.getElementById('dt-time').value = '';
         _dateChangeLast = '';
-        // 時間帯ボタンを非表示
         document.getElementById('time-slot-loading').style.display = 'none';
         document.getElementById('time-slot-grid').style.display    = 'none';
         document.getElementById('time-slot-grid').innerHTML        = '';
         phEl.textContent = 'まず希望日を選択してください';
         phEl.style.display = 'block';
-        const reason = holiday.reason ? `（${holiday.reason}）` : '';
-        showAlert('datetime-alert', `この日は休業日のためご予約いただけません${reason}。別の日程をお選びください。`);
-        return;
-      }
-      const [bookedTimes, blockedTimes] = await Promise.all([
-        fetchBookedTimes(date),
-        fetchBlockedTimes(date).catch(() => [])
-      ]);
-      const unavailable = Array.from(new Set([...bookedTimes, ...blockedTimes]));
-      renderTimeSlots(unavailable);
-    } catch (e) {
-      console.error('時間帯取得エラー:', e);
-      renderTimeSlots([]); // エラー時は全枠を選択可能として表示
-    }
-  }
-
-  /** Supabase から指定日の予約済み時間帯を取得 */
-  async function fetchBookedTimes(date) {
-    const { data, error } = await sbClient
-      .from('bookings')
+        const reason = holiday.reason ? `（${holiday.reason}���%��耜��(��������͡�����Р���ѕѥ�������М����O���^�����G����^�����
+�S��#�������G���o�
+L��ɕ�ͽ����"����^���/�
+K�+��ώ?���W��	���(��������ɕ��ɸ�(�������(����������Ё������Q���̀�݅�Ё��э�	�����Q���̡��є��(����������f�ZO��'�nӚ^�������}ѥ������͕}ѥ���
+K�⇎_���
+����#�"ۦf@(����������Ё����Q�������Q���1���Ѐ��������乽���}ѥ����聹ձ��(����������Ё���͕Q������Q���1���Ѐ��������乍��͕}ѥ���聹ձ��(������������Q���1���Ф��(������������Ё�����􁀑�����Q���������������p�퍱�͕Q�����������������(��������͡�����Р���ѕѥ�������М����O���^����Zۚ���f�ZO�0�����������'�nӎW�
+3������g�	���(�������(������ɕ����Q���M���̡������Q���̰�����Q��������͕Q�����(����􁍅э�������(���������ͽ�����ɽȠ��f�ZO�⿖>[��_�
+�����蜰����(������ɕ����Q���M���̡mt�쀼���
+�����f�����z��
+K��*{�>������_��������(�����(���((������M�����͔��/�
+'�2��k�^�����#����#���f�ZO�⿎
+K�>[��\���(����幌��չ�ѥ�����э�	�����Q���̡��є���(��������Ё쁑�ф����ɽȁ��݅�Ё͉
+�����(��������ɽ����okings')
       .select('time')
       .eq('date', date);
     if (error) throwSupabaseError('予約済み時間帯の取得', error);
@@ -2173,12 +2099,12 @@
   }
 
   /** 時間帯グリッドを描画 */
-  function renderTimeSlots(bookedTimes) {
+  function renderTimeSlots(bookedTimes, openTime, closeTime) {
     document.getElementById('time-slot-loading').style.display = 'none';
     const grid = document.getElementById('time-slot-grid');
     grid.style.display = 'grid';
 
-    // \u5f53\u65e5\u306e\u5834\u5408\u306e\u307f\u300c\u73fe\u5728\u6642\u523b\u3092\u904e\u304e\u305f\u67a0\u300d\u3092\u30b0\u30ec\u30fc\u30a2\u30a6\u30c8\uff08\u901a\u5e38\u306f\u5f53\u65e5\u9078\u629e\u3092\u5f3e\u3044\u3066\u3044\u308b\u305f\u3081\u4fdd\u967a\uff09
+    // \u5f53\u65e5\u306e\u5834\u5408\u306e\u307f\u300c\u73fe\u5728\u6642\u523b\u3092\u904e\u304e\u305f\u67a0\u300d\u3092\u30b0\u30ec\u30fc\u30a2\u30a5\u30c8
     const date = document.getElementById('dt-date').value;
     const now = new Date();
     const todayStr =
@@ -2188,15 +2114,22 @@
     const isToday = date === todayStr;
     const currentHour = now.getHours();
 
+    // \u55b6\u696d\u6642\u9593\u5236\u9650\u30d1\u30fc\u30b9
+    const openHour  = openTime  ? parseInt(openTime.split(':')[0],  10) : null;
+    const closeHour = closeTime ? parseInt(closeTime.split(':')[0], 10) : null;
+
     let html = '';
     for (const t of ALL_TIMES) {
-      const slotHour   = parseInt(t.split(':')[0], 10);
-      const isPastTime = isToday && slotHour <= currentHour;
-      const isBooked   = bookedTimes.includes(t);
-      const isDisabled = isBooked || isPastTime;
+      const slotHour      = parseInt(t.split(':')[0], 10);
+      const isPastTime    = isToday && slotHour <= currentHour;
+      const isBooked      = bookedTimes.includes(t);
+      const isOutOfHours  = (openHour  !== null && slotHour < openHour)
+                         || (closeHour !== null && slotHour >= closeHour);
+      const isDisabled    = isBooked || isPastTime || isOutOfHours;
+
       if (isDisabled) {
-        html += '<button type="button" class="time-slot-btn booked" disabled>'
-              + t + '<em class="slot-mark">\u00d7 \u4e0d\u53ef</em></button>';
+        const mark = isOutOfHours ? '\u6642\u9593\u5916' : '\u00d7 \u4e0d\u53ef';
+        html += `<button type="button" class="time-slot-btn booked" disabled>${t}<em class="slot-mark">${mark}</em></button>`;
       } else {
         html += '<button type="button" class="time-slot-btn"'
               + ' onclick="selectTimeSlot(this,\'' + t + '\')">'
@@ -2253,14 +2186,11 @@
       return;
     }
     // 確定時に再度重複チェック（二重送信防止）
-    const [bookedNow, blockedNow] = await Promise.all([
-      fetchBookedTimes(date).catch(() => []),
-      fetchBlockedTimes(date).catch(() => [])
-    ]);
-    const unavailableNow = new Set([...bookedNow, ...blockedNow]);
-    if (unavailableNow.has(time)) {
-      showAlert('datetime-alert', '選択した時間帯はご予約いただけません。別の時間帯をお選びください。');
-      renderTimeSlots(Array.from(unavailableNow));
+    const bookedNow = await fetchBookedTimes(date).catch(() => []);
+    if (bookedNow.includes(time)) {
+      showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
+      const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
+      renderTimeSlots(bookedTimesRefresh);
       document.getElementById('dt-time').value = '';
       return;
     }
@@ -2711,28 +2641,26 @@
     const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
     const { data, error } = await sbClient
       .from('holidays')
-      .select('date, reason')
+      .select('date, reason, open_time, close_time')
       .gte('date', start)
       .lte('date', end);
     if (error) throwSupabaseError('休業日一覧の取得', error);
     const map = {};
-    (data || []).forEach(h => { map[h.date] = h.reason || ''; });
+    (data || []).forEach(h => {
+      map[h.date] = { reason: h.reason || '', open_time: h.open_time || null, close_time: h.close_time || null };
+    });
     return map;
   }
 
   async function renderHolidayCalendar() {
     document.getElementById('holiday-month-label').textContent =
-      `${holidayViewYear}年${holidayViewMonth + 1}月`;
+      `${holidayViewYear}�t${holidayViewMonth + 1}月`;
     const grid = document.getElementById('holiday-cal-grid');
     hideAlert('admin-holiday-error');
 
     let holidays = {};
-    let blockedByDate = {};
     try {
-      [holidays, blockedByDate] = await Promise.all([
-        fetchHolidaysForMonth(holidayViewYear, holidayViewMonth),
-        fetchBlockedTimesForMonth(holidayViewYear, holidayViewMonth)
-      ]);
+      holidays = await fetchHolidaysForMonth(holidayViewYear, holidayViewMonth);
     } catch (e) {
       console.error('❌ [renderHolidayCalendar] エラー:', e);
       showAlert('admin-holiday-error', `休業日データの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
@@ -2762,25 +2690,23 @@
       const isPast    = dateObj < today;
       const isToday   = dateObj.getTime() === today.getTime();
       const isHoliday = holidays[dateStr] !== undefined;
-      const blockedCount = (blockedByDate[dateStr] || []).length;
-      const isPartial = !isHoliday && blockedCount > 0;
 
+      const hData       = holidays[dateStr];
+      const isTimeLimit = isHoliday && (hData?.open_time || hData?.close_time);
       const classes = ['holiday-cal-day'];
-      if (isPast)    classes.push('past');
-      if (isToday)   classes.push('today');
-      if (isHoliday) classes.push('holiday');
-      if (isPartial) classes.push('partial');
+      if (isPast)      classes.push('past');
+      if (isToday)     classes.push('today');
+      if (isHoliday && !isTimeLimit) classes.push('holiday');
+      if (isTimeLimit) classes.push('holiday', 'time-limit-day');
 
-      const onclick = isPast ? '' : `onclick="openDayEditor('${dateStr}')"`;
-      let mark = '';
-      if (isHoliday && holidays[dateStr]) {
-        mark = `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>`;
-      } else if (isPartial) {
-        mark = `<span class="partial-mark">${blockedCount}枠不可</span>`;
-      }
+      const onclick = isPast ? '' : `onclick="toggleHoliday('${dateStr}', this)"`;
+      const reason  = hData?.reason
+        ? `<span class="holiday-day-reason">${esc(hData.reason)}</span>` : '';
+      const timeInfo = isTimeLimit
+        ? `<span class="holiday-day-reason" style="font-size:.68rem;">${hData.open_time||'9:00'}〜${hData.close_time||'19:00'}</span>` : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>
         <span class="holiday-day-num">${d}</span>
-        ${mark}
+        ${reason}${timeInfo}
       </div>`;
     }
 
@@ -2790,247 +2716,106 @@
   async function toggleHoliday(dateStr, dayEl) {
     const isHoliday = dayEl.classList.contains('holiday');
     if (isHoliday) {
-      if (!confirm(`${dateStr} の休業日設定を解除しますか？`)) return;
+      if (!confirm(`${dateStr} の設定を解除しますか？`)) return;
       showLoading('解除中...');
       try {
         const { error } = await sbClient.from('holidays').delete().eq('date', dateStr);
-        if (error) throwSupabaseError('休業日の解除', error);
+        if (error) throwSupabaseError('設定の解除', error);
         await renderHolidayCalendar();
       } catch (e) {
         console.error('❌ [toggleHoliday/delete] エラー:', e);
         const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
-        showAlert('admin-holiday-error', `休業日の解除に失敗しました。${detail}`);
+        showAlert('admin-holiday-error', `解除に失敗しました。${detail}`);
       } finally {
         hideLoading();
       }
     } else {
-      const reason = prompt(`${dateStr} を休業日に設定します。\n理由（任意・空欄でも可）：`, '');
-      if (reason === null) return; // キャンセル
-      showLoading('登録中...');
-      try {
-        const { data, error } = await sbClient
-          .from('holidays')
-          .insert({ date: dateStr, reason: reason.trim() || null })
-          .select();
-        if (error) throwSupabaseError('休業日の登録', error);
-        if (!data || data.length === 0) {
-          showAlert('admin-holiday-error',
-            '休業日を登録できませんでした。Supabase の holidays テーブルに INSERT 用の RLS ポリシーが設定されているかご確認ください。');
-          return;
-        }
-        await renderHolidayCalendar();
-      } catch (e) {
-        console.error('❌ [toggleHoliday/insert] エラー:', e);
-        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
-        showAlert('admin-holiday-error', `休業日の登録に失敗しました。${detail}`);
-      } finally {
-        hideLoading();
-      }
+      openHolidayModal(dateStr);
     }
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 営業時間設定（時間帯ブロック）
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  let _dayEditDate = '';
-  let _dayEditFullHoliday = false;
-  let _dayEditBlockedTimes = new Set();
-
-  /** 指定日の blocked_times を取得（時間の配列） */
-  async function fetchBlockedTimes(date) {
-    const { data, error } = await sbClient
-      .from('blocked_times')
-      .select('time')
-      .eq('date', date);
-    if (error) {
-      // テーブルが未作成の場合は空配列でフォールバック
-      if (error.code === '42P01') return [];
-      throwSupabaseError('時間ブロック取得', error);
-    }
-    return (data || []).map(b => b.time);
+  function openHolidayModal(dateStr) {
+    document.getElementById('hm-date-label').textContent = dateStr;
+    document.getElementById('hm-date').value = dateStr;
+    document.getElementById('hm-reason').value = '';
+    document.getElementById('hm-type-full').checked = true;
+    document.getElementById('hm-time-row').style.display = 'none';
+    document.getElementById('hm-open').value  = '9:00';
+    document.getElementById('hm-close').value = '19:00';
+    document.getElementById('holiday-modal').style.display = 'flex';
   }
 
-  /** 指定月の blocked_times を取得（map: dateStr -> [times]） */
-  async function fetchBlockedTimesForMonth(year, month) {
-    const mm  = String(month + 1).padStart(2, '0');
-    const ld  = new Date(year, month + 1, 0).getDate();
-    const start = `${year}-${mm}-01`;
-    const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
-    const { data, error } = await sbClient
-      .from('blocked_times')
-      .select('date, time')
-      .gte('date', start)
-      .lte('date', end);
-    if (error) {
-      if (error.code === '42P01') return {};
-      throwSupabaseError('時間ブロック月取得', error);
+  function closeHolidayModal() {
+    document.getElementById('holiday-modal').style.display = 'none';
+  }
+
+  // 休業日モーダルの時刻セレクトを生成
+  (function initHolidayModalSelects() {
+    const times = [
+      '8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30',
+      '12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30',
+      '16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00'
+    ];
+    function populateSelect(id, defaultVal) {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      times.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = t;
+        if (t === defaultVal) opt.selected = true;
+        sel.appendChild(opt);
+      });
     }
-    const map = {};
-    (data || []).forEach(b => {
-      if (!map[b.date]) map[b.date] = [];
-      map[b.date].push(b.time);
+    populateSelect('hm-open',  '9:00');
+    populateSelect('hm-close', '19:00');
+
+    const typeInputs = document.querySelectorAll('input[name="hm-type"]');
+    typeInputs.forEach(r => {
+      r.addEventListener('change', () => {
+        document.getElementById('hm-time-row').style.display =
+          document.getElementById('hm-type-time').checked ? 'flex' : 'none';
+      });
     });
-    return map;
-  }
+  })();
 
-  /** 営業時間設定モーダルを開く */
-  async function openDayEditor(dateStr) {
-    _dayEditDate = dateStr;
-    const [y, m, d] = dateStr.split('-');
-    document.getElementById('dayedit-title').textContent =
-      `${y}年${parseInt(m)}月${parseInt(d)}日 の営業時間設定`;
-    hideAlert('dayedit-error');
-    showLoading('読み込み中...');
+  async function saveHolidayModal() {
+    const dateStr  = document.getElementById('hm-date').value;
+    const reason   = document.getElementById('hm-reason').value.trim() || null;
+    const isFull   = document.getElementById('hm-type-full').checked;
+    const openTime = isFull ? null : (document.getElementById('hm-open').value  || null);
+    const closeTime= isFull ? null : (document.getElementById('hm-close').value || null);
+
+    closeHolidayModal();
+    showLoading('登録中...');
     try {
-      const [holiday, blocked] = await Promise.all([
-        checkIsHoliday(dateStr).catch(() => null),
-        fetchBlockedTimes(dateStr).catch(() => [])
-      ]);
-      _dayEditFullHoliday = holiday !== null;
-      _dayEditBlockedTimes = new Set(blocked);
-      document.getElementById('dayedit-full-checkbox').checked = _dayEditFullHoliday;
-      document.getElementById('dayedit-reason').value = (holiday && holiday.reason) || '';
-      renderDayEditTimeGrid();
-    } catch (e) {
-      console.error('openDayEditor error:', e);
-      showAlert('dayedit-error', '読み込みに失敗しました。');
-    } finally {
-      hideLoading();
-    }
-    document.getElementById('dayedit-modal').style.display = 'flex';
-  }
-
-  function closeDayEditor() {
-    document.getElementById('dayedit-modal').style.display = 'none';
-    renderHolidayCalendar(); // 閉じたらカレンダーを更新
-  }
-
-  function renderDayEditTimeGrid() {
-    const grid = document.getElementById('dayedit-time-grid');
-    let html = '';
-    for (const t of ALL_TIMES) {
-      const isBlocked = _dayEditBlockedTimes.has(t);
-      let cls = 'dayedit-time-chip';
-      if (_dayEditFullHoliday) cls += ' disabled-by-full';
-      else if (isBlocked)      cls += ' blocked';
-      html += `<button type="button" class="${cls}" onclick="toggleBlockedTimeChip('${t}')">${t}</button>`;
-    }
-    grid.innerHTML = html;
-  }
-
-  async function toggleBlockedTimeChip(time) {
-    if (_dayEditFullHoliday) return;
-    hideAlert('dayedit-error');
-    const isBlocked = _dayEditBlockedTimes.has(time);
-    showLoading('保存中...');
-    try {
-      if (isBlocked) {
-        const { error } = await sbClient
-          .from('blocked_times')
-          .delete()
-          .eq('date', _dayEditDate)
-          .eq('time', time);
-        if (error) throwSupabaseError('時間ブロック解除', error);
-        _dayEditBlockedTimes.delete(time);
-      } else {
-        const { data, error } = await sbClient
-          .from('blocked_times')
-          .insert({ date: _dayEditDate, time })
-          .select();
-        if (error) throwSupabaseError('時間ブロック登録', error);
-        if (!data || data.length === 0) {
-          showAlert('dayedit-error',
-            'blocked_times テーブルへの INSERT が拒否されました（テーブル未作成または RLS をご確認ください）');
-          return;
-        }
-        _dayEditBlockedTimes.add(time);
+      const { data, error } = await sbClient
+        .from('holidays')
+        .insert({ date: dateStr, reason, open_time: openTime, close_time: closeTime })
+        .select();
+      if (error) throwSupabaseError('設定の登録', error);
+      if (!data || data.length === 0) {
+        showAlert('admin-holidat�error', '登録できませんでした。holidays テーブルの RLS ポリシーをご確認ください。');
+        return;
       }
-      renderDayEditTimeGrid();
+      await renderHolidayCalendar();
     } catch (e) {
-      console.error('toggleBlockedTimeChip error:', e);
-      const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : `（${e.message}）`;
-      showAlert('dayedit-error', `時間帯設定の更新に失敗しました。${detail}`);
-    } finally {
-      hideLoading();
-    }
-  }
-
-  async function onFullHolidayToggle() {
-    const checked = document.getElementById('dayedit-full-checkbox').checked;
-    const reason  = document.getElementById('dayedit-reason').value.trim();
-    hideAlert('dayedit-error');
-    showLoading('保存中...');
-    try {
-      if (checked) {
-        // UPSERT 風（既存があれば理由を更新、なければ insert）
-        const { data: existing } = await sbClient
-          .from('holidays').select('date').eq('date', _dayEditDate).maybeSingle();
-        if (existing) {
-          const { error } = await sbClient
-            .from('holidays').update({ reason: reason || null }).eq('date', _dayEditDate);
-          if (error) throwSupabaseError('休業日更新', error);
-        } else {
-          const { data, error } = await sbClient
-            .from('holidays').insert({ date: _dayEditDate, reason: reason || null }).select();
-          if (error) throwSupabaseError('休業日登録', error);
-          if (!data || data.length === 0) {
-            showAlert('dayedit-error', 'holidays への INSERT が拒否されました（RLS確認）');
-            document.getElementById('dayedit-full-checkbox').checked = false;
-            return;
-          }
-        }
-        _dayEditFullHoliday = true;
-      } else {
-        const { error } = await sbClient.from('holidays').delete().eq('date', _dayEditDate);
-        if (error) throwSupabaseError('休業日解除', error);
-        _dayEditFullHoliday = false;
-      }
-      renderDayEditTimeGrid();
-    } catch (e) {
-      console.error('onFullHolidayToggle error:', e);
-      document.getElementById('dayedit-full-checkbox').checked = !checked;
+      console.error('❌ [saveHolidayModal] エラー:', e);
       const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
-      showAlert('dayedit-error', `休業日の更新に失敗しました。${detail}`);
+      showAlert('admin-holiday-error', `登録に失敗しました。${detail}`);
     } finally {
       hideLoading();
     }
   }
 
-  async function saveFullHolidayReason() {
-    if (!_dayEditFullHoliday) {
-      showAlert('dayedit-error', '先に「終日休業」をオンにしてください。');
-      return;
-    }
-    const reason = document.getElementById('dayedit-reason').value.trim();
-    hideAlert('dayedit-error');
-    showLoading('保存中...');
-    try {
-      const { error } = await sbClient
-        .from('holidays').update({ reason: reason || null }).eq('date', _dayEditDate);
-      if (error) throwSupabaseError('理由更新', error);
-      // 視覚フィードバック
-      const btn = document.querySelector('.dayedit-save-btn');
-      if (btn) {
-        const orig = btn.textContent; btn.textContent = '✓ 保存しました';
-        setTimeout(() => { btn.textContent = orig; }, 1500);
-      }
-    } catch (e) {
-      console.error('saveFullHolidayReason error:', e);
-      showAlert('dayedit-error', `保存に失敗しました。${e.message || ''}`);
-    } finally {
-      hideLoading();
-    }
-  }
-
-  /** 指定日が休業日かどうか確認 */
+  /** 指定日が休業日・時間変更日かどうか確認 */
   async function checkIsHoliday(dateStr) {
     const { data, error } = await sbClient
       .from('holidays')
-      .select('reason')
+      .select('reason, open_time, close_time')
       .eq('date', dateStr)
       .maybeSingle();
     if (error) throwSupabaseError('休業日チェック', error);
-    return data; // null なら休業日ではない
+    return data; // null なら通常営業日
   }
 
   async function renderBookings() {
@@ -3123,15 +2908,7 @@
               <span>✉️ ${esc(c.email)}</span>
             </div>
             <div class="visit-count-wrap">
-              <span class="visit-count-label">整体：</span>
-              <input class="visit-count-input" type="number" min="0"
-                id="vc-seitai-${esc(c.id)}" value="${c.seitai_count ?? 0}">
-              <span class="visit-count-label">回　ピラティス：</span>
-              <input class="visit-count-input" type="number" min="0"
-                id="vc-pilates-${esc(c.id)}" value="${c.pilates_count ?? 0}">
-              <span class="visit-count-label">回</span>
-              <button class="btn-visit-update"
-                onclick="updateVisitCount('${esc(c.id)}')">更新</button>
+              <span class="visit-count-label">整体：${c.seitai_count ?? 0}回　ピラティス：${c.pilates_count ?? 0}回</span>
             </div>
           </div>
           <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
@@ -3143,21 +2920,18 @@
   }
 
   async function updateVisitCount(customerId) {
-    const seitaiInput  = document.getElementById(`vc-seitai-${customerId}`);
-    const pilatesInput = document.getElementById(`vc-pilates-${customerId}`);
-    const seitaiCount  = parseInt(seitaiInput.value, 10);
-    const pilatesCount = parseInt(pilatesInput.value, 10);
-    if (isNaN(seitaiCount) || seitaiCount < 0 || isNaN(pilatesCount) || pilatesCount < 0) {
+    const input = document.getElementById(`vc-${customerId}`);
+    const count = parseInt(input.value, 10);
+    if (isNaN(count) || count < 0) {
       showAlert('admin-customer-error', '正しい回数（0以上の整数）を入力してください。');
       return;
     }
-    const visitCount = seitaiCount + pilatesCount;
-    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, seitaiCount, pilatesCount, visitCount });
+    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, count });
     try {
       // .select() を付けることで RLS で UPDATE が拒否された場合（0行更新）を検知できる
       const { data, error } = await sbClient
         .from('customers')
-        .update({ visit_count: visitCount, seitai_count: seitaiCount, pilates_count: pilatesCount })
+        .update({ visit_count: count })
         .eq('id', customerId)
         .select();
 
@@ -3172,13 +2946,13 @@
         const detail = error.code
           ? `（${error.code}: ${error.message}）`
           : `（${error.message}）`;
-        showAlert('admin-customer-error', `来院回数の更新に失敗しました。${detail}`);
+        showAlert('admin-customer-error', `来院済み回数の更新に失敗しました。${detail}`);
         return;
       }
 
       // RLS で UPDATE 権限がない場合、エラーは出ずに data が空配列で返ってくる
       if (!data || data.length === 0) {
-        console.error('❌ [updateVisitCount] 0行更新（RLSのUPDATEポリシー未設定の可能性）:', { customerId, seitaiCount, pilatesCount });
+        console.error('❌ [updateVisitCount] 0行更新（RLSのUPDATEポリシー未設定の可能性）:', { customerId, count });
         showAlert(
           'admin-customer-error',
           '更新できませんでした。Supabase の customers テーブルに UPDATE 用の RLS ポリシーが設定されているかご確認ください。'
@@ -3187,16 +2961,12 @@
       }
 
       console.log('✅ [updateVisitCount] UPDATE成功 保存行:', data);
-      seitaiInput.style.borderColor  = 'var(--success)';
-      pilatesInput.style.borderColor = 'var(--success)';
-      setTimeout(() => {
-        seitaiInput.style.borderColor  = '';
-        pilatesInput.style.borderColor = '';
-      }, 1500);
+      input.style.borderColor = 'var(--success)';
+      setTimeout(() => { input.style.borderColor = ''; }, 1500);
       hideAlert('admin-customer-error');
     } catch (e) {
       console.error('❌ [updateVisitCount] 予期せぬエラー:', e);
-      showAlert('admin-customer-error', `来院回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
+      showAlert('admin-customer-error', `来院済み回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
     }
   }
 
@@ -3314,350 +3084,3 @@
     } catch (e) {
       console.error('❌ [toggleVisited] 失敗:', e);
       checkbox.checked = !checked; // 失敗時は元に戻す
-      showAlert('admin-booking-error', `来院済みの更新に失敗しました。${e.message ? '（' + e.message + '）' : ''}`);
-    } finally {
-      checkbox.disabled = false;
-    }
-  }
-
-  function toggleQ(el) {
-    const body = el.nextElementSibling;
-    const open = body.classList.toggle('open');
-    el.textContent = open ? '▼ 問診内容を閉じる' : '▶ 問診内容を見る';
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Supabase DB 操作
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  /** Supabase エラーを日本語ログ付きで throw するヘルパー */
-  function throwSupabaseError(label, sbError) {
-    console.error(`❌ [${label}] Supabaseエラー詳細:`, {
-      message: sbError.message,
-      code:    sbError.code,
-      details: sbError.details,
-      hint:    sbError.hint,
-      status:  sbError.status
-    });
-    const err = new Error(`${label}: ${sbError.message}`);
-    err.supabaseError = sbError;
-    throw err;
-  }
-
-  /** 顧客を customer_number で検索 */
-  async function findCustomer(customerNumber) {
-    console.log('🔵 [findCustomer] 検索中 customer_number:', customerNumber);
-    const { data, error } = await sbClient
-      .from('customers')
-      .select('*')
-      .eq('customer_number', customerNumber)
-      .maybeSingle();
-    if (error) throwSupabaseError('顧客情報の取得', error);
-    console.log('🔵 [findCustomer] 結果:', data);
-    return data; // null if not found
-  }
-
-  /** 既存の customer_number 一覧を取得して重複しない6桁番号を生成 */
-  async function generateCustomerId() {
-    console.log('🔵 [generateCustomerId] 既存顧客番号を取得中...');
-    const { data, error } = await sbClient.from('customers').select('customer_number');
-    if (error) throwSupabaseError('顧客番号一覧の取得', error);
-
-    const existing = (data || []).map(c => c.customer_number);
-    console.log('🔵 [generateCustomerId] 既存番号一覧:', existing);
-
-    if (existing.length >= 900000) throw new Error('顧客番号が上限に達しています。');
-
-    // 重複しない番号が確定するまでループ（100000〜999999 の範囲で生成）
-    let id;
-    let tries = 0;
-    do {
-      id = String(Math.floor(Math.random() * 900000) + 100000);
-      tries++;
-      if (tries > 5000) throw new Error('顧客番号の生成に失敗しました（試行上限）。');
-    } while (existing.includes(id)); // ← 重複する限り必ず再生成
-    console.log(`🔵 [generateCustomerId] 決定番号: ${id}（${tries}回試行）`);
-    return id;
-  }
-
-  /** 顧客を保存（INSERT 後に保存行を返す） */
-  async function saveCustomer(c) {
-    console.log('🔵 [saveCustomer] INSERT開始:', c);
-    const { data, error } = await sbClient
-      .from('customers')
-      .insert({
-        customer_number: c.customer_number,
-        name:            c.name,
-        phone:           c.phone,
-        email:           c.email
-      })
-      .select(); // 保存された行を返してもらい確認
-    if (error) throwSupabaseError('顧客登録', error);
-    console.log('✅ [saveCustomer] INSERT完了 保存行:', data);
-    return data;
-  }
-
-  /** 予約を保存 */
-  async function saveBooking(b) {
-    console.log('🔵 [saveBooking] INSERT開始:', b);
-    const { data, error } = await sbClient
-      .from('bookings')
-      .insert({
-        customer_number:   b.customer_number   || null,
-        name:              b.name,
-        phone:             b.phone,
-        email:             b.email,
-        menu:              b.menu,
-        date:              b.date,
-        time:              b.time,
-        memo:              b.memo              || null,
-        symptom:           b.symptom           || null,
-        treatment_history: b.treatment_history || null,
-        symptom_start:     b.symptom_start     || null,
-        exercise_ok:       b.exercise_ok       || null,
-        daily_impact:      b.daily_impact      || null,
-        line_user_id:   lineUserId           || null
-      })
-      .select();
-    if (error) throwSupabaseError('予約の保存', error);
-    console.log('✅ [saveBooking] INSERT完了 保存行:', data);
-    return data;
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LINE通知
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function sendLineNotify({ name, menu, date, time, phone, memo }) {
-    await fetch(
-      'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-notify',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
-        },
-        body: JSON.stringify({ name, menu, date, time, phone, memo })
-      }
-    );
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // ユーティリティ
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function formatDate(s) {
-    if (!s) return '';
-    const [y, m, d] = s.split('-');
-    return `${y}年${parseInt(m)}月${parseInt(d)}日`;
-  }
-  function showAlert(id, msg) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (msg) el.textContent = msg;
-    el.classList.add('show');
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-  function hideAlert(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('show');
-  }
-  function esc(s) {
-    return String(s || '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-  function emptyState(icon, msg) {
-    return `<div class="empty-state"><div class="ei">${icon}</div><p>${msg}</p></div>`;
-  }
-
-  // ラジオボタンのビジュアル選択
-  document.querySelectorAll('.radio-group').forEach(g => {
-    g.querySelectorAll('input[type=radio]').forEach(r => {
-      r.addEventListener('change', () => {
-        g.querySelectorAll('.radio-item').forEach(i => i.classList.remove('selected'));
-        r.closest('.radio-item').classList.add('selected');
-      });
-    });
-  });
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 初期化
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  /** 起動時に Supabase 接続を疎通確認 */
-  async function checkConnection() {
-    try {
-      const { error } = await sbClient.from('customers').select('id').limit(1);
-      if (error) {
-        console.error('❌ [接続確認] Supabase疎通エラー:', {
-          message: error.message,
-          code:    error.code,
-          hint:    error.hint,
-          status:  error.status
-        });
-        console.warn('⚠️ 考えられる原因: APIキーの誤り / RLSポリシーによるアクセス拒否 / テーブル名の不一致');
-      } else {
-        console.log('✅ [接続確認] Supabase接続OK（customersテーブル到達確認）');
-      }
-    } catch (e) {
-      console.error('❌ [接続確認] 予期せぬエラー:', e);
-    }
-  }
-
-  (function init() {
-    checkConnection(); // 非同期で接続確認（ページ表示はブロックしない）
-    (async () => {
-      const isLineCallback = await handleLineCallback();
-      if (isLineCallback) {
-        navigateTo('page-personal');
-      } else if (window.location.search.includes('admin')) {
-        navigateTo('page-admin-login');
-      } else {
-        navigateTo('page-top');
-      }
-    })();
-  })();
-
-    // ════════════════════════════════════
-    // LINE Login 連携
-    // ════════════════════════════════════
-    const LINE_CHANNEL_ID   = '2004833107';
-    const LINE_REDIRECT_URI = 'https://lactive-okayama.github.io/lactive-booking/';
-    const EDGE_URL          = 'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1';
-    let lineUserId      = null;
-    let lineDisplayName = null;
-
-    /** LINEログインへリダイレクト（フォーム状態をsessionStorageに保存） */
-    function startLineLogin() {
-      const state = {
-        name:    document.getElementById('p-name')?.value    || '',
-        phone:   document.getElementById('p-phone')?.value   || '',
-        email:   document.getElementById('p-email')?.value   || '',
-        consent: document.getElementById('personal-consent')?.checked || false
-      };
-      sessionStorage.setItem('lineLoginFormState', JSON.stringify(state));
-      const url = 'https://access.line.me/oauth2/v2.1/authorize'
-        + '?response_type=code'
-        + '&client_id='    + LINE_CHANNEL_ID
-        + '&redirect_uri=' + encodeURIComponent(LINE_REDIRECT_URI)
-        + '&state=booking'
-        + '&scope=profile';
-      window.location.href = url;
-    }
-
-    /** LINE連携を解除 */
-    function cancelLineLink() {
-      lineUserId = null; lineDisplayName = null;
-      document.getElementById('line-linked-info').style.display = 'none';
-      document.getElementById('line-login-btn').style.display   = 'inline-block';
-    }
-
-    /** OAuthコールバック処理（ページロード時に呼ぶ） */
-    async function handleLineCallback() {
-      const params = new URLSearchParams(window.location.search);
-      const code   = params.get('code');
-      const state  = params.get('state');
-      if (!code || state !== 'booking') return false;
-      // URLをクリーン
-      window.history.replaceState({}, '', window.location.pathname);
-      // フォーム状態を復元
-      const saved = sessionStorage.getItem('lineLoginFormState');
-      if (saved) {
-        try {
-          const s = JSON.parse(saved);
-          sessionStorage.removeItem('lineLoginFormState');
-          setTimeout(() => {
-            if (s.name)    document.getElementById('p-name').value             = s.name;
-            if (s.phone)   document.getElementById('p-phone').value            = s.phone;
-            if (s.email)   document.getElementById('p-email').value            = s.email;
-            if (s.consent) document.getElementById('personal-consent').checked = s.consent;
-          }, 300);
-        } catch(e) {}
-      }
-      // Edge Functionでline_user_id取得
-      try {
-        const res  = await fetch(EDGE_URL + '/line-auth', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ code, redirect_uri: LINE_REDIRECT_URI })
-        });
-        const data = await res.json();
-        if (data.line_user_id) {
-          lineUserId = data.line_user_id; lineDisplayName = data.display_name;
-          document.getElementById('line-login-btn').style.display   = 'none';
-          document.getElementById('line-display-name').textContent  = lineDisplayName;
-          document.getElementById('line-linked-info').style.display = 'block';
-        }
-      } catch(e) { console.error('LINE auth error:', e); }
-      return true;
-    }
-  
-    /* ── 会員登録ページ用 LINE 連携 ─────────────────── */
-
-    /** 会員登録ページから LINE ログイン開始 */
-    function startLineLoginReg() {
-      sessionStorage.setItem('lineLoginFromPage', 'page-member-register');
-      sessionStorage.setItem('lineLoginRegFormState', JSON.stringify({
-        name:    document.getElementById('r-name')?.value    || '',
-        phone:   document.getElementById('r-phone')?.value   || '',
-        email:   document.getElementById('r-email')?.value   || '',
-        consent: document.getElementById('register-consent')?.checked || false
-      }));
-      startLineLogin();
-    }
-
-    /** navigateTo をラップ：LINE コールバック後を page-member-register へ誘導 */
-    (function patchNavigateToForReg() {
-      const orig = navigateTo;
-      window.navigateTo = function(pageId) {
-        const fromPage = sessionStorage.getItem('lineLoginFromPage');
-        if (pageId === 'page-personal' && fromPage === 'page-member-register') {
-          sessionStorage.removeItem('lineLoginFromPage');
-          const saved = sessionStorage.getItem('lineLoginRegFormState');
-          if (saved) {
-            try {
-              const st = JSON.parse(saved);
-              const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
-              set('r-name',  st.name);
-              set('r-phone', st.phone);
-              set('r-email', st.email);
-              const cb = document.getElementById('register-consent');
-              if (cb) cb.checked = !!st.consent;
-            } catch(e) {}
-            sessionStorage.removeItem('lineLoginRegFormState');
-          }
-          return orig('page-member-register');
-        }
-        return orig(pageId);
-      };
-    })();
-
-    /** line-linked-info の表示を r- 要素にミラー（LINE連携状態を同期） */
-    (function initRegLineSync() {
-      function doSync() {
-        const src    = document.getElementById('line-linked-info');
-        const srcBtn = document.getElementById('line-login-btn');
-        const srcNm  = document.getElementById('line-display-name');
-        const tgt    = document.getElementById('r-line-linked-info');
-        const tgtBtn = document.getElementById('r-line-login-btn');
-        const tgtNm  = document.getElementById('r-line-display-name');
-        if (!src || !tgt) return;
-        const sync = () => {
-          tgt.style.display = src.style.display;
-          if (tgtBtn && srcBtn) tgtBtn.style.display = srcBtn.style.display;
-          if (tgtNm  && srcNm)  tgtNm.textContent    = srcNm.textContent;
-        };
-        sync();
-        const obs = new MutationObserver(sync);
-        obs.observe(src,    { attributes: true, attributeFilter: ['style'] });
-        if (srcBtn) obs.observe(srcBtn, { attributes: true, attributeFilter: ['style'] });
-        if (srcNm)  obs.observe(srcNm,  { childList: true, characterData: true, subtree: true });
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', doSync);
-      } else {
-        doSync();
-      }
-    })();
-</script>
-</body>
-</html>
