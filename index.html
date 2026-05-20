@@ -3089,3 +3089,17 @@
       // 顧客一覧タブが表示中なら自動更新
       if (document.getElementById('tab-customers').classList.contains('active')) {
         await renderCu
+stomers();
+      }
+    } catch (e) {
+      console.error('❌ [toggleVisited] 失敗:', e);
+      checkbox.checked = !checked; // 失敗時は元に戻す
+      showAlert('admin-booking-error', `来院済みの更新に失敗しました。${e.message ? '（' + e.message + '）' : ''}`);
+    } finally {
+      checkbox.disabled = false;
+    }
+  }
+
+</script>
+</body>
+</html>
