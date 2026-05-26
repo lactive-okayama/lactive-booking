@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lactiveï½ãäºç´</title>
+  <title>Lactive｜ご予約</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <!-- Supabase CDNï¼UMD ãã«ãï¼window.supabase ãç¢ºå®ã«è¨­å®ï¼ -->
+  <!-- Supabase CDN（UMD ビルド：window.supabase を確実に設定） -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
-    /* âââââââââââââââââââââââââââââââ
-       å¤æ°ã»ãªã»ãã
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       変数・リセット
+    ─────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --orange:        #FF8C42;
@@ -44,9 +44,9 @@
       font-size: 15px;
     }
 
-    /* âââââââââââââââââââââââââââââââ
-       ãããã¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       ヘッダー
+    ─────────────────────────────── */
     header {
       background: var(--white);
       border-bottom: 2px solid var(--orange-light);
@@ -92,9 +92,9 @@
     }
     .btn-visit-update:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã­ã¼ãã£ã³ã°ãªã¼ãã¼ã¬ã¤
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       ローディングオーバーレイ
+    ─────────────────────────────── */
     #loading-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(255,255,255,.75); z-index: 999;
@@ -110,16 +110,16 @@
     .loading-text { font-size: .88rem; color: var(--text-light); }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã¡ã¤ã³ã»ãã¼ã¸ç®¡ç
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       メイン・ページ管理
+    ─────────────────────────────── */
     main { max-width: 780px; margin: 0 auto; padding: 28px 18px 72px; }
     .page { display: none; }
     .page.active { display: block; }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã¹ããããã¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       ステップバー
+    ─────────────────────────────── */
     #steps-container { margin-bottom: 24px; }
     .steps-bar {
       display: flex; align-items: flex-start;
@@ -140,9 +140,9 @@
     .step-line { flex: 1; height: 2px; background: var(--border); min-width: 18px; max-width: 60px; margin-top: 19px; }
     .step-line.done { background: var(--orange); }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã»ã¯ã·ã§ã³ãããã¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       セクションヘッダー
+    ─────────────────────────────── */
     .section-block { margin-bottom: 32px; }
     .section-label {
       display: inline-flex; align-items: center; gap: 8px;
@@ -156,9 +156,9 @@
     .badge-member { background: var(--blue); color: #fff; }
     .section-title { font-size: 1rem; font-weight: 700; color: var(--text); }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã¡ãã¥ã¼ã«ã¼ã
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       メニューカード
+    ─────────────────────────────── */
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     @media (max-width: 500px) { .menu-grid { grid-template-columns: 1fr; } }
     .menu-grid.single-col { grid-template-columns: 1fr; }
@@ -191,9 +191,9 @@
     .card-duration { font-size: .82rem; color: var(--text-light); }
     .card-price { font-size: 1.1rem; font-weight: 700; color: var(--orange-dark); margin-top: 2px; }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã«ã¼ãï¼ç½èæ¯ããã¯ã¹ï¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       カード（白背景ボックス）
+    ─────────────────────────────── */
     .card {
       background: var(--white); border-radius: var(--radius);
       padding: 28px; box-shadow: var(--shadow);
@@ -201,16 +201,16 @@
     }
     @media (max-width: 480px) { .card { padding: 18px 14px; } }
 
-    /* âââââââââââââââââââââââââââââââ
-       ãã¼ã¸ã¿ã¤ãã«
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       ページタイトル
+    ─────────────────────────────── */
     .page-title { text-align: center; margin-bottom: 24px; }
     .page-title h2 { font-size: 1.25rem; font-weight: 700; color: var(--orange-deep); margin-bottom: 5px; }
     .page-title p  { font-size: .86rem; color: var(--text-light); }
 
-    /* âââââââââââââââââââââââââââââââ
-       ãã©ã¼ã 
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       フォーム
+    ─────────────────────────────── */
     .form-group { margin-bottom: 18px; }
     .form-group label {
       display: block; font-size: .86rem; font-weight: 500;
@@ -236,7 +236,7 @@
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     @media (max-width: 460px) { .form-row { grid-template-columns: 1fr; } }
 
-    /* ã©ã¸ãªé¸æã°ã«ã¼ã */
+    /* ラジオ選択グループ */
     .radio-group { display: flex; flex-direction: column; gap: 8px; }
     .radio-item {
       display: flex; align-items: center; gap: 10px;
@@ -249,7 +249,7 @@
     .radio-item.selected { border-color: var(--orange); background: var(--orange-pale); }
     .radio-label { font-size: .9rem; color: var(--text); flex: 1; }
 
-    /* æ³¨æäºé ãªã¹ã */
+    /* 注意事項リスト */
     .notice-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
     .notice-item {
       display: flex; align-items: flex-start; gap: 12px;
@@ -259,9 +259,9 @@
     }
     .notice-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
 
-    /* âââââââââââââââââââââââââââââââ
-       ãã¿ã³
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       ボタン
+    ─────────────────────────────── */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 6px;
       padding: 13px 28px; border: none; border-radius: 40px;
@@ -294,9 +294,9 @@
     .btn-actions { display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
     .btn-actions .btn { flex: 1; min-width: 110px; }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã¢ã©ã¼ã
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       アラート
+    ─────────────────────────────── */
     .alert {
       padding: 11px 15px; border-radius: var(--radius-sm);
       font-size: .86rem; margin-bottom: 16px; display: none;
@@ -306,9 +306,9 @@
     .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-bd); }
     .alert-info    { background: var(--blue-light);  color: var(--blue);   border: 1px solid #90C8F0; }
 
-    /* âââââââââââââââââââââââââââââââ
-       é¡§å®¢èªè¨¼ç»é¢
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       顧客認証画面
+    ─────────────────────────────── */
     .auth-choice { display: flex; flex-direction: column; gap: 14px; }
     .auth-option {
       padding: 20px; border: 2px solid var(--border); border-radius: var(--radius);
@@ -318,7 +318,7 @@
     .auth-option-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
     .auth-option-sub   { font-size: .82rem; color: var(--text-light); }
 
-    /* é¡§å®¢æå ±ã«ã¼ã */
+    /* 顧客情報カード */
     .customer-card {
       background: var(--orange-pale); border: 2px solid var(--orange-light);
       border-radius: var(--radius); padding: 18px 20px; margin: 16px 0;
@@ -328,7 +328,7 @@
     .customer-info-label { color: var(--text-light); min-width: 90px; font-size: .82rem; }
     .customer-info-val   { color: var(--text); font-weight: 500; }
 
-    /* é¡§å®¢çªå·ããã¸ */
+    /* 顧客番号バッジ */
     .customer-id-display {
       text-align: center; padding: 20px;
       background: var(--success-bg); border: 2px solid var(--success-bd);
@@ -338,9 +338,9 @@
     .customer-id-num   { font-size: 2.5rem; font-weight: 700; color: var(--success); letter-spacing: .2em; }
     .customer-id-note  { font-size: .8rem; color: var(--success); margin-top: 6px; }
 
-    /* âââââââââââââââââââââââââââââââ
-       æéå¸¯ã°ãªãã
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       時間帯グリッド
+    ─────────────────────────────── */
     .time-slot-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -374,7 +374,7 @@
       border-radius: var(--radius-sm);
     }
 
-    /* 6åå¥å */
+    /* 6咑入力 */
     .id-input-wrap { text-align: center; padding: 12px 0 6px; }
     .id-input {
       width: 200px; text-align: center; letter-spacing: .3em;
@@ -384,9 +384,9 @@
     }
     .id-input:focus { border-color: var(--orange); outline: none; box-shadow: 0 0 0 3px rgba(255,140,66,.18); }
 
-    /* âââââââââââââââââââââââââââââââ
-       å®äºç»é¢
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       完了画面
+    ─────────────────────────────── */
     .done-icon {
       width: 80px; height: 80px; border-radius: 50%;
       background: linear-gradient(135deg, var(--orange-light), var(--orange));
@@ -404,9 +404,9 @@
     .done-table td:first-child { color: var(--text-light); width: 35%; font-weight: 500; }
     .done-table td:last-child  { color: var(--text); font-weight: 500; }
 
-    /* âââââââââââââââââââââââââââââââ
-       ç®¡çç»é¢
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       管理画面
+    ─────────────────────────────── */
     .admin-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 22px; }
     .tab-btn {
       padding: 10px 22px; border: none; background: none; cursor: pointer;
@@ -466,9 +466,9 @@
     .empty-state .ei { font-size: 2.6rem; margin-bottom: 10px; opacity: .35; }
     .empty-state p { font-size: .88rem; }
 
-    /* âââââââââââââââââââââââââââââââ
-       $¼æ¥­æ¥ã«ã¬ã³ãã¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       $��業日カレンダー
+    ─────────────────────────────── */
     .holiday-cal-header {
       display: flex; align-items: center; justify-content: center;
       gap: 14px; margin-bottom: 16px;
@@ -511,7 +511,7 @@
       border: 2px solid var(--orange);
       color: var(--orange-deep); font-weight: 700;
     }
-    /* äºç´ç¨ã«ã¬ã³ãã¼ã®å½æ¥ï¼é¸æä¸å¯ã ãã¯ãªãã¯ã§ã¢ã©ã¼ã */
+    /* 予約用カレンダーの当日：選択不可だがクリックでアラート */
     #booking-cal-grid .holiday-cal-day.today-disabled {
       background: #F4F4F4 !important;
       border-color: #DDDDDD !important;
@@ -522,7 +522,7 @@
       background: var(--orange-pale) !important;
     }
 
-    /* äºç´ç¨ã«ã¬ã³ãã¼ã®ä¼æ¥­æ¥ï¼ã°ã¬ã¼ã¢ã¦ã */
+    /* 予約用カレンダーの休業日：グレーアウト */
     .holiday-cal-day.holiday-disabled {
       background: #F0F0F0; border-color: #DDD;
       color: #999; cursor: not-allowed;
@@ -531,7 +531,7 @@
       background: #F0F0F0; border-color: #DDD;
     }
     .holiday-cal-day.holiday-disabled .holiday-day-reason { color: #AAA; }
-    /* äºç´ãã©ã¼ã åã®ã«ã¬ã³ãã¼ï¼ä¼æ¥­æ¥ã¯ã°ã¬ã¼ã¢ã¦ãï¼ç®¡çç»é¢ã¯ãªã¬ã³ã¸ã®ã¾ã¾ï¼ */
+    /* 予約フォーム内のカレンダー：休業日はグレーアウト（管理画面はオレンジのまま） */
     #booking-cal-grid .holiday-cal-day.holiday {
       background: #EAEAEA !important;
       border-color: #CCCCCC;
@@ -543,7 +543,7 @@
       border-color: #BBBBBB;
     }
     #booking-cal-grid .holiday-cal-day.holiday .holiday-day-reason { color: #888; }
-    /* äºç´ãã©ã¼ã ç¨ï¼ä¼æ¥­æ¥ã¯ã°ã¬ã¼ã¢ã¦ãã§éé¸æé¢¨ã« */
+    /* 予約フォーム用：休業日はグレーアウトで非選択風に */
     .holiday-cal-day.holiday-disabled {
       background: #E8E8E8 !important; border-color: #CCC !important;
       color: #999 !important; cursor: not-allowed; font-weight: 500;
@@ -570,9 +570,9 @@
       border-radius: var(--radius-sm); line-height: 1.7;
     }
 
-    /* âââââââââââââââââââââââââââââââ
-       ã«ã¬ã³ãã¼ãã¥ã¼ï¼ç®¡çç»é¢ï¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       カレンダービュー（管理画面）
+    ─────────────────────────────── */
     .cal-view-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 14px;
@@ -652,7 +652,7 @@
       .cal-count-badge { font-size: .62rem; padding: 1px 4px; }
     }
 
-    /* æ¥å¥äºç´ä¸è¦§ã¢ã¼ãã« */
+    /* 日別予約一覧モーダル */
     .day-modal {
       position: fixed; inset: 0;
       background: rgba(0,0,0,.45); z-index: 500;
@@ -695,9 +695,9 @@
       color: var(--text-light); font-size: .88rem;
     }
 
-    /* âââââââââââââââââââââââââââââââ
-       ãããé¸æç»é¢
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       トップ選択画面
+    ─────────────────────────────── */
     .top-choice-wrap {
       display: flex; flex-direction: column; gap: 16px;
       max-width: 480px; margin: 0 auto; padding: 8px 0 24px;
@@ -729,9 +729,9 @@
     .choice-btn-member .choice-btn-sub { color: var(--text-light); opacity: 1; }
     .choice-btn-member:hover { background: var(--orange-pale); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(255,140,66,.3); }
 
-    /* âââââââââââââââââââââââââââââââ
-       ãã¤ãã¼ã¸ã»ã­ã£ã³ã»ã«
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       マイページ・キャンセル
+    ─────────────────────────────── */
     .cancel-link-wrap {
       text-align: center; margin-top: 28px; padding-top: 24px;
       border-top: 1px solid var(--border);
@@ -812,9 +812,9 @@
     .visited-check input[type=checkbox] { accent-color: var(--success); width: 14px; height: 14px; cursor: pointer; }
     .visited-check.checked-label { color: var(--success); font-weight: 600; }
 
-    /* âââââââââââââââââââââââââââââââ
-       åæãã§ãã¯ããã¯ã¹
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       同意チェックボックス
+    ─────────────────────────────── */
     .consent-box {
       display: flex; align-items: flex-start; gap: 10px;
       padding: 14px 16px;
@@ -834,9 +834,9 @@
       color: var(--orange-dark); font-weight: 700; text-decoration: underline;
     }
 
-    /* âââââââââââââââââââââââââââââââ
-       ä¼æ¥­æ¥ã«ã¬ã³ãã¼ï¼ç®¡çç»é¢ï¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       休業日カレンダー（管理画面）
+    ─────────────────────────────── */
     .holiday-cal-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 14px; gap: 10px; flex-wrap: wrap;
@@ -875,7 +875,7 @@
       font-weight: 700;
     }
     .cal-day-holiday::after {
-      content: 'ä¼'; position: absolute; bottom: 1px; right: 3px; font-size: .56rem;
+      content: '休'; position: absolute; bottom: 1px; right: 3px; font-size: .56rem;
     }
     .holiday-list-section { margin-top: 22px; }
     .holiday-list-title {
@@ -897,9 +897,9 @@
       margin-bottom: 16px; line-height: 1.7;
     }
 
-    /* âââââââââââââââââââââââââââââââ
-       ããã¿ã¼
-    âââââââââââââââââââââââââââââââ */
+    /* ───────────────────────────────
+       フッター
+    ─────────────────────────────── */
     footer {
       background: var(--white);
       border-top: 1px solid var(--orange-light);
@@ -919,17 +919,17 @@
 </head>
 <body>
 
-<!-- ã­ã¼ãã£ã³ã°ãªã¼ãã¼ã¬ã¤ -->
+<!-- ローディングオーバーレイ -->
 <div id="loading-overlay">
   <div class="spinner"></div>
-  <div class="loading-text" id="loading-text">å¦çä¸­...</div>
+  <div class="loading-text" id="loading-text">処理中...</div>
 </div>
 
 <header>
   <div class="header-inner">
     <div class="logo" onclick="navigateTo('page-top')">
       <div class="logo-name">Lactive</div>
-      <div class="logo-sub">æ´ä½é¢ï½ãäºç´</div>
+      <div class="logo-sub">整体院｜ご予約</div>
     </div>
   </div>
 </header>
@@ -937,434 +937,434 @@
 <main>
   <div id="steps-container"></div>
 
-  <!-- â¼ ãããï¼2æï¼ -->
+  <!-- ▼ トップ（2択） -->
   <div id="page-top" class="page active">
     <div class="top-choice-wrap">
       <div class="top-choice-title">
-        <h2>ãããããLactiveã¸</h2>
-        <p>ãæ¥é¢åºåããé¸ã³ãã ãã</p>
+        <h2>ようこそ、Lactiveへ</h2>
+        <p>ご来院区分をお選びください</p>
       </div>
       <button class="choice-btn choice-btn-first" onclick="navigateTo('page-first-select')">
-        <span class="choice-btn-main">åãã¦æ¥é¢ãããæ¹</span>
-        <span class="choice-btn-sub">ååã®ãäºç´ã¯ãã¡ã</span>
+        <span class="choice-btn-main">初めて来院される方</span>
+        <span class="choice-btn-sub">初回のご予約はこちら</span>
       </button>
       <button class="choice-btn choice-btn-member" onclick="navigateTo('page-member-choice')">
-        <span class="choice-btn-main">æ¢å­ã®æ¹</span>
-        <span class="choice-btn-sub">ãäºç´ã»äºç´ç¢ºèªã»ã­ã£ã³ã»ã«</span>
+        <span class="choice-btn-main">既存の方</span>
+        <span class="choice-btn-sub">ご予約・予約確認・キャンセル</span>
       </button>
     </div>
   </div><!-- /page-top -->
 
-  <!-- â¼ ååã¡ãã¥ã¼é¸æ -->
+  <!-- ▼ 初回メニュー選択 -->
   <div id="page-first-select" class="page">
     <div class="section-block">
       <div class="page-title">
-        <h2>ã¡ãã¥ã¼ãé¸ãã§ãã ãã</h2>
-        <p>ååã®ãäºç´ã¯ãã¡ã</p>
+        <h2>メニューを選んでください</h2>
+        <p>初回のご予約はこちら</p>
       </div>
       <div class="menu-grid">
         <div class="menu-card" onclick="startFirstFlow('first-seitai')">
           <div class="card-top">
-            <span class="card-type-badge first-badge">ååæ¥é¢</span>
-            <span class="card-arrow">âº</span>
+            <span class="card-type-badge first-badge">初回来院</span>
+            <span class="card-arrow">›</span>
           </div>
-          <div class="card-name">ååæ´ä½</div>
-          <div class="card-duration">90å</div>
-          <div class="card-price">Â¥1,980</div>
+          <div class="card-name">初回整体</div>
+          <div class="card-duration">90分</div>
+          <div class="card-price">¥1,980</div>
         </div>
         <div class="menu-card" onclick="startFirstFlow('first-pilates')">
           <div class="card-top">
-            <span class="card-type-badge first-badge">ååæ¥é¢</span>
-            <span class="card-arrow">âº</span>
+            <span class="card-type-badge first-badge">初回来院</span>
+            <span class="card-arrow">›</span>
           </div>
-          <div class="card-name">ååãã©ãã£ã¹</div>
-          <div class="card-duration">60å</div>
-          <div class="card-price">Â¥1,980</div>
+          <div class="card-name">初回ピラティス</div>
+          <div class="card-duration">60分</div>
+          <div class="card-price">¥1,980</div>
         </div>
       </div>
       <div class="btn-actions" style="margin-top:20px;">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">â æ»ã</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
       </div>
     </div>
   </div><!-- /page-first-select -->
 
-  <!-- â¼ ä¼å¡ã®æ¹ï¼é¸æ -->
+  <!-- ▼ 会員の方：選択 -->
   <div id="page-member-choice" class="page">
     <div class="top-choice-wrap">
       <div class="top-choice-title">
-        <h2>ä¼å¡ã¡ãã¥ã¼</h2>
-        <p>ãç¨ä»¶ããé¸ã³ãã ãã</p>
+        <h2>会員メニュー</h2>
+        <p>ご用件をお選びください</p>
       </div>
       <button class="choice-btn choice-btn-first" onclick="navigateTo('page-member-menu')">
-        <span class="choice-btn-main">äºç´ãã</span>
-        <span class="choice-btn-sub">ã¡ãã¥ã¼ãé¸ãã§ãäºç´ãã ãã</span>
+        <span class="choice-btn-main">予約する</span>
+        <span class="choice-btn-sub">メニューを選んでご予約ください</span>
       </button>
       <button class="choice-btn choice-btn-member" onclick="navigateTo('page-cancel-login')">
-        <span class="choice-btn-main">äºç´ç¢ºèªã»ã­ã£ã³ã»ã«</span>
-        <span class="choice-btn-sub">ãã¤ãã¼ã¸ã§äºç´åå®¹ããç¢ºèªãã ãã</span>
+        <span class="choice-btn-main">予約確認・キャンセル</span>
+        <span class="choice-btn-sub">マイページで予約内容をご確認ください</span>
       </button>
       <div class="btn-actions" style="margin-top:4px;">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">â æ»ã</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
       </div>
     </div>
   </div><!-- /page-member-choice -->
 
-  <!-- â¼ ä¼å¡ã¡ãã¥ã¼é¸æ -->
+  <!-- ▼ 会員メニュー選択 -->
   <div id="page-member-menu" class="page">
     <div class="section-block">
       <div class="page-title">
-        <h2>ã¡ãã¥ã¼ãé¸ãã§ãã ãã</h2>
-        <p>ãå¸æã®ã¡ãã¥ã¼ããé¸ã³ãã ãã</p>
+        <h2>メニューを選んでください</h2>
+        <p>ご希望のメニューをお選びください</p>
       </div>
       <div class="menu-grid single-col">
-        <div class="menu-card member-card" onclick="startMemberFlow('æ´ä½ï¼éåçæ³ï¼30å')">
+        <div class="menu-card member-card" onclick="startMemberFlow('整体（運動療法）30分')">
           <div class="card-top">
-            <span class="card-type-badge member-badge">ä¼å¡</span>
-            <span class="card-arrow">âº</span>
+            <span class="card-type-badge member-badge">会員</span>
+            <span class="card-arrow">›</span>
           </div>
-          <div class="card-name">æ´ä½ï¼éåçæ³ï¼</div>
-          <div class="card-duration">30å</div>
+          <div class="card-name">整体（運動療法）</div>
+          <div class="card-duration">30分</div>
         </div>
-        <div class="menu-card member-card" onclick="startMemberFlow('ãã·ã³ãã©ãã£ã¹ 40å')">
+        <div class="menu-card member-card" onclick="startMemberFlow('マシンピラティス 40分')">
           <div class="card-top">
-            <span class="card-type-badge member-badge">ä¼å¡</span>
-            <span class="card-arrow">âº</span>
+            <span class="card-type-badge member-badge">会員</span>
+            <span class="card-arrow">›</span>
           </div>
-          <div class="card-name">ãã·ã³ãã©ãã£ã¹</div>
-          <div class="card-duration">40å</div>
+          <div class="card-name">マシンピラティス</div>
+          <div class="card-duration">40分</div>
         </div>
-        <div class="menu-card member-card" onclick="startMemberFlow('ããããã©ãã£ã¹ 40å')">
+        <div class="menu-card member-card" onclick="startMemberFlow('マットピラティス 40分')">
           <div class="card-top">
-            <span class="card-type-badge member-badge">ä¼å¡</span>
-            <span class="card-arrow">âº</span>
+            <span class="card-type-badge member-badge">会員</span>
+            <span class="card-arrow">›</span>
           </div>
-          <div class="card-name">ããããã©ãã£ã¹</div>
-          <div class="card-duration">40å</div>
+          <div class="card-name">マットピラティス</div>
+          <div class="card-duration">40分</div>
         </div>
       </div>
       <div class="btn-actions" style="margin-top:20px;">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">â æ»ã</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
       </div>
     </div>
   </div><!-- /page-member-menu -->
 
-  <!-- â¼ æ³¨æäºé ï¼STEP1ï¼ååå±éï¼ -->
+  <!-- ▼ 注意事項（STEP1：初回共通） -->
   <div id="page-notice" class="page">
     <div class="card">
       <div class="page-title">
-        <h2>ãäºç´åã«ãç¢ºèªãã ãã</h2>
-        <p>ä»¥ä¸ã®æ³¨æäºé ããèª­ã¿ã®ãããåæãã¦æ¬¡ã¸ãé²ã¿ãã ãã</p>
+        <h2>ご予約前にご確認ください</h2>
+        <p>以下の注意事項をお読みのうえ、同意して次へお進みください</p>
       </div>
       <ul class="notice-list">
-        <li class="notice-item"><span class="notice-icon">ð§¦</span>äºæ¬æã½ãã¯ã¹ã®çç¨ããé¡ããã¾ã</li>
-        <li class="notice-item"><span class="notice-icon">ð¿ï¸</span>é§è»å ´ã¯2çªããå©ç¨ãã ãã</li>
-        <li class="notice-item"><span class="notice-icon">ð</span>å ´æãããããªãå ´åã¯ãé»è©±ã§ãåãåãããã ãã</li>
-        <li class="notice-item"><span class="notice-icon">â°</span>éå»ã»ã­ã£ã³ã»ã«ã®éã¯å¿ããé£çµ¡ãã ãã</li>
+        <li class="notice-item"><span class="notice-icon">🧦</span>五本指ソックスの着用をお願いします</li>
+        <li class="notice-item"><span class="notice-icon">🅿️</span>駐車場は2番をご利用ください</li>
+        <li class="notice-item"><span class="notice-icon">📞</span>場所がわからない場合はお電話でお問い合わせください</li>
+        <li class="notice-item"><span class="notice-icon">⏰</span>遅刻・キャンセルの際は必ずご連絡ください</li>
       </ul>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">â æ»ã</button>
-        <button class="btn btn-primary" onclick="noticeAgree()">åæãã¦æ¬¡ã¸ â</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+        <button class="btn btn-primary" onclick="noticeAgree()">同意して次へ →</button>
       </div>
     </div>
   </div>
 
-  <!-- â¼ åè¨ºç¥¨ï¼STEP2ï¼ååæ´ä½ã®ã¿ï¼ -->
+  <!-- ▼ 問診票（STEP2：初回整体のみ） -->
   <div id="page-questionnaire" class="page">
     <div class="card">
       <div class="page-title">
-        <h2>åè¨ºç¥¨</h2>
-        <p>æ½è¡ã®åèã«ããã¦ããã ãã¾ããã§ããç¯å²ã§ãè¨å¥ãã ããã</p>
+        <h2>問診票</h2>
+        <p>施術の参考にさせていただきます。できる範囲でご記入ください。</p>
       </div>
       <div id="q-alert" class="alert alert-error"></div>
 
       <div class="form-group">
-        <label>1. ç¾å¨å°ã£ã¦ããèº«ä½ã®çç¶ãæãã¦ãã ãã<span class="req">*</span></label>
-        <textarea id="q1" placeholder="ä¾ï¼è°ãçããè©ãããã²ã©ã ãªã©"></textarea>
+        <label>1. 現在困っている身体の症状を教えてください<span class="req">*</span></label>
+        <textarea id="q1" placeholder="例：腰が痛い、肩こりがひどい など"></textarea>
       </div>
       <div class="form-group">
-        <label>2. ãã®çç¶ã§æ´ä½ã»æ¥éª¨é¢ã»çé¢ã«è¡ã£ããã¨ã¯ããã¾ããï¼<span class="req">*</span></label>
+        <label>2. その症状で整体・接骨院・病院に行ったことはありますか？<span class="req">*</span></label>
         <div class="radio-group" id="q2-group">
-          <label class="radio-item"><input type="radio" name="q2" value="ã¯ã"><span class="radio-label">ã¯ã</span></label>
-          <label class="radio-item"><input type="radio" name="q2" value="ããã"><span class="radio-label">ããã</span></label>
-          <label class="radio-item"><input type="radio" name="q2" value="ä»¥åè¡ã£ã¦ãã"><span class="radio-label">ä»¥åè¡ã£ã¦ãã</span></label>
+          <label class="radio-item"><input type="radio" name="q2" value="はい"><span class="radio-label">はい</span></label>
+          <label class="radio-item"><input type="radio" name="q2" value="いいえ"><span class="radio-label">いいえ</span></label>
+          <label class="radio-item"><input type="radio" name="q2" value="以前行っていた"><span class="radio-label">以前行っていた</span></label>
         </div>
       </div>
       <div class="form-group">
-  #     <label>3. ãã®çç¶ã¯ãã¤é ããåºå§ãã¾ãããï¼<span class="req">*</span></label>
-        <input type="text" id="q3" placeholder="ä¾ï¼3ã¶æåã1å¹´å ãªã©">
+  #     <label>3. その症状はいつ頃から出始めましたか？<span class="req">*</span></label>
+        <input type="text" id="q3" placeholder="例：3ヶ月前、1年前 など">
       </div>
       <div class="form-group">
-        <label>4. æ½è¡ä¸­ãèº«ä½ãåããã¦ããã ããã¨ãããã¾ããåé¡ããã¾ãããï¼<span class="req">*</span></label>
+        <label>4. 施術中、身体を動かしていただくことがありますが問題ありませんか？<span class="req">*</span></label>
         <div class="radio-group" id="q4-group">
-          <label class="radio-item"><input type="radio" name="q4" value="åé¡ãªã"><span class="radio-label">åé¡ãªã</span></label>
-          <label class="radio-item"><input type="radio" name="q4" value="å°ãä¸å®"><span class="radio-label">å°ãä¸å®</span></label>
-          <label class="radio-item"><input type="radio" name="q4" value="è©³ããèããã"><span class="radio-label">è©³ããèããã</span></label>
+          <label class="radio-item"><input type="radio" name="q4" value="問題ない"><span class="radio-label">問題ない</span></label>
+          <label class="radio-item"><input type="radio" name="q4" value="少し不安"><span class="radio-label">少し不安</span></label>
+          <label class="radio-item"><input type="radio" name="q4" value="詳しく聞きたい"><span class="radio-label">詳しく聞きたい</span></label>
         </div>
       </div>
       <div class="form-group">
-        <label>5. ç¾å¨ã®çç¶ã§æ¥å¸¸çæ´»ã¯ã©ã®ç¨åº¦å°ã£ã¦ãã¾ããï¼<span class="req">*</span></label>
+        <label>5. 現在の症状で日常生活はどの程度困っていますか？<span class="req">*</span></label>
         <div class="radio-group" id="q5-group">
-          <label class="radio-item"><input type="radio" name="q5" value="ããªãå°ã£ã¦ãã"><span class="radio-label">ããªãå°ã£ã¦ãã</span></label>
-          <label class="radio-item"><input type="radio" name="q5" value="å°ãå°ã£ã¦ãã"><span class="radio-label">å°ãå°ã£ã¦ãã</span></label>
-          <label class="radio-item"><input type="radio" name="q5" value="ãªãã¨ããªã£ã¦ãã"><span class="radio-label">ãªãã¨ããªã£ã¦ãã</span></label>
+          <label class="radio-item"><input type="radio" name="q5" value="かなり困っている"><span class="radio-label">かなり困っている</span></label>
+          <label class="radio-item"><input type="radio" name="q5" value="少し困っている"><span class="radio-label">少し困っている</span></label>
+          <label class="radio-item"><input type="radio" name="q5" value="なんとかなっている"><span class="radio-label">なんとかなっている</span></label>
         </div>
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-notice')">â æ»ã</button>
-        <button class="btn btn-primary" onclick="submitQuestionnaire()">æ¬¡ã¸ â</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-notice')">← 戻る</button>
+        <button class="btn btn-primary" onclick="submitQuestionnaire()">次へ →</button>
       </div>
     </div>
   </div>
 
-  <!-- â¼ åäººæå ±ï¼ååå±éï¼ -->
+  <!-- ▼ 個人情報（初回共通） -->
   <div id="page-personal" class="page">
     <div class="card">
       <div class="page-title">
-        <h2>ãå®¢æ§æå ±ã®å¥å</h2>
-        <p>ãäºç´ã«å¿è¦ãªæå ±ããå¥åãã ãã</p>
+        <h2>お客様情報の入力</h2>
+        <p>ご予約に必要な情報をご入力ください</p>
       </div>
       <div id="personal-alert" class="alert alert-error"></div>
       <div class="form-group">
-        <label>ãåå<span class="req">*</span></label>
-        <input type="text" id="p-name" placeholder="å±±ç° è±å­">
+        <label>お名前<span class="req">*</span></label>
+        <input type="text" id="p-name" placeholder="山田 花子">
       </div>
       <div class="form-group">
-        <label>é»è©±çªå·<span class="req">*</span></label>
+        <label>電話番号<span class="req">*</span></label>
         <input type="tel" id="p-phone" placeholder="090-0000-0000">
       </div>
       <div class="form-group">
-        <label>ã¡ã¼ã«<span class="req">*</span></label>
+        <label>メール<span class="req">*</span></label>
         <input type="email" id="p-email" placeholder="example@email.com">
       </div>
       <label class="consent-box">
         <input type="checkbox" id="personal-consent">
         <span class="consent-label">
-          ãã©ã¤ãc·ã¼ããªã·ã¼ï¼ãã¼ã¸ä¸é¨ã«è¨è¼ï¼ãèª­ã¿ãåäººæå ±ã®åãæ±ãã«åæãã¾ãã
+          プライバc��ーポリシー（ページ下部に記載）を読み、個人情報の取り扱いに同意します。
         </span>
       </label>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="personalBack()">â æ»ã</button>
-        <button class="btn btn-primary" onclick="submitPersonal()">æ¬¡ã¸ â</button>
+        <button class="btn btn-secondary" onclick="personalBack()">← 戻る</button>
+        <button class="btn btn-primary" onclick="submitPersonal()">次へ →</button>
       </div>
     </div>
   </div>
 
-  <!-- â¼ ä¼å¡èªè¨¼ï¼æ¹æ³é¸æ -->
+  <!-- ▼ 会員認証：方法選択 -->
   <div id="page-member-auth" class="page">
     <div class="card">
       <div class="page-title">
-        <h2>ãäºç´æ¹æ³ã®é¸æ</h2>
+        <h2>ご予約方法の選択</h2>
         <p id="member-auth-menu-label"></p>
       </div>
       <div class="auth-choice">
         <div class="auth-option" onclick="navigateTo('page-member-login')">
-          <div class="auth-option-title">ð é¡§å®¢çªå·ããæã¡ã®æ¹</div>
-          <div class="auth-option-sub">6æ¡ã®é¡§å®¢çªå·ã§ã­ã°ã¤ã³ãã¦äºç´ãã¾ã</div>
+          <div class="auth-option-title">🔑 顧客番号をお持ちの方</div>
+          <div class="auth-option-sub">6桁の顧客番号でログインして予約します</div>
         </div>
         <div class="auth-option" onclick="navigateTo('page-member-register')">
-          <div class="auth-option-title">ð æ°è¦ç»é²ï¼ååä»¥å¤ã§åãã¦ãä½¿ãã®æ¹ï¼</div>
-          <div class="auth-option-sub">æå ±ããç»é²ããã ããé¡§å®¢çªå·ãçºè¡ãã¾ã</div>
+          <div class="auth-option-title">📝 新規登録（初回以外で初めてお使いの方）</div>
+          <div class="auth-option-sub">情報をご登録いただき、顧客番号を発行します</div>
         </div>
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-member-menu')">â æ»ã</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-member-menu')">← 戻る</button>
       </div>
     </div>
   </div>
 
-  <!-- â¼ ä¼å¡ã­ã°ã¤ã³ -->
+  <!-- ▼ 会員ログイン -->
   <div id="page-member-login" class="page">
     <div class="card">
       <div class="page-title">
-        <h2>é¡§å®¢çªå·ã§ã­ã°ã¤ã³</h2>
-        <p>6æ¡ã®é¡§å®¢çªå·ã¨ãååï¼å§ï¼ãå¥åãã¦ãã ãã</p>
+        <h2>顧客番号でログイン</h2>
+        <p>6桁の顧客番号とお名前（姓）を入力してください</p>
       </div>
       <div id="login-alert" class="alert alert-error"></div>
 
       <div id="login-form-section">
         <div class="id-input-wrap">
           <input type="text" class="id-input" id="member-id-input"
-                 maxlength="6" placeholder="ä¾ï¼123456" autocomplete="off" inputmode="numeric"
+                 maxlength="6" placeholder="例：123456" autocomplete="off" inputmode="numeric"
                  onkeydown="if(event.key==='Enter') document.getElementById('member-name-input').focus()">
         </div>
         <div class="form-group" style="margin-top:16px;">
-          <label>ãååï¼å§ã®ã¿ã§OKï¼<span class="req">*</span></label>
-          <input type="text" id="member-name-input" placeholder="ä¾ï¼å±±ç°"
+          <label>お名前（姓のみでOK）<span class="req">*</span></label>
+          <input type="text" id="member-name-input" placeholder="例：山田"
                  autocomplete="off"
                  onkeydown="if(event.key==='Enter') verifyMemberId()">
         </div>
         <div class="btn-actions">
-          <button class="btn btn-secondary" onclick="navigateTo('page-member-menu')">â æ»ã</button>
-          <button class="btn btn-primary" id="verify-btn" onclick="verifyMemberId()">ç¢ºèªãã</button>
+          <button class="btn btn-secondary" onclick="navigateTo('page-member-menu')">← 戻る</button>
+          <button class="btn btn-primary" id="verify-btn" onclick="verifyMemberId()">確認する</button>
         </div>
       </div>
 
       <div id="login-confirm-section" style="display:none;">
         <div class="customer-card">
-          <div class="customer-card-title">ä»¥ä¸ã®ãå®¢æ§æå ±ã§ããããã§ããï¼</div>
-          <div class="customer-info-row"><span class="customer-info-label">é¡§å®¢çªå·</span><span class="customer-info-val" id="lc-id"></span></div>
-          <div class="customer-info-row"><span class="customer-info-label">ãåå</span><span class="customer-info-val" id="lc-name"></span></div>
-          <div class="customer-info-row"><span class="customer-info-label">é»è©±çªå·</span><span class="customer-info-val" id="lc-phone"></span></div>
-          <div class="customer-info-row"><span class="customer-info-label">ã¡ã¼ã«</span><span class="customer-info-val" id="lc-email"></span></div>
+          <div class="customer-card-title">以下のお客様情報でよろしいですか？</div>
+          <div class="customer-info-row"><span class="customer-info-label">顧客番号</span><span class="customer-info-val" id="lc-id"></span></div>
+          <div class="customer-info-row"><span class="customer-info-label">お名前</span><span class="customer-info-val" id="lc-name"></span></div>
+          <div class="customer-info-row"><span class="customer-info-label">電話番号</span><span class="customer-info-val" id="lc-phone"></span></div>
+          <div class="customer-info-row"><span class="customer-info-label">メール</span><span class="customer-info-val" id="lc-email"></span></div>
         </div>
         <div class="btn-actions">
-          <button class="btn btn-secondary" onclick="resetMemberLogin()">éãçªå·ãè©¦ã</button>
-          <button class="btn btn-primary" onclick="loginConfirm()">ãã®æå ±ã§äºç´ãã â</button>
+          <button class="btn btn-secondary" onclick="resetMemberLogin()">違う番号を試す</button>
+          <button class="btn btn-primary" onclick="loginConfirm()">この情報で予約する →</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- â¼ ä¼å¡æ°è¦ç»é² -->
+  <!-- ▼ 会員新規登録 -->
   <div id="page-member-register" class="page">
     <div class="card">
       <div id="register-form-section">
         <div class="page-title">
-          <h2>æ°è¦ç»é²</h2>
-          <p>æå ±ãå¥åããã¨é¡§å®¢çªå·ãçºè¡ããã¾ã</p>
+          <h2>新規登録</h2>
+          <p>情報を入力すると顧客番号が発行されます</p>
         </div>
         <div id="register-alert" class="alert alert-error"></div>
         <div class="form-group">
-          <label>ãåå<span class="req">*</span></label>
-          <input type="text" id="r-name" placeholder="å±±ç° è±å­">
+          <label>お名前<span class="req">*</span></label>
+          <input type="text" id="r-name" placeholder="山田 花子">
         </div>
         <div class="form-group">
-          <label>é»è©±çªå·<span class="req">*</span></label>
+          <label>電話番号<span class="req">*</span></label>
           <input type="tel" id="r-phone" placeholder="090-0000-0000">
         </div>
         <div class="form-group">
           <labm-group">
-          <label>ã¡ã¼ã«ã¢ãã¬ã¹<span class="req">*</span></label>
+          <label>メールアドレス<span class="req">*</span></label>
           <input type="email" id="r-email" placeholder="example@email.com">
         </div>
         <label class="consent-box">
           <input type="checkbox" id="register-consent">
           <span class="consent-label">
-            ãã©ã¤ãã·ã¼ããªã·ã¼ï¼ãã¼ã¸ä¸é¨ã«è¨è¼ï¼ãèª­ã¿ãåäººæå ±ã®åãæ±ãã«åæãã¾ãã
+            プライバシーポリシー（ページ下部に記載）を読み、個人情報の取り扱いに同意します。
           </span>
         </label>
-        <!-- LINEé£æºï¼ä»»æï¼ -->
+        <!-- LINE連携（任意） -->
         <div class="line-connect-box">
-          <div class="line-connect-title">ð LINEãªãã¤ã³ããåãåãï¼ä»»æï¼</div>
-          <div class="line-connect-desc">é£æºããã¨äºç´åæ¥ã«LINEã§ãªãã¤ã³ãã¡ãã»ã¼ã¸ãå±ãã¾ãã</div>
-          <div id="line-connect-status" style="display:none;" class="line-connect-done">â LINEé£æºæ¸ã¿</div>
-          <button class="btn btn-line" id="line-connect-btn" type="button" onclick="startLineLogin()">LINEã§é£æºãã</button>
+          <div class="line-connect-title">🔔 LINEリマインドを受け取る（任意）</div>
+          <div class="line-connect-desc">連携すると予約前日にLINEでリマインドメッセージが届きます。</div>
+          <div id="line-connect-status" style="display:none;" class="line-connect-done">✅ LINE連携済み</div>
+          <button class="btn btn-line" id="line-connect-btn" type="button" onclick="startLineLogin()">LINEで連携する</button>
         </div>
         <div class="btn-actions">
-          <button class="btn btn-secondary" onclick="navigateTo('page-member-login')">â æ»ã</button>
-          <button class="btn btn-primary" id="register-btn" onclick="submitRegister()">ç»é²ãã¦æ¬¡ã¸ â</button>
+          <button class="btn btn-secondary" onclick="navigateTo('page-member-login')">← 戻る</button>
+          <button class="btn btn-primary" id="register-btn" onclick="submitRegister()">登録して次へ →</button>
         </div>
       </div>
 
       <div id="register-done-section" style="display:none;">
         <div class="page-title">
-          <h2>é¡§å®¢çªå·ãçºè¡ããã¾ãã</h2>
+          <h2>顧客番号が発行されました</h2>
         </div>
         <div class="customer-id-display">
-          <div class="customer-id-label">ããªãã®é¡§å®¢çªå·</div>
+          <div class="customer-id-label">あなたの顧客番号</div>
           <div class="customer-id-num" id="issued-id">---</div>
-          <div class="customer-id-note">æ¬¡åãããã®çªå·ã§ã­ã°ã¤ã³ã§ãã¾ãã<br>å¿ããæ§ããã ããã</div>
+          <div class="customer-id-note">次回からこの番号でログインできます。<br>必ずお控えください。</div>
         </div>
         <div class="btn-actions" style="justify-content:center;">
-     0    <button class="btn btn-primary" style="min-width:180px;" onclick="setupDatetime(); navigateTo('page-datetime')">æ¥æãé¸ã¶ â</button>
+     0    <button class="btn btn-primary" style="min-width:180px;" onclick="setupDatetime(); navigateTo('page-datetime')">日時を選ぶ →</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- â¼ æ¥æé¸æï¼å±éï¼ -->
+  <!-- ▼ 日時選択（共通） -->
   <div id="page-datetime" class="page">
     <div class="card">
       <div id="datetime-newid-notice" class="alert alert-info" style="display:none;"></div>
       <div class="page-title">
-        <h2>å¸ææ¥æã®é¸æ</h2>
+        <h2>希望日時の選択</h2>
         <p id="datetime-menu-label"></p>
       </div>
       <div id="datetime-alert" class="alert alert-error"></div>
       <div class="form-group">
-        <label>å¸ææ¥<span class="req">*</span></label>
+        <label>希望日<span class="req">*</span></label>
         <input type="hidden" id="dt-date" value="">
         <div class="holiday-cal-header">
-          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(-1)">â¹ åæ</button>
+          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(-1)">‹ 前月</button>
           <span class="holiday-month-label" id="booking-month-label">-</span>
-          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(1)">æ¬¡æ âº</button>
+          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(1)">次月 ›</button>
         </div>
         <div class="holiday-cal-grid" id="booking-cal-grid"></div>
         <div class="holiday-legend">
-          <span><span class="holiday-legend-swatch" style="background:#F0F0F0;border:1px solid #DDD;"></span>ä¼æ¥­æ¥ã»é¸æä¸å¯</span>
-          <span><span class="holiday-legend-swatch" style="background:var(--orange-pale);border:1.5px solid var(--orange);"></span>é¸æä¸­</span>
+          <span><span class="holiday-legend-swatch" style="background:#F0F0F0;border:1px solid #DDD;"></span>休業日・選択不可</span>
+          <span><span class="holiday-legend-swatch" style="background:var(--orange-pale);border:1.5px solid var(--orange);"></span>選択中</span>
         </div>
-        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">â»ä¼æ¥­æ¥ã¯é¸æã§ãã¾ãã</div>
+        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日は選択できません</div>
       </div>
       <div class="form-group">
-        <label>å¸ææé<span class="req">*</span></label>
+        <label>希望時間<span class="req">*</span></label>
         <input type="hidden" id="dt-time" value="">
         <div id="time-slot-placeholder" class="time-slot-placeholder">
-          ã¾ãå¸ææ¥ãé¸æãã¦ãã ãã
+          まず希望日を選択してください
         </div>
         <div id="time-slot-loading" style="display:none; padding:14px; text-align:center; color:var(--text-light); font-size:.86rem;">
-          â³ ç¢ºèªä¸­...
+          ⏳ 確認中...
         </div>
         <div id="time-slot-grid" class="time-slot-grid" style="display:none;"></div>
       </div>
       <div class="form-group">
-        <label>ã¡ã¢ã»ãè¦æï¼ä»»æï¼</label>
-        <textarea id="dt-memo" placeholder="æ°ã«ãªããã¨ããè¦æãªã©ãããã°ãè¨å¥ãã ãã"></textarea>
+        <label>メモ・ご要望（任意）</label>
+        <textarea id="dt-memo" placeholder="気になること、ご要望などがあればご記入ください"></textarea>
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="datetimeBack()">â æ»ã</button>
-        <button class="btn btn-primary" id="booking-btn" onclick="submitBooking()">äºç´ãç¢ºå®ãã â</button>
+        <button class="btn btn-secondary" onclick="datetimeBack()">← 戻る</button>
+        <button class="btn btn-primary" id="booking-btn" onclick="submitBooking()">予約を確定する ✓</button>
       </div>
     </div>
   </div>
 
-  <!-- â¼ äºç´å®äº -->
+  <!-- ▼ 予約完了 -->
   <div id="page-done" class="page">
     <div class="card" style="text-align:center; padding:40px 28px;">
-      <div class="done-icon">ð¿</div>
-      <div class="done-title">ãäºç´ãããã¨ããããã¾ã</div>
-      <div class="done-msg">å½æ¥ãä¼ãã§ããã®ãæ¥½ãã¿ã«ãã¦ãã¾ãï¼</div>
+      <div class="done-icon">🌿</div>
+      <div class="done-title">ご予約ありがとうございます</div>
+      <div class="done-msg">当日お会いできるのを楽しみにしています！</div>
       <table class="done-table">
-        <tr><td>ãåå</td><td id="dn-name"></td></tr>
-        <tr><td>ã¡ãã¥ã¼</td><td id="dn-menu"></td></tr>
-        <tr><td>å¸ææ¥æ</td><td id="dn-dt"></td></tr>
-        <tr id="dn-id-row" style="display:none;"><td>é¡§å®¢çªå·</td><td id="dn-id"></td></tr>
-        <tr id="dn-memo-row" style="display:none;"><td>ãè¦æ</td><td id="dn-memo"></td></tr>
+        <tr><td>お名前</td><td id="dn-name"></td></tr>
+        <tr><td>メニュー</td><td id="dn-menu"></td></tr>
+        <tr><td>希望日時</td><td id="dn-dt"></td></tr>
+        <tr id="dn-id-row" style="display:none;"><td>顧客番号</td><td id="dn-id"></td></tr>
+        <tr id="dn-memo-row" style="display:none;"><td>ご要望</td><td id="dn-memo"></td></tr>
       </table>
       <p style="font-size:.8rem;color:var(--text-light);margin-top:16px;line-height:1.8;">
-        ãä¸æãªç¹ã¯ãé»è©±ã«ã¦ãåãåãããã ããã
+        ご不明な点はお電話にてお問い合わせください。
       </p>
-      <button class="btn btn-primary" style="margin-top:22px;" onclick="navigateTo('page-top')">ãããã«æ»ã</button>
+      <button class="btn btn-primary" style="margin-top:22px;" onclick="navigateTo('page-top')">トップに戻る</button>
     </div>
   </div>
 
-  <!-- â¼ ã­ã£ã³ã»ã«ï¼ã­ã°ã¤ã³ -->
+  <!-- ▼ キャンセル：ログイン -->
   <div id="page-cancel-login" class="page">
     <div class="card">
       <div class="page-title">
-        <h2>äºç´ç¢ºèªã»ã­ã£ã³ã»ã«</h2>
-        <p>6æ¡ã®é¡§å®¢çªå·ã¨ãååï¼å§ï¼ãå¥åãã¦ãã ãã</p>
+        <h2>予約確認・キャンセル</h2>
+        <p>6桁の顧客番号とお名前（姓）を入力してください</p>
       </div>
       <div id="cancel-login-alert" class="alert alert-error"></div>
       <div class="id-input-wrap">
         <input type="text" class="id-input" id="cancel-id-input"
-               maxlength="6" placeholder="ä¾ï¼123456" autocomplete="off" inputmode="numeric"
+               maxlength="6" placeholder="例：123456" autocomplete="off" inputmode="numeric"
                onkeydown="if(event.key==='Enter') document.getElementById('cancel-name-input').focus()">
       </div>
       <div class="form-group" style="margin-top:16px;">
-        <label>ãååï¼å§ã®ã¿ã§OKï¼<span class="req">*</span></label>
-        <input type="text" id="cancel-name-input" placeholder="ä¾ï¼å±±ç°"
+        <label>お名前（姓のみでOK）<span class="req">*</span></label>
+        <input type="text" id="cancel-name-input" placeholder="例：山田"
                autocomplete="off"
                onkeydown="if(event.key==='Enter') verifyCancelLogin()">
       </div>
       <div class="btn-actions">
-        <button class="btn btn-secondary" onclick="navigateTo('page-top')">â æ»ã</button>
-        <button class="btn btn-primary" id="cancel-verify-btn" onclick="verifyCancelLogin()">äºç´ãç¢ºèªãã</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+        <button class="btn btn-primary" id="cancel-verify-btn" onclick="verifyCancelLogin()">予約を確認する</button>
       </div>
     </div>
   </div>
 
-  <!-- â¼ ãã¤ãã¼ã¸ -->
+  <!-- ▼ マイページ -->
   <div id="page-cancel-list" class="page">
     <div class="card">
       <div class="mypage-customer-bar">
@@ -1374,24 +1374,24 @@
       <div class="mypage-stats">
         <div class="stat-card">
           <div class="stat-num" id="mp-total">-</div>
-          <div class="stat-label">ç·äºç´åæ°</div>
+          <div class="stat-label">総予約回数</div>
         </div>
         <div class="stat-card-sub-row">
           <div class="stat-card-sub">
             <div class="stat-num-sub" id="mp-seitai">-</div>
-            <div class="stat-label-sub">æ´ä½ æ¥é¢åæ°</div>
+            <div class="stat-label-sub">整体 来院回数</div>
           </div>
           <div class="stat-card-sub">
             <div class="stat-num-sub" id="mp-pilates">-</div>
-            <div class="stat-label-sub">ãã©ãã£ã¹ æ¥é¢åæ°</div>
+            <div class="stat-label-sub">ピラティス 来院回数</div>
           </div>
         </div>
       </div>
       <div id="mypage-success" class="alert alert-success"></div>
       <div id="mypage-alert"   class="alert alert-error"></div>
       <div class="mypage-tabs">
-        <button class="tab-btn active" id="mypage-tab-btn-upcoming" onclick="switchMypageTab('upcoming', this)">ä»å¾ã®äºç´</button>
-        <button class="tab-btn"        id="mypage-tab-btn-past"     onclick="switchMypageTab('past', this)">éå»ã®äºç´</button>
+        <button class="tab-btn active" id="mypage-tab-btn-upcoming" onclick="switchMypageTab('upcoming', this)">今後の予約</button>
+        <button class="tab-btn"        id="mypage-tab-btn-past"     onclick="switchMypageTab('past', this)">過去の予約</button>
       </div>
       <div id="mypage-tab-upcoming" class="tab-panel active">
         <div id="mypage-upcoming-list"></div>
@@ -1400,61 +1400,61 @@
         <div id="mypage-past-list"></div>
       </div>
       <div class="btn-actions" style="margin-top:20px;">
-        <button class="btn btn-secondary" onclick="navigateTo('page-cancel-login')">â æ»ã</button>
+        <button class="btn btn-secondary" onclick="navigateTo('page-cancel-login')">← 戻る</button>
       </div>
     </div>
   </div>
 
-  <!-- â¼ ç®¡çã­ã°ã¤ã³ -->
+  <!-- ▼ 管理ログイン -->
   <div id="page-admin-login" class="page">
     <div style="max-width:380px;margin:0 auto;">
       <div class="page-title">
-        <h2>ç®¡çç»é¢ã­ã°ã¤ã³</h2>
-        <p>ç®¡çèãã¹ã¯ã¼ããå¥åãã¦ãã ãã</p>
+        <h2>管理画面ログイン</h2>
+        <p>管理者パスワードを入力してください</p>
       </div>
      0<div class="card">
-        <div id="admin-login-alert" class="alert alert-error">ãã¹ã¯ã¼ããæ­£ããããã¾ããã</div>
+        <div id="admin-login-alert" class="alert alert-error">パスワードが正しくありません。</div>
         <div class="form-group">
-          <label>ãã¹ã¯ã¼ã</label>
-          <input type="password" id="admin-pw" placeholder="ãã¹ã¯ã¼ããå¥å"
+          <label>パスワード</label>
+          <input type="password" id="admin-pw" placeholder="パスワードを入力"
                  onkeydown="if(event.key==='Enter') adminLogin()">
         </div>
         <div class="btn-actions">
-          <button class="btn btn-secondary" onclick="navigateTo('page-top')">â æ»ã</button>
-          <button class="btn btn-primary" onclick="adminLogin()">ã­ã°ã¤ã³</button>
+          <button class="btn btn-secondary" onclick="navigateTo('page-top')">← 戻る</button>
+          <button class="btn btn-primary" onclick="adminLogin()">ログイン</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- â¼ ç®¡çããã·ã¥ãã¼ã -->
+  <!-- ▼ 管理ダッシュボード -->
   <div id="page-admin" class="page">
     <div class="admin-header">
-      <h2>ç®¡çç»é¢</h2>
+      <h2>管理画面</h2>
       <button class="btn btn-secondary"
               style="padding:7px 16px;font-size:.84rem;border-radius:var(--radius-sm);"
-              onclick="adminLogout()">ã­ã°ã¢ã¦ã</button>
+              onclick="adminLogout()">ログアウト</button>
     </div>
 
     <div class="admin-tabs">
-      <button class="tab-btn active" onclick="switchTab('tab-bookings', this)">äºç´ä¸è¦§</button>
-      <button class="tab-btn"        onclick="switchTab('tab-calendar', this)">ã«ã¬ã³ãã¼</button>
-      <button class="tab-btn"        onclick="switchTab('tab-customers', this)">é¡§å®¢ä¸è¦§</button>
-      <button class="tab-btn"        onclick="switchTab('tab-holidays', this)">ä¼æ¥­æ¥è¨­å®</button>
+      <button class="tab-btn active" onclick="switchTab('tab-bookings', this)">予約一覧</button>
+      <button class="tab-btn"        onclick="switchTab('tab-calendar', this)">カレンダー</button>
+      <button class="tab-btn"        onclick="switchTab('tab-customers', this)">顧客一覧</button>
+      <button class="tab-btn"        onclick="switchTab('tab-holidays', this)">休業日設定</button>
     </div>
 
     <div id="tab-bookings" class="tab-panel active">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-        <span class="count-badge" id="booking-count">0ä»¶</span>
+        <span class="count-badge" id="booking-count">0件</span>
         <div class="filter-bar" style="margin:0;flex:1;">
-          <input type="text" id="bf-name" placeholder="ååã§æ¤ç´¢" oninput="renderBookings()">
+          <input type="text" id="bf-name" placeholder="名前で検索" oninput="renderBookings()">
           <select id="bf-menu" onchange="renderBookings()">
-      2     <option value="">ãã¹ã¦ã®ã¡ãã¥ã¼</option>
-            <option>ååæ´ä½ 90å</option>
-            <option>ååãã©ãã£ã¹ 60å</option>
-            <option>æ´ä½ï¼éåçæ³ï¼30å</option>
-            <option>ãã·ã³ãã©ãã£ã¹ 40å</option>
-            <option>ããããã©ãã£ã¹ 40å</option>
+      2     <option value="">すべてのメニュー</option>
+            <option>初回整体 90分</option>
+            <option>初回ピラティス 60分</option>
+            <option>整体（運動療法）30分</option>
+            <option>マシンピラティス 40分</option>
+            <option>マットピラティス 40分</option>
           </select>
         </div>
       </div>
@@ -1466,9 +1466,9 @@
 
     <div id="tab-customers" class="tab-panel">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-        <span class="count-badge" id="customer-count">0ä»¶</span>
+        <span class="count-badge" id="customer-count">0件</span>
         <div class="filter-bar" style="margin:0;flex:1;">
-          <input type="text" id="cf-name" placeholder="ååã»é»è©±çªå·ã§æ¤ç´¢" oninput="renderCustomers()">
+          <input type="text" id="cf-name" placeholder="名前・電話番号で検索" oninput="renderCustomers()">
         </div>
       </div>
       <div id="admin-customer-error" class="alert alert-error"></div>
@@ -1479,40 +1479,40 @@
 
     <div id="tab-calendar" class="tab-panel">
       <div class="cal-view-header">
-        <button class="cal-nav-btn" onclick="changeCalendarMonth(-1)">â¹ åæ</button>
+        <button class="cal-nav-btn" onclick="changeCalendarMonth(-1)">‹ 前月</button>
         <span class="cal-month-label" id="cal-month-label">-</span>
-        <button class="cal-nav-btn" onclick="changeCalendarMonth(1)">æ¬¡æ âº</button>
+        <button class="cal-nav-btn" onclick="changeCalendarMonth(1)">次月 ›</button>
       </div>
       <div id="admin-calendar-error" class="alert alert-error"></div>
       <div class="cal-view-grid" id="cal-view-grid"></div>
       <div class="cal-legend">
-        <span><span class="cal-legend-dot orange"></span>äºç´ããï¼ä»¶æ°è¡¨ç¤ºï¼</span>
-        <span><span class="cal-legend-dot gray"></span>ä¼æ¥­æ¥ï¼Ãå°ï¼</span>
-        <span><span class="cal-legend-dot today-mark"></span>ä»æ¥</span>
+        <span><span class="cal-legend-dot orange"></span>予約あり（件数表示）</span>
+        <span><span class="cal-legend-dot gray"></span>休業日（×印）</span>
+        <span><span class="cal-legend-dot today-mark"></span>今日</span>
       </div>
     </div>
 
     <div id="tab-holidays" class="tab-panel">
       <div class="holiday-cal-header">
-        <button class="holiday-nav-btn" onclick="changeHolidayMonth(-1)">â¹ åæ</button>
+        <button class="holiday-nav-btn" onclick="changeHolidayMonth(-1)">‹ 前月</button>
         <span class="holiday-month-label" id="holiday-month-label">-</span>
-        <button class="holiday-nav-btn" onclick="changeHolidayMonth(1)">æ¬¡æ âº</button>
+        <button class="holiday-nav-btn" onclick="changeHolidayMonth(1)">次月 ›</button>
       </div>
       <div id="admin-holiday-error" class="alert alert-error"></div>
       <div class="holiday-cal-grid" id="holiday-cal-grid"></div>
       <div class="holiday-help">
-        ð¡ æ¥ä»ãã¯ãªãã¯ããã¨ä¼æ¥­æ¥ã«è¨­å®ã§ãã¾ãï¼çç±ã®å¥åæ¬ãè¡¨ç¤ºããã¾ãï¼ã<br>
-        ä¼æ¥­æ¥ï¼ãªã¬ã³ã¸è¡¨ç¤ºï¼ãããä¸åº¦ã¯ãªãã¯ããã¨è§£é¤ã§ãã¾ãã
+        💡 日付をクリックすると休業日に設定できます（理由の入力欄が表示されます）。<br>
+        休業日（オレンジ表示）をもう一度クリックすると解除できます。
       </div>
     </div>
   </div>
 
-  <!-- â¼ æ¥å¥äºç´ä¸è¦§ã¢ã¼ãã«ï¼ç®¡çç»é¢ã®ã«ã¬ã³ãã¼ã¿ãç¨ï¼ -->
+  <!-- ▼ 日別予約一覧モーダル（管理画面のカレンダータブ用） -->
   <div id="day-bookings-modal" class="day-modal" style="display:none;" onclick="if(event.target===this)closeDayBookingsModal()">
     <div class="day-modal-card">
       <div class="day-modal-header">
         <h3 id="day-modal-title">-</h3>
-        <button class="day-modal-close" onclick="closeDayBookingsModal()" aria-label="éãã">Ã</button>
+        <button class="day-modal-close" onclick="closeDayBookingsModal()" aria-label="閉じる">×</button>
       </div>
       <div class="day-modal-body" id="day-modal-body"></div>
     </div>
@@ -1523,42 +1523,42 @@
 <footer>
   <div class="footer-inner">
     <div class="footer-links">
-      <a href="privacy.html" target="_blank" rel="noopener">ãã©ã¤ãã·ã¼ããªã·ã¼</a>
+      <a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>
     </div>
     <div class="footer-copy">&copy; 2025 Lactive All Rights Reserved.</div>
   </div>
 </footer>
 
 <script>
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // å®æ°
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ç®¡çèãã¹ã¯ã¼ãã¯ã³ã¼ãåã«ä¿æããªãï¼Supabase Edge Function: verify-admin ã§æ¤è¨¼ï¼
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 定数
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 管理者パスワードはコード内に保持しない（Supabase Edge Function: verify-admin で検証）
   const ALL_TIMES = [
     '9:00','10:00','11:00','12:00','13:00',
     '14:00','15:00','16:00','17:00','18:00','19:00'
   ];
 
-  // ââââââââââââââââââââââââââââââââââââââââ
-  // Supabase åæå
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // â» å¤æ°åã sbClient ã«ãããã¨ã§ CDN ã® window.supabase ã°ã­ã¼ãã«ã¨ã®è¡çªãåé¿
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Supabase 初期化
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ※ 変数名を sbClient にすることで CDN の window.supabase グローバルとの衝突を回避
   const sbClient = window.supabase.createClient(
     'https://wuthbgxzmvjeosugzfbs.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzMiIsInJlZiI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
   );
-  console.log('ð¢ [Supabase] ã¯ã©ã¤ã¢ã³ãåæåå®äº');
+  console.log('🟢 [Supabase] クライアント初期化完了');
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ãã­ã¼è¨­å®
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // フロー設定
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   const FLOW_CONFIG = {
     'first-seitai': {
       steps: [
-        { label: 'STEP\n1', desc: 'æ³¨æäºé ' },
-        { label: 'STEP\n2', desc: 'åè¨ºç¥¨' },
-        { label: 'STEP\n3', desc: 'åäººæå ±' },
-        { label: 'STEP\n4', desc: 'æ¥æé¸æ' }
+        { label: 'STEP\n1', desc: '注意事項' },
+        { label: 'STEP\n2', desc: '問診票' },
+        { label: 'STEP\n3', desc: '個人情報' },
+        { label: 'STEP\n4', desc: '日時選択' }
       ],
       pageStep: {
         'page-notice': 0, 'page-questionnaire': 1,
@@ -1567,9 +1567,9 @@
     },
     'first-pilates': {
       steps: [
-        { label: 'STEP\n1', desc: 'æ³¨æäºé ' },
-        { label: 'STEP\n2', desc: 'åäººæå ±' },
-        { label: 'STEP\n3', desc: 'æ¥æé¸æ' }
+        { label: 'STEP\n1', desc: '注意事項' },
+        { label: 'STEP\n2', desc: '個人情報' },
+        { label: 'STEP\n3', desc: '日時選択' }
       ],
       pageStep: {
         'page-notice': 0, 'page-personal': 1, 'page-datetime': 2
@@ -1577,8 +1577,8 @@
     },
     'member': {
       steps: [
-        { label: 'STEP\n1', desc: 'èªè¨¼' },
-        { label: 'STEP\n2', desc: 'æ¥æé¸æ' }
+        { label: 'STEP\n1', desc: '認証' },
+        { label: 'STEP\n2', desc: '日時選択' }
       ],
       pageStep: {
         'page-member-auth': 0, 'page-member-login': 0,
@@ -1587,7 +1587,7 @@
     }
   };
 
-  // ã¢ããªç¶æ
+  // アプリ状態
   let ST = {
     flow: '', menu: '',
     questionnaire: {},
@@ -1598,10 +1598,10 @@
     lineUserId: null
   };
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ã­ã¼ãã£ã³ã°å¶å¾¡
-  // âââââââââââââââââââââââââââââââââââââââââ
-  function showLoading(msg = 'å¦çä¸­...') {
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ローディング制御
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  function showLoading(msg = '処理中...') {
     document.getElementById('loading-text').textContent = msg;
     document.getElementById('loading-overlay').classList.add('show');
   }
@@ -1609,9 +1609,9 @@
     document.getElementById('loading-overlay').classList.remove('show');
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ããã²ã¼ã·ã§ã³
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ナビゲーション
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function navigateTo(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
@@ -1630,7 +1630,7 @@
     let html = '<div class="steps-bar">';
     cfg.steps.forEach((s, i) => {
       const cls = i < activeIdx ? 'done' : i === activeIdx ? 'active' : 'pending';
-      const lbl = cls === 'done' ? 'â' : s.label;
+      const lbl = cls === 'done' ? '✓' : s.label;
       html += `
         <div class="step-item">
           <div class="step-circle ${cls}" style="white-space:pre-line;">${lbl}</div>
@@ -1644,12 +1644,12 @@
     container.innerHTML = html;
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ååãã­ã¼
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 初回フロー
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startFirstFlow(flow) {
     ST = {
-      flow, menu: flow === 'first-seitai' ? 'ååæ´ä½ 90å' : 'ååãã©ãã£ã¹ 60å',
+      flow, menu: flow === 'first-seitai' ? '初回整体 90分' : '初回ピラティス 60分',
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: '', lineUserId: null
     };
@@ -1667,7 +1667,7 @@
     const q4 = document.querySelector('input[name="q4"]:checked')?.value || '';
     const q5 = document.querySelector('input[name="q5"]:checked')?.value || '';
     if (!q1 || !q2 || !q3 || !q4 || !q5) {
-      showAlert('q-alert', 'ãã¹ã¦ã®é ç®ã«ãåç­ãã ããã');
+      showAlert('q-alert', 'すべての項目にご回答ください。');
       return;
     }
     hideAlert('q-alert');
@@ -1683,11 +1683,11 @@
   2   const name  = document.getElementById('p-name').value.trim();
     const phone = document.getElementById('p-phone').value.trim();
     const email = document.getElementById('p-email').value.trim();
-    if (!name)  { showAlert('personal-alert', 'ãååãå¥åãã¦ãã ããã'); return; }
-    if (!phone) { showAlert('personal-alert', 'éûè©±æªå·ãå¥åãã¦ãã£ ããã'); return; }
-    if (!email) { showAlert('personal-alert', 'ã¡ã¼ã«<span ã¢ãã¬ã¹ãå¥åãã¦ãã ããã'); return; }
+    if (!name)  { showAlert('personal-alert', 'お名前を入力してください。'); return; }
+    if (!phone) { showAlert('personal-alert', '��話敪号を入力してく㣁�さい。'); return; }
+    if (!email) { showAlert('personal-alert', 'メール<span アドレスを入力してください。'); return; }
     if (!document.getElementById('personal-consent').checked) {
-      showAlert('personal-alert', 'ãã©ã¤ãã·ã¼ããªã·ã¼ã¸ã®åæãå¿è¦ã§ãã'); return;
+      showAlert('personal-alert', 'プライバシーポリシーへの同意が必要です。'); return;
     }
     hideAlert('personal-alert');
     ST.personal = { name, phone, email };
@@ -1695,16 +1695,16 @@
     navigateTo('page-datetime');
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ä¼å¡ãã­ã¼
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 会員フロー
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startMemberFlow(menuName) {
     ST = {
       flow: 'member', menu: menuName,
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: '', lineUserId: null
     };
-    document.getElementById('member-auth-menu-label').textContent = `ã¡ãã¥ã¼ï¼${menuName}`;
+    document.getElementById('member-auth-menu-label').textContent = `メニュー：${menuName}`;
     navigateTo('page-member-auth');
   }
 
@@ -1712,24 +1712,24 @@
     const raw         = document.getElementById('member-id-input').value.trim();
     const enteredName = document.getElementById('member-name-input').value.trim();
     if (!raw || !/^\d{6}$/.test(raw)) {
-      showAlert('login-alert', '6æ¡ã®æ°å­ã§é¡§å®¢çªå·ãå¥åãã¦ãã ããã');
+      showAlert('login-alert', '6桁の数字で顧客番号を入力してください。');
       return;
     }
     if (!enteredName) {
-      showAlert('login-alert', 'ãååï¼å§ï¼ãå¥åãã¦ãã ããã');
+      showAlert('login-alert', 'お名前（姓）を入力してください。');
       return;
     }
     const id = raw;
     const btn = document.getElementById('verify-btn');
     btn.disabled = true;
-    showLoading('é¡§å®¢æå ±ãç¢ºèªä¸­...');
+    showLoading('顧客情報を確認中...');
     try {
       const customer = await findCustomer(id);
-      // é¡§å®¢çªå· or ååãä¸ä¸è´ã®å ´åã¯åãã¨ã©ã¼ã¡ãã»ã¼ã¸ï¼æå ±æ¼æ´©ãé²ãï¼
-      const storedName    = (customer?.name || '').replace(/[\sã]/g, '');
-      const normalizedEntry = enteredName.replace(/[\sã]/g, '');
+      // 顧客番号 or 名前が不一致の場合は同じエラーメッセージ（情報漏洩を防ぐ）
+      const storedName    = (customer?.name || '').replace(/[\s　]/g, '');
+      const normalizedEntry = enteredName.replace(/[\s　]/g, '');
       if (!customer || !storedName.startsWith(normalizedEntry)) {
-        showAlert('login-alert', 'é¡§å®¢çªå·ã¾ãã¯ãååãæ­£ããããã¾ããã');
+        showAlert('login-alert', '顧客番号またはお名前が正しくありません。');
         return;
       }
       hideAlert('login-alert');
@@ -1741,7 +1741,7 @@
       document.getElementById('login-form-section').style.display    = 'none';
       document.getElementById('login-confirm-section').style.display = 'block';
     } catch (e) {
-      showAlert('login-alert', 'éä¿¡ã¨ã©ã¼ãçºçãã¾ããããã°ãããã¦ãããè©¦ããã ããã');
+      showAlert('login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
     } finally {
       btn.disabled = false;
       hideLoading();
@@ -1757,10 +1757,10 @@
   }
 
   function loginConfirm() {
-    // ST.customer ã null ã®å ´åï¼ãªã­ã¼ãå¾ãªã©ï¼ã¯å¥åç»é¢ã«æ»ã
+    // ST.customer が null の場合（リロード後など）は入力画面に戻す
     if (!ST.customer) {
       resetMemberLogin();
-      showAlert('login-alert', 'ã»ãã·ã§ã³ãåãã¾ãããããä¸åº¦é¡§å®¢çªå·ã¨ãååãå¥åãã¦ãã ããã');
+      showAlert('login-alert', 'セッションが切れました。もう一度顧客番号とお名前を入力してください。');
       return;
     }
     ST.personal = {
@@ -1776,26 +1776,26 @@
     const name  = document.getElementById('r-name').value.trim();
     const phone = document.getElementById('r-phone').value.trim();
     const email = document.getElementById('r-email').value.trim();
-    if (!name)  { showAlert('register-alert', 'ãååãå¥åãã¦ãã ããã'); return; }
-    if (!phone) { showAlert('register-alert', 'é»è©±çªå·ãå¥åãã¦ãã ããã'); return; }
-    if (!email) { showAlert('register-alert', 'ã¡ã¼ã«ã¢ãã¬ã¹ãå¥åãã¦ãã ããã'); return; }
+    if (!name)  { showAlert('register-alert', 'お名前を入力してください。'); return; }
+    if (!phone) { showAlert('register-alert', '電話番号を入力してください。'); return; }
+    if (!email) { showAlert('register-alert', 'メールアドレスを入力してください。'); return; }
     if (!document.getElementById('register-consent').checked) {
-      showAlert('register-alert', 'ãã©ã¤ãã·ã¼ããªã·ã¼ã¸ã®åæãå¿è¦ã§ãã'); return;
+      showAlert('register-alert', 'プライバシーポリシーへの同意が必要です。'); return;
     }
     hideAlert('register-alert');
 
     const btn = document.getElementById('register-btn');
     btn.disabled = true;
-    showLoading('é¡§å®¢çªå·ãçºè¡ä¸­...');
-    console.log('ðµ [æ°è¦ç»é²] éå§:', { name, phone, email });
+    showLoading('顧客番号を発行中...');
+    console.log('🔵 [新規登録] 開始:', { name, phone, email });
     try {
-      console.log('ðµ [æ°è¦ç»é²] é¡§å®¢çªå·ãçæä¸­...');
+      console.log('🔵 [新規登録] 顧客番号を生成中...');
    2  const newId = await generateCustomerId();
-      console.log('ðµ [æ°è¦ç»é²] çæãããé¡§å®¢çªå·:', newId);
+      console.log('🔵 [新規登録] 生成された顧客番号:', newId);
 
-      console.log('ðµ [æ°è¦ç»é²] customersãã¼ãã«ã«INSERTä¸­...');
+      console.log('🔵 [新規登録] customersテーブルにINSERT中...');
       const savedCustomer = await saveCustomer({ customer_number: newId, name, phone, email });
-      console.log('â [æ°è¦ç»é²] INSERTæå:', savedCustomer);
+      console.log('✅ [新規登録] INSERT成功:', savedCustomer);
 
      0ST.isNewCustomer = true;
       ST.newCustomerId = newId;
@@ -1804,52 +1804,52 @@
       document.getElementById('register-form-section').style.display = 'none';
       document.getElementById('register-done-section').style.display = 'block';
       renderSteps('page-member-register');
-      console.log('â [æ°è¦ç»é²] é¡§å®¢çªå·çºè¡ã»ç»é¢é·ç§»å®äº No.' + newId);
+      console.log('✅ [新規登録] 顧客番号発行・画面遷移完了 No.' + newId);
     } catch (e) {
-      console.error('â [æ°è¦ç»é²] ã¨ã©ã¼çºç:', e);
+      console.error('❌ [新規登録] エラー発生:', e);
       const detail = e.supabaseError
-        ? `ï¼ã³ã¼ã: ${e.supabaseError.code} / ${e.supabaseError.message}ï¼`
-        : `ï¼${e.message}ï¼`;
-      showAlert('register-alert', `ç»é²ã«å¤±æãã¾ããããã°ãããã¦ãããè©¦ããã ããã${detail}`);
+        ? `（コード: ${e.supabaseError.code} / ${e.supabaseError.message}）`
+        : `（${e.message}）`;
+      showAlert('register-alert', `登録に失敗しました。しばらくしてからお試しください。${detail}`);
       btn.disabled = false;
     } finally {
       hideLoading();
     }
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // æ¥æé¸æ
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 日時選択
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function setupDatetime() {
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     document.getElementById('dt-memo').value = '';
-    // æéå¸¯ã°ãªããããªã»ãã
+    // 時間帯グリッドをリセット
     _dateChangeLast = '';
     document.getElementById('time-slot-placeholder').style.display = 'block';
     document.getElementById('time-slot-loading').style.display     = 'none';
     document.getElementById('time-slot-grid').style.display        = 'none';
     document.getElementById('time-slot-grid').innerHTML            = '';
     hideAlert('datetime-alert');
-    document.getElementById('datetime-menu-label').textContent = `ã¡ãã¥ã¼ï¼${ST.menu}`;
+    document.getElementById('datetime-menu-label').textContent = `メニュー：${ST.menu}`;
     const noticeEl = document.getElementById('datetime-newid-notice');
     if (ST.isNewCustomer) {
-      noticeEl.textContent = `é¡§å®¢çªå·ã${ST.newCustomerId}ããçºè¡ããã¾ãããæ¬¡åãããã®çªå·ã§ã­ã°ã¤ã³ã§ãã¾ãã`;
+      noticeEl.textContent = `顧客番号【${ST.newCustomerId}】が発行されました。次回からこの番号でログインできます。`;
       noticeEl.style.display = 'block';
     } else {
       noticeEl.style.display = 'none';
     }
     document.getElementById('booking-btn').disabled = false;
-    // äºç´ç¨ã«ã¬ã³ãã¼ãä»æã§åæå
+    // 予約用カレンダーを今月で初期化
     const now = new Date();
     bookingViewYear  = now.getFullYear();
     bookingViewMonth = now.getMonth();
     renderBookingCalendar();
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // äºç´ç¨ã«ã¬ã³ãã¼
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 予約用カレンダー
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   let bookingViewYear  = null;
   let bookingViewMonth = null;
 
@@ -1862,25 +1862,25 @@
 
   async function renderBookingCalendar() {
     document.getElementById('booking-month-label').textContent =
-      `${bookingViewYear}å¹´${bookingViewMonth + 1}æ`;
+      `${bookingViewYear}年${bookingViewMonth + 1}月`;
     const grid = document.getElementById('booking-cal-grid');
 
     let holidays = {};
     let fetchFailed = false;
     try {
       holidays = await fetchHolidaysForMonth(bookingViewYear, bookingViewMonth);
-      console.log(`ð¢ [renderBookingCalendar] ${bookingViewYear}å¹´${bookingViewMonth + 1}æã®ä¼æ¥­æ¥:`, holidays);
+      console.log(`🟢 [renderBookingCalendar] ${bookingViewYear}年${bookingViewMonth + 1}月の休業日:`, holidays);
     } catch (e) {
-      console.error('â [renderBookingCalendar] ä¼æ¥­æ¥åå¾ã¨ã©ã¼:', e);
+      console.error('❌ [renderBookingCalendar] 休業日取得エラー:', e);
       fetchFailed = true;
       const detail = e.supabaseError
-        ? `ï¼${e.supabaseError.code}: ${e.supabaseError.message}ï¼`
+        ? `（${e.supabaseError.code}: ${e.supabaseError.message}）`
         : '';
       showAlert('datetime-alert',
-        `ä¼æ¥­æ¥æå ±ã®åå¾ã«å¤±æãã¾ããã${detail}ï¼ç®¡çèã«ãåãåãããã ããï¼`);
+        `休業日情報の取得に失敗しました。${detail}（管理者にお問い合わせください）`);
     }
 
-    const dows = ['æ¥', 'æ', 'ç«', 'æ°´', 'æ¨', 'é', 'å'];
+    const dows = ['日', '月', '火', '水', '木', '金', '土'];
     let html = '';
     dows.forEach((d, i) => {
       const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
@@ -1901,20 +1901,20 @@
       const mm      = String(bookingViewMonth + 1).padStart(2, '0');
       const dd      = String(d).padStart(2, '0');
       const dateStr = `${bookingViewYear}-${mm}-${dd}`;
-      const isPast    = dateObj < today;        // ç´ç²ãªéå»
+      const isPast    = dateObj < today;        // 純粋な過去
       const isToday   = dateObj.getTime() === today.getTime();
       const isHoliday = holidays[dateStr] !== undefined;
       const isSelected = dateStr === selectedDate;
 
       const classes = ['holiday-cal-day'];
       if (isPast)     classes.push('past');
-      if (isToday)    classes.push('today', 'today-disabled'); // å½æ¥ã¯äºç´ä¸å¯
+      if (isToday)    classes.push('today', 'today-disabled'); // 当日は予約不可
       if (isHoliday)  classes.push('holiday-disabled');
       if (isSelected) classes.push('selected-date');
 
       let onclick = '';
       if (isToday) {
-        // å½æ¥ï¼é»è©±æ¡åã¢ã©ã¼ã
+        // 当日：電話案内アラート
         onclick = `onclick="alertSameDayBooking()"`;
       } else if (!isPast) {
         onclick = isHoliday
@@ -1934,13 +1934,13 @@
 
   function selectBookingDate(dateStr) {
     document.getElementById('dt-date').value = dateStr;
-    renderBookingCalendar(); // é¸æç¶æãåæ 
-    _dateChangeLast = '';     // å¼·å¶ååå¾
+    renderBookingCalendar(); // 選択状態を反映
+    _dateChangeLast = '';     // 強制再取得
     onDateChange();
   }
 
   function alertSameDayBooking() {
-    // å½æ¥é¸ææï¼æ¥ä»é¸æããªã»ãããã¦é»è©±æ¡åãè¡¨ç¤º
+    // 当日選択時：日付選択をリセットして電話案内を表示
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     _dateChangeLast = '';
@@ -1948,37 +1948,37 @@
     document.getElementById('time-slot-grid').style.display    = 'none';
     document.getElementById('time-slot-grid').innerHTML        = '';
     const ph = document.getElementById('time-slot-placeholder');
-    ph.textContent = 'ã¿ãå¸ææ¥ãé¸æãã¦ãã ãã';
+    ph.textContent = 'みず希望日を選択してください';
     ph.style.display = 'block';
-    showAlert('datetime-alert', 'å½æ¥ã®ãäºç´ã¯ãé»è©±ã§ãåãåãããã ããã');
+    showAlert('datetime-alert', '当日のご予約はお電話でお問い合わせください。');
   }
 
   function alertBookingHoliday() {
-    // æ¥ä»ã»æéé¸æããªã»ãã
+    // 日付・時間選択をリセット
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     _dateChangeLast = '';
-    // æéå¸¯ãã¿ã³ãéè¡¨ç¤º
+    // 時間帯ボタンを非表示
     document.getElementById('time-slot-loading').style.display = 'none';
     document.getElementById('time-slot-grid').style.display    = 'none';
     document.getElementById('time-slot-grid').innerHTML        = '';
     const ph = document.getElementById('time-slot-placeholder');
-    ph.textContent = 'ã¿ãå¸ææ¥ãé¸æãã¦ãã ãã';
+    ph.textContent = 'みず希望日を選択してください';
     ph.style.display = 'block';
-    showAlert('datetime-alert', 'ãã®æ¥ã¯ä¼æ¥­æ¥ã®ãããäºç´ããã ãã¾ãããå¥ã®æ¥ç¨ããé¸ã³ãã ããã');
+    showAlert('datetime-alert', 'この日は休業日のためご予約いただけません。別の日程をお選びください。');
     renderBookingCalendar();
   }
 
-  /** æ¥ä»å¤æ´æï¼äºç´æ¸ã¿æéå¸¯ãåå¾ãã¦ã°ãªãããåæç» */
+  /** 日付変更時：予約済み時間帯を取得してグリッドを再描画 */
   let _dateChangeLast = '';
   async function onDateChange() {
     const date = document.getElementById('dt-date').value;
-    if (date === _dateChangeLast) return; // oninput+onchange éè¤å¼ã³åºãé²æ­¢
+    if (date === _dateChangeLast) return; // oninput+onchange 重複呼び出し防止
     _dateChangeLast = date;
     document.getElementById('dt-time').value = '';
     const phEl = document.getElementById('time-slot-placeholder');
     if (!date) {
-      phEl.textContent = 'ã¿ãå¸ææ¥ãé¸æãã¦ãã ãã';
+      phEl.textContent = 'みず希望日を選択してください';
       phEl.style.display = 'block';
       document.getElementById('time-slot-loading').style.display = 'none';
       document.getElementById('time-slot-grid').style.display    = 'none';
@@ -1989,42 +1989,42 @@
     document.getElementById('time-slot-grid').style.display    = 'none';
     hideAlert('datetime-alert');
     try {
-      // ä¼æ¥­æ¥ãã§ãã¯
+      // 休業日チェック
       const holiday = await checkIsHoliday(date);
       if (holiday) {
-        // æ¥ä»é¸æããªã»ãã
+        // 日付選択をリセット
         document.getElementById('dt-date').value = '';
         document.getElementById('dt-time').value = '';
         _dateChangeLast = '';
-        // æéå¸¯ãã¿ã³ãéè¡¨ç¤º
+        // 時間帯ボタンを非表示
         document.getElementById('time-slot-loading').style.display = 'none';
         document.getElementById('time-slot-grid').style.display    = 'none';
         document.getElementById('time-slot-grid').innerHTML        = '';
-        phEl.textContent = 'ã¾ãå¸ææ¥ãé¸æãã¦ãã ãã';
+        phEl.textContent = 'まず希望日を選択してください';
         phEl.style.display = 'block';
-        const reason = holiday.reason ? `ï¼${holiday.reason}ï¼` : '';
-        showAlert('datetime-alert', `ãã®æ¥ã¯ä¼æ¥­æ¥ã®ãããäºç´ããã ãã¾ãã${reason}ãå¥ã®æ¥ç¨ããé¸ã³ãã ããã`);
+        const reason = holiday.reason ? `（${holiday.reason}）` : '';
+        showAlert('datetime-alert', `この日は休業日のためご予約いただけません${reason}。別の日程をお選びください。`);
         return;
       }
       const bookedTimes = await fetchBookedTimes(date);
       renderTimeSlots(bookedTimes);
     } catch (e) {
-      console.error('æéå¸¯åå¾ã¨ã©ã¼:', e);
-      renderTimeSlots([]); // ã¨ã©ã¼æã¯å¨æ ãé¸æå¯è½ã¨ãã¦è¡¨ç¤º
+      console.error('時間帯取得エラー:', e);
+      renderTimeSlots([]); // エラー時は全枠を選択可能として表示
     }
   }
 
-  /** Supabase ããæå®æ¥ã®äºç´æ¸ã¿æéå¸¯ãåå¾ */
+  /** Supabase から指定日の予約済み時間帯を取得 */
   async function fetchBookedTimes(date) {
     const { data, error } = await sbClient
       .from('bookings')
       .select('time')
       .eq('date', date);
-    if (error) throwSupabaseError('äºç´æ¸ã¿æéå¸¯ã®åå¾', error);
+    if (error) throwSupabaseError('予約済み時間帯の取得', error);
     return (data || []).map(b => b.time);
   }
 
-  /** æéå¸¯ã°ãªãããæç» */
+  /** 時間帯グリッドを描画 */
   function renderTimeSlots(bookedTimes) {
     document.getElementById('time-slot-loading').style.display = 'none';
     const grid = document.getElementById('time-slot-grid');
@@ -2058,7 +2058,7 @@
     grid.innerHTML = html;
   }
 
-  /** æéå¸¯ãé¸æ */
+  /** 時間帯を選択 */
   function selectTimeSlot(el, time) {
     document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
     el.classList.add('selected');
@@ -2084,30 +2084,30 @@
     const date = document.getElementById('dt-date').value;
     const time = document.getElementById('dt-time').value;
     const memo = document.getElementById('dt-memo').value.trim();
-    if (!date) { showAlert('datetime-alert', 'å¸ææ¥ãé¸æãã¦ãã ããã'); return; }
-    if (!time) { showAlert('datetime-alert', 'å¸ææéãé¸æãã¦ãã ããã'); return; }
-    // å½æ¥ã»éå»æ¥ãã§ãã¯ï¼UIãã¤ãã¹å¯¾ç­ï¼
+    if (!date) { showAlert('datetime-alert', '希望日を選択してください。'); return; }
+    if (!time) { showAlert('datetime-alert', '希望時間を選択してください。'); return; }
+    // 当日・過去日チェック（UIバイパス対策）
     const _now = new Date(); _now.setHours(0,0,0,0);
     const _selDate = new Date(date + 'T00:00:00');
     if (_selDate.getTime() === _now.getTime()) {
-      showAlert('datetime-alert', 'å½æ¥ã®ãäºç´ã¯ãé»è©±ã§ãåãåãããã ããã');
+      showAlert('datetime-alert', '当日のご予約はお電話でお問い合わせください。');
       return;
     }
     if (_selDate < _now) {
-      showAlert('datetime-alert', 'éå»ã®æ¥ä»ã¯é¸æã§ãã¾ããã');
+      showAlert('datetime-alert', '過去の日付は選択できません。');
       return;
     }
-    // ç¢ºå®æã«ä¼æ¥­æ¥ãåãã§ãã¯ï¼ç®¡çå´ã§ç´åã«ä¼æ¥­æ¥è¨­å®ãããå ´åã®ä¿éºï¼
+    // 確定時に休業日を再チェック（管理側で直前に休業日設定された場合の保険）
     const holidayCheck = await checkIsHoliday(date).catch(() => null);
     if (holidayCheck) {
-      const reason = holidayCheck.reason ? `ï¼${holidayCheck.reason}ï¼` : '';
-      showAlert('datetime-alert', `ãã®æ¥ã¯ä¼æ¥­æ¥ã®ããäºç´ã§ãã¾ãã${reason}ãå¥ã®æ¥ä»ããé¸ã³ãã ããã`);
+      const reason = holidayCheck.reason ? `（${holidayCheck.reason}）` : '';
+      showAlert('datetime-alert', `この日は休業日のため予約できません${reason}。別の日付をお選びください。`);
       return;
     }
-    // ç¢ºå®æã«ååº¦éè¤ãã§ãã¯ï¼äºééä¿¡é²æ­¢ï¼
+    // 確定時に再度重複チェック（二重送信防止）
     const bookedNow = await fetchBookedTimes(date).catch(() => []);
     if (bookedNow.includes(time)) {
-      showAlert('datetime-alert', 'é¸æããæéå¸¯ã¯ãã§ã«äºç´æ¸ã¿ã«ãªãã¾ãããå¥ã®æéå¸¯ããé¸ã³ãã ããã');
+      showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
       const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
       renderTimeSlots(bookedTimesRefresh);
       document.getElementById('dt-time').value = '';
@@ -2116,7 +2116,7 @@
 
     const btn = document.getElementById('booking-btn');
     btn.disabled = true;
-    showLoading('äºç´ãéä¿¡ä¸­...');
+    showLoading('予約を送信中...');
     try {
       const q = ST.questionnaire;
       await saveBooking({
@@ -2136,8 +2136,8 @@
         line_user_id:      ST.lineUserId || null
       });
 
-      // LINEéç¥ãéä¿¡ï¼å¤±æãã¦ãäºç´å®äºã¯ç¶ç¶ï¼
-      // â» ãã¤ã­ã¼ãã«ã¯ customerNumber ãä¸åå«ããªã
+      // LINE通知を送信（失敗しても予約完了は継続）
+      // ※ ペイロードには customerNumber を一切含めない
       const isFirstVisit = ST.flow !== 'member';
       const name  = ST.personal.name;
       const menu  = ST.menu;
@@ -2147,10 +2147,10 @@
         memo: memo || '',
         isFirstVisit
       };
-      console.log('LINEéä¿¡ãã¼ã¿:', linePayload);
-      sendLineNotify(linePayload).catch(e => console.warn('LINEéç¥ã¨ã©ã¼ï¼ç¡è¦ï¼:', e));
+      console.log('LINE送信データ:', linePayload);
+      sendLineNotify(linePayload).catch(e => console.warn('LINE通知エラー（無視）:', e));
 
-      // å®äºç»é¢
+      // 完了画面
       document.getElementById('dn-name').textContent = ST.personal.name;
       document.getElementById('dn-menu').textContent = ST.menu;
       document.getElementById('dn-dt').textContent   = `${formatDate(date)} ${time}`;
@@ -2164,20 +2164,20 @@
 
       navigateTo('page-done');
     } catch (e) {
-      showAlert('datetime-alert', 'äºç´ã®éä¿¡ã«å¤±æãã¾ããããã¦ãããè©¦ããã ããã');
+      showAlert('datetime-alert', '予約の送信に失敗しました。してからお試しください。');
       btn.disabled = false;
     } finally {
       hideLoading();
     }
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ãã¤ãã¼ã¸ã»ã­ã£ã³ã»ã«ãã­ã¼
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // マイページ・キャンセルフロー
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   let cancelCustomer = null;
 
   function getDayOfWeek(dateStr) {
-    const days = ['æ¥', 'æ', 'ç«', 'æ°´', 'æ¨', 'é', 'å'];
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
     const [y, m, d] = dateStr.split('-').map(Number);
     return days[new Date(y, m - 1, d).getDay()];
   }
@@ -2192,34 +2192,34 @@
     const raw         = document.getElementById('cancel-id-input').value.trim();
     const enteredName = document.getElementById('cancel-name-input').value.trim();
     if (!raw || !/^\d{6}$/.test(raw)) {
-      showAlert('cancel-login-alert', '6æ¡ã®æ°å­ã§é¡§å®¢çªå·ãå¥åãã¦ãã ããã');
+      showAlert('cancel-login-alert', '6桁の数字で顧客番号を入力してください。');
       return;
     }
     if (!enteredName) {
-      showAlert('cancel-login-alert', 'ãååï¼å§ï¼ãå¥åãã¦ãã ããã');
+      showAlert('cancel-login-alert', 'お名前（姓）を入力してください。');
       return;
     }
     const btn = document.getElementById('cancel-verify-btn');
     btn.disabled = true;
-    showLoading('äºç´ãç¢ºèªä¸­...');
+    showLoading('予約を確認中...');
     try {
       const customer = await findCustomer(raw);
-      const storedName      = (customer?.name || '').replace(/[\sã]/g, '');
-      const normalizedEntry = enteredName.replace(/[\sã]/g, '');
+      const storedName      = (customer?.name || '').replace(/[\s　]/g, '');
+      const normalizedEntry = enteredName.replace(/[\s　]/g, '');
       if (!customer || !storedName.startsWith(normalizedEntry)) {
-        showAlert('cancel-login-alert', 'é¡§å®¢çªå·ã¾ãã¯ãååãæ­£ããããããããã¾ããã');
+        showAlert('cancel-login-alert', '顧客番号またはお名前が正しくありしくありません。');
         return;
       }
       hideAlert('cancel-login-alert');
       cancelCustomer = customer;
-      document.getElementById('mypage-customer-name').textContent = `${customer.name} æ§`;
-      document.getElementById('mypage-customer-num').textContent  = `é¡§å®¢çªå·ï¼${customer.customer_number}`;
+      document.getElementById('mypage-customer-name').textContent = `${customer.name} 様`;
+      document.getElementById('mypage-customer-num').textContent  = `顧客番号：${customer.customer_number}`;
       hideAlert('mypage-success');
       hideAlert('mypage-alert');
       await renderMypage();
       navigateTo('page-cancel-list');
     } catch (e) {
-      showAlert('cancel-login-alert', 'éä¿¡ã¨ã©ã¼ãçºçãã¾ããããã°ãããã¦ãããè©¦ããã ããã');
+      showAlert('cancel-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
     } finally {
       btn.disabled = false;
       hideLoading();
@@ -2228,7 +2228,7 @@
 
   async function renderMypage() {
     document.getElementById('mypage-upcoming-list').innerHTML =
-      '<div class="empty-state"><div class="ei">â³</div><p>èª­ã¿è¾¼ã¿ä¸­...</p></div>';
+      '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     document.getElementById('mypage-past-list').innerHTML = '';
 
     try {
@@ -2251,15 +2251,15 @@
         bd >= today ? upcoming.push(b) : past.push(b);
       });
 
-      // çµ±è¨
+      // 統計
       document.getElementById('mp-total').textContent   = all.length;
       document.getElementById('mp-seitai').textContent   = cancelCustomer.seitai_count ?? 0;
       document.getElementById('mp-pilates').textContent  = cancelCustomer.pilates_count ?? 0;
 
-      // ä»å¾ã®äºç´
+      // 今後の予約
       if (!upcoming.length) {
         document.getElementById('mypage-upcoming-list').innerHTML =
-          emptyState('ð', 'ä»å¾ã®äºç´ã¯ããã¾ãã');
+          emptyState('📅', '今後の予約はありません');
       } else {
         document.getElementById('mypage-upcoming-list').innerHTML = upcoming.map(b => {
           const [y, m, d] = b.date.split('-').map(Number);
@@ -2269,14 +2269,14 @@
 
           let actionHtml;
           if (diffDays === 0) {
-            actionHtml = `!<div class="cancel-today-note">å½æ¥ã®ã­ã£ã³ã»ã«ã¯Line<br>ã¢ã¯ã»ã·ã«ããé¤ããè¡¨24æä»¥ãã</div>`;
+            actionHtml = `!<div class="cancel-today-note">当日のねャンセルはLine<br>アクセシルをお除をお表24時以さい</div>`;
           } else {
-            actionHtml = `!<button class="btn-cancel-item" onclick="cancelBookingConfirm('${esc(b.id)}','${esc(b.date)}','${esc(b.time)}','${esc(b.menu).replace(/'/g,'\\u0027')}')">ã­ã£ã³ã»ã«</button>`;
+            actionHtml = `!<button class="btn-cancel-item" onclick="cancelBookingConfirm('${esc(b.id)}','${esc(b.date)}','${esc(b.time)}','${esc(b.menu).replace(/'/g,'\\u0027')}')">キャンセル</button>`;
           }
           return `
             <div class="booking-upcoming">
               <div class="booking-info">
-                <div class="booking-date-upcoming">ð $ {formatDate(b.date)}ï¼${dow}ï¼${esc(b.time)}</div>
+                <div class="booking-date-upcoming">📅 $ {formatDate(b.date)}（${dow}）${esc(b.time)}</div>
                 <div class="booking-menu-upcoming">${esc(b.menu)}</div>
               </div>
               <div style="flex-shrink:0; text-align:right;">${actionHtml}</div>
@@ -2284,18 +2284,18 @@
         }).join('');
       }
 
-      // éå»ã®äºç´ï¼æ°ããé ï¼
+      // 過去の予約（新しい順）
       const pastDesc = [...past].reverse();
       if (!pastDesc.length) {
         document.getElementById('mypage-past-list').innerHTML =
-          emptyState('ð', 'éå»ã®äºç´ã¯ããã¾ãã');
+          emptyState('📋', '過去の予約はありません');
       } else {
         document.getElementById('mypage-past-list').innerHTML = pastDesc.map(b => {
           const dow = getDayOfWeek(b.date);
           return `
             <div class="booking-past">
               <div class="booking-info">
-                <div class="booking-date-past">ð ${formatDate(b.date)}ï¼${dow}ï¼${esc(b.time)}</div>
+                <div class="booking-date-past">📅 ${formatDate(b.date)}（${dow}）${esc(b.time)}</div>
                 <div class="booking-menu-past">${esc(b.menu)}</div>
               </div>
             </div>`;
@@ -2303,7 +2303,7 @@
       }
     } catch (e) {
       document.getElementById('mypage-upcoming-list').innerHTML =
-        emptyState('â ï¸', 'äºç´ãã¼ã¿ã®åå¾ã«å¤±æãã¾ãã');
+        emptyState('⚠️', '予約データの取得に失敗しました');
     }
   }
 
@@ -2316,35 +2316,35 @@
   }
 
   async function cancelBookingConfirm(id, date, time, menu) {
-    if (!confirm(`ä»¥ä¸ã®äºç´ãã­ã£ã³ã»ã«ãã¾ããï¼\n\n${formatDate(date)} ${time}\n${menu}\n\nãã®æä½ã¯åãæ¶ãã¾ããã`)) return;
-    showLoading('ã­ã£ã³ã»ã«å¦çä¸­...');
+    if (!confirm(`以下の予約をキャンセルしますか？\n\n${formatDate(date)} ${time}\n${menu}\n\nこの操作は取り消せません。`)) return;
+    showLoading('キャンセル処理中...');
     try {
       const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
       await renderMypage();
       const el = document.getElementById('mypage-success');
-      el.textContent = 'ã­ã£ã³ã»ã«ãå®äºãã¾ãããã¾ãã®ãå©ç¨ããå¾ã¡ãã¦ããã¾ãã';
+      el.textContent = 'キャンセルが完了しました。またのご利用をお待ちしております。';
       el.classList.add('show');
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } catch (e) {
-      showAlert('mypage-alert', 'ã­ã£ã³ã»ã«ã«å¤±æãã¾ããããã°ãããã¦ãããè©¦ããã ããã');
+      showAlert('mypage-alert', 'キャンセルに失敗しました。しばらくしてからお試しください。');
     } finally {
       hideLoading();
     }
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ç®¡çç»é¢
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 管理画面
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   async function adminLogin() {
     const pwInput = document.getElementById('admin-pw');
     const pw = pwInput.value;
     if (!pw) {
-      showAlert('admin-login-alert', 'ãã¹ã¯ã¼ããå¥åãã¦ãã ããã');
+      showAlert('admin-login-alert', 'パスワードを入力してください。');
       pwInput.focus();
       return;
     }
-    showLoading('èªè¨¼ä¸­...');
+    showLoading('認証中...');
     try {
       const res = await fetch(
         'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/verify-admin',
@@ -2365,13 +2365,13 @@
         renderBookings();
         renderCustomers();
       } else {
-        showAlert('admin-login-alert', 'ãã¹ã¯ã¼ããæ­£ããããã¾ããã');
+        showAlert('admin-login-alert', 'パスワードが正しくありません。');
         pwInput.value = '';
         pwInput.focus();
       }
     } catch (e) {
-      console.error('ç®¡çèèªè¨¼ã¨ã©ã¼:', e);
-      showAlert('admin-login-alert', 'éä¿¡ã¨ã©ã¼ãçºçãã¾ããããã°ãããã¦ãããè©¦ããã ããã');
+      console.error('管理者認証エラー:', e);
+      showAlert('admin-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
       pwInput.focus();
     } finally {
       hideLoading();
@@ -2390,9 +2390,9 @@
     if (tabId === 'tab-calendar')  initCalendarView();
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ã«ã¬ã³ãã¼ãã¥ã¼ï¼ç®¡çç»é¢ï¼
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // カレンダービュー（管理画面）
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   let calViewYear  = null;
   let calViewMonth = null; // 0-11
   let _calBookingsByDate = {};
@@ -2413,7 +2413,7 @@
     renderCalendarView();
   }
 
-  /** æå®æã®äºç´ãåå¾ï¼map: dateStr -> [bookings]ï¼ */
+  /** 指定月の予約を取得（map: dateStr -> [bookings]） */
   async function fetchBookingsForMonth(year, month) {
     const mm  = String(month + 1).padStart(2, '0');
     const ld  = new Date(year, month + 1, 0).getDate();
@@ -2426,7 +2426,7 @@
       .lte('date', end)
       .order('date')
       .order('time');
-    if (error) throwSupabaseError('äºç´ä¸è¦§ã®åå¾', error);
+    if (error) throwSupabaseError('予約一覧の取得', error);
     const map = {};
     (data || []).forEach(b => {
       if (!map[b.date]) map[b.date] = [];
@@ -2437,7 +2437,7 @@
 
   async function renderCalendarView() {
     document.getElementById('cal-month-label').textContent =
-      `${calViewYear}å¹´${calViewMonth + 1}æ`;
+      `${calViewYear}年${calViewMonth + 1}月`;
     const grid = document.getElementById('cal-view-grid');
     hideAlert('admin-calendar-error');
 
@@ -2449,13 +2449,13 @@
         fetchHolidaysForMonth(calViewYear, calViewMonth),
       ]);
     } catch (e) {
-      console.error('â [renderCalendarView] ã¨ã©ã¼:', e);
+      console.error('❌ [renderCalendarView] エラー:', e);
       showAlert('admin-calendar-error',
-        `ã«ã¬ã³ãã¼ãã¼ã¿ã®åå¾ã«å¤±æãã¾ããã${e.supabaseError ? 'ï¼' + e.supabaseError.code + 'ï¼' : ''}`);
+        `カレンダーデータの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
     }
     _calBookingsByDate = bookings;
 
-    const dows = ['æ¥', 'æ', 'ç«', 'æ°´', 'æ¨', 'é', 'å'];
+    const dows = ['日', '月', '火', '水', '木', '金', '土'];
     let html = '';
     dows.forEach((d, i) => {
       const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
@@ -2490,12 +2490,12 @@
 
       let body = `<div class="cal-day-num">${d}</div>`;
       if (isHoliday) {
-        body += `<div class="cal-holiday-mark">Ã</div>`;
+        body += `<div class="cal-holiday-mark">×</div>`;
       } else if (count > 0) {
-        body += `<div class="cal-count-badge">â${count}ä»¶</div>`;
+        body += `<div class="cal-count-badge">●${count}件</div>`;
       }
 
-      // äºç´ãããæ¥ã®ã¿ã¯ãªãã¯å¯è½
+      // 予約がある日のみクリック可能
       const onclick = (count > 0 && !isHoliday)
         ? `onclick="showDayBookings('${dateStr}')"` : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>${body}</div>`;
@@ -2504,15 +2504,15 @@
     grid.innerHTML = html;
   }
 
-  /** æ¥ä»ã¯ãªãã¯æï¼ãã®æ¥ã®äºç´ä¸è¦§ãã¢ã¼ãã«ã§è¡¨ç¤º */
+  /** 日付クリック時：その日の予約一覧をモーダルで表示 */
   function showDayBookings(dateStr) {
     const list = _calBookingsByDate[dateStr] || [];
     const [y, m, d] = dateStr.split('-');
     document.getElementById('day-modal-title').textContent =
-      `${y}å¹´${parseInt(m)}æ${parseInt(d)}æ¥ ã®äºç´ï¼${list.length}ä»¶ï¼`;
+      `${y}年${parseInt(m)}月${parseInt(d)}日 の予約（${list.length}件）`;
     const body = document.getElementById('day-modal-body');
     if (!list.length) {
-      body.innerHTML = `<div class="day-modal-empty">äºç´ã¯ããã¾ãã</div>`;
+      body.innerHTML = `<div class="day-modal-empty">予約はありません</div>`;
     } else {
       body.innerHTML = list.map(b => `
         <div class="day-modal-item">
@@ -2530,9 +2530,9 @@
     document.getElementById('day-bookings-modal').style.display = 'none';
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // ä¼æ¥­æ¥è¨­å®
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 休業日設定
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   let holidayViewYear  = null;
   let holidayViewMonth = null; // 0-11
 
@@ -2552,7 +2552,7 @@
     renderHolidayCalendar();
   }
 
-  /** æå®æã®ä¼æ¥­æ¥ãåå¾ï¼map: dateStr -> reasonï¼ */
+  /** 指定月の休業日を取得（map: dateStr -> reason） */
   async function fetchHolidaysForMonth(year, month) {
     const mm  = String(month + 1).padStart(2, '0');
     const ld  = new Date(year, month + 1, 0).getDate();
@@ -2563,7 +2563,7 @@
       .select('date, reason')
       .gte('date', start)
       .lte('date', end);
-    if (error) throwSupabaseError('ä¼æ¥­æ¥ä¸è¦§ã®åå¾', error);
+    if (error) throwSupabaseError('休業日一覧の取得', error);
     const map = {};
     (data || []).forEach(h => { map[h.date] = h.reason || ''; });
     return map;
@@ -2571,7 +2571,7 @@
 
   async function renderHolidayCalendar() {
     document.getElementById('holiday-month-label').textContent =
-      `${holidayViewYear}å¹´${holidayViewMonth + 1}æ`;
+      `${holidayViewYear}年${holidayViewMonth + 1}月`;
     const grid = document.getElementById('holiday-cal-grid');
     hideAlert('admin-holiday-error');
 
@@ -2579,11 +2579,11 @@
     try {
       holidays = await fetchHolidaysForMonth(holidayViewYear, holidayViewMonth);
     } catch (e) {
-      console.error('â [renderHolidayCalendar] ã¨ã©ã¼:', e);
-      showAlert('admin-holiday-error', `ä¼æ¥­æ¥ãã¼ã¿ã®åå¾ã«å¤±æãã¾ããã${e.supabaseError ? 'ï¼' + e.supabaseError.code + 'ï¼' : ''}`);
+      console.error('❌ [renderHolidayCalendar] エラー:', e);
+      showAlert('admin-holiday-error', `休業日データの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
     }
 
-    const dows = ['æ¥', 'æ', 'ç«', 'æ°´', 'æ¨', 'é', 'å'];
+    const dows = ['日', '月', '火', '水', '木', '金', '土'];
     let html = '';
     dows.forEach((d, i) => {
       const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
@@ -2628,61 +2628,61 @@
   async function toggleHoliday(dateStr, dayEl) {
     const isHoliday = dayEl.classList.contains('holiday');
     if (isHoliday) {
-      if (!confirm(`${dateStr} ã®ä¼æ¥­æ¥è¨­å®ãè§£é¤ãã¾ããï¼`)) return;
-      showLoading('è§£é¤ä¸­...');
+      if (!confirm(`${dateStr} の休業日設定を解除しますか？`)) return;
+      showLoading('解除中...');
       try {
         const { error } = await sbClient.from('holidays').delete().eq('date', dateStr);
-        if (error) throwSupabaseError('ä¼æ¥­æ¥ã®è§£é¤', error);
+        if (error) throwSupabaseError('休業日の解除', error);
         await renderHolidayCalendar();
       } catch (e) {
-        console.error('â [toggleHoliday/delete] ã¨ã©ã¼:', e);
-        const detail = e.supabaseError ? `ï¼${e.supabaseError.code}: ${e.supabaseError.message}ï¼` : '';
-        showAlert('admin-holiday-error', `ä¼æ¥­æ¥ã®è§£é¤ã«å¤±æãã¾ããã${detail}`);
+        console.error('❌ [toggleHoliday/delete] エラー:', e);
+        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
+        showAlert('admin-holiday-error', `休業日の解除に失敗しました。${detail}`);
       } finally {
         hideLoading();
       }
     } else {
-      const reason = prompt(`${dateStr} ãä¼æ¥­æ¥ã«è¨­å®ãã¾ãã\nçç±ï¼ä»»æã»ç©ºæ¬ã§ãå¯ï¼ï¼`, '');
-      if (reason === null) return; // ã­ã£ã³ã»ã«
-      showLoading('ç»é²ä¸­...');
+      const reason = prompt(`${dateStr} を休業日に設定します。\n理由（任意・空欄でも可）：`, '');
+      if (reason === null) return; // キャンセル
+      showLoading('登録中...');
       try {
         const { data, error } = await sbClient
           .from('holidays')
           .insert({ date: dateStr, reason: reason.trim() || null })
           .select();
-        if (error) throwSupabaseError('ä¼æ¥­æ¥ã®ç»é²', error);
+        if (error) throwSupabaseError('休業日の登録', error);
         if (!data || data.length === 0) {
           showAlert('admin-holiday-error',
-            'ä¼æ¥­æ¥ãç»é²ã§ãã¾ããã§ãããSupabase ã® holidays ãã¼ãã«ã« INSERT ç¨ã® RLS ããªã·ã¼ãè¨­å®ããã¦ããããç¢ºèªãã ããã');
+            '休業日を登録できませんでした。Supabase の holidays テーブルに INSERT 用の RLS ポリシーが設定されているかご確認ください。');
           return;
         }
         await renderHolidayCalendar();
       } catch (e) {
-        console.error('â [toggleHoliday/insert] ã¨ã©ã¼:', e);
-        const detail = e.supabaseError ? `ï¼${e.supabaseError.code}: ${e.supabaseError.message}ï¼` : '';
-        showAlert('admin-holiday-error', `ä¼æ¥­æ¥ã®ç»é²ã«å¤±æãã¾ããã${detail}`);
+        console.error('❌ [toggleHoliday/insert] エラー:', e);
+        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
+        showAlert('admin-holiday-error', `休業日の登録に失敗しました。${detail}`);
       } finally {
         hideLoading();
       }
     }
   }
 
-  /** æå®æ¥ãä¼æ¥­æ¥ãã©ããç¢ºèª */
+  /** 指定日が休業日かどうか確認 */
   async function checkIsHoliday(dateStr) {
     const { data, error } = await sbClient
       .from('holidays')
       .select('reason')
       .eq('date', dateStr)
       .maybeSingle();
-    if (error) throwSupabaseError('ä¼æ¥­æ¥ãã§ãã¯', error);
-    return data; // null ãªãä¼æ¥­æ¥ã§ã¯ãªã
+    if (error) throwSupabaseError('休業日チェック', error);
+    return data; // null なら休業日ではない
   }
 
   async function renderBookings() {
     const fName = document.getElementById('bf-name').value.toLowerCase();
     const fMenu = document.getElementById('bf-menu').value;
     const container = document.getElementById('booking-list');
-    container.innerHTML = '<div class="empty-state"><div class="ei">â³</div><p>èª­ã¿è¾¼ã¿ä¸­...</p></div>';
+    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     hideAlert('admin-booking-error');
     try {
       let query = sbClient.from('bookings').select('*').order('date').order('time');
@@ -2695,20 +2695,20 @@
         (b.name || '').toLowerCase().includes(fName) ||
         (b.customer_number || '').includes(fName)
       );
-      document.getElementById('booking-count').textContent = `${list.length}ä»¶`;
-      if (!list.length) { container.innerHTML = emptyState('ð', 'äºç´ãããã¾ãã'); return; }
+      document.getElementById('booking-count').textContent = `${list.length}件`;
+      if (!list.length) { container.innerHTML = emptyState('📋', '予約がありません'); return; }
 
       container.innerHTML = list.map(b => {
-        const isFirst = (b.menu || '').startsWith('åå');
+        const isFirst = (b.menu || '').startsWith('初回');
         const qHtml = b.symptom ? `
           <div class="admin-q">
-            <span class="admin-q-toggle" onclick="toggleQ(this)">â¶ åè¨ºåå®¹ãè¦ã</span>
+            <span class="admin-q-toggle" onclick="toggleQ(this)">▶ 問診内容を見る</span>
             <div class="admin-q-body">
-              <div>â  çç¶ï¼${esc(b.symptom)}</div>
-              <div>â¡ åè¨ºæ­´ï¼${esc(b.treatment_history)}</div>
-              <div>â¢ çºçææï¼${esc(b.symptom_start)}</div>
-              <div>â£ åä½å¯å¦ï¼${esc(b.exercise_ok)}</div>
-              <div>â¤ æ¥å¸¸çæ´»ï¼${esc(b.daily_impact)}</div>
+              <div>① 症状：${esc(b.symptom)}</div>
+              <div>② 受診歴：${esc(b.treatment_history)}</div>
+              <div>③ 発症時期：${esc(b.symptom_start)}</div>
+              <div>④ 動作可否：${esc(b.exercise_ok)}</div>
+              <div>⑤ 日常生活：${esc(b.daily_impact)}</div>
             </div>
           </div>` : '';
         return `
@@ -2717,25 +2717,25 @@
               <div class="admin-name">${esc(b.name)}</div>
               <span class="admin-tag${isFirst ? '' : ' blue-tag'}">${esc(b.menu)}</span>
               <div class="admin-meta">
-                <span>ð ${formatDate(b.date)} ${esc(b.time)}</span>
-                <span>ð ${esc(b.phone)}</span>
-                ${b.customer_number ? `<span>ð No.${esc(b.customer_number)}</span>` : ''}
+                <span>📅 ${formatDate(b.date)} ${esc(b.time)}</span>
+                <span>📞 ${esc(b.phone)}</span>
+                ${b.customer_number ? `<span>🔑 No.${esc(b.customer_number)}</span>` : ''}
               </div>
-              ${b.memo ? `<div class="admin-memo">ð ${esc(b.memo)}</div>` : ''}
+              ${b.memo ? `<div class="admin-memo">📝 ${esc(b.memo)}</div>` : ''}
               ${qHtml}
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
               <label class="visited-check${b.visited ? ' checked-label' : ''}">
                 <input type="checkbox" ${b.visited ? 'checked' : ''}
                   onchange="toggleVisited('${esc(b.id)}', '${esc(b.customer_number || '')}', this)">
-                æ¥é¢æ¸ã¿
+                来院済み
               </label>
-              <button class="btn-danger" onclick="deleteBookingConfirm('${esc(b.id)}', '${esc(b.name).replace(/'/g,'\\u0027')}')">åé¤</button>
+              <button class="btn-danger" onclick="deleteBookingConfirm('${esc(b.id)}', '${esc(b.name).replace(/'/g,'\\u0027')}')">削除</button>
             </div>
           </div>`;
       }).join('');
     } catch (e) {
-      showAlert('admin-booking-error', 'äºç´ãã¼ã¿ã®åå¾ã«å¤±æãã¾ããããã¼ã¸ãåèª­ã¿è¾¼ã¿ãã¦ãã ããã');
+      showAlert('admin-booking-error', '予約データの取得に失敗しました。ページを再読み込みしてください。');
       container.innerHTML = '';
     }
   }
@@ -2743,7 +2743,7 @@
   async function renderCustomers() {
     const fName = document.getElementById('cf-name').value.toLowerCase();
     const container = document.getElementById('customer-list');
-    container.innerHTML = '<div class="empty-state"><div class="ei">â³</div><p>èª­ã¿è¾¼ã¿ä¸­...</p></div>';
+    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     hideAlert('admin-customer-error');
     try {
       const { data, error } = await sbClient.from('customers').select('*').order('customer_number');
@@ -2755,8 +2755,8 @@
         (c.phone || '').includes(fName) ||
         (c.customer_number || '').includes(fName)
       );
-      document.getElementById('customer-count').textContent = `${list.length}ä»¶`;
-      if (!list.length) { container.innerHTML = emptyState('ð¤', 'é¡§å®¢ãç»é²ããã¦ãã¾ãã'); return; }
+      document.getElementById('customer-count').textContent = `${list.length}件`;
+      if (!list.length) { container.innerHTML = emptyState('👤', '顧客が登録されていません'); return; }
 
       container.innerHTML = list.map(c => `
         <div class="admin-item">
@@ -2764,25 +2764,25 @@
             <div class="admin-name">${esc(c.name)}</div>
             <span class="admin-tag blue-tag">No.${esc(c.customer_number)}</span>
             <div class="admin-meta">
-              <span>ð ${esc(c.phone)}</span>
-              <span>âï¸ ${esc(c.email)}</span>
+              <span>📞 ${esc(c.phone)}</span>
+              <span>✉️ ${esc(c.email)}</span>
             </div>
             <div class="visit-count-wrap">
-              <span class="visit-count-label">æ´ä½ï¼</span>
+              <span class="visit-count-label">整体：</span>
               <input class="visit-count-input" type="number" min="0"
                 id="vc-seitai-${esc(c.id)}" value="${c.seitai_count ?? 0}">
-              <span class="visit-count-label">åããã©ãã£ã¹ï¼</span>
+              <span class="visit-count-label">回　ピラティス：</span>
               <input class="visit-count-input" type="number" min="0"
                 id="vc-pilates-${esc(c.id)}" value="${c.pilates_count ?? 0}">
-              <span class="visit-count-label">å</span>
+              <span class="visit-count-label">回</span>
               <button class="btn-visit-update"
-                onclick="updateVisitCount('${esc(c.id)}')">æ´æ°</button>
+                onclick="updateVisitCount('${esc(c.id)}')">更新</button>
             </div>
           </div>
-          <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">åé¤</button>
+          <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
         </div>`).join('');
     } catch (e) {
-      showAlert('admin-customer-error', 'é¡§å®¢ãã¼ã¿ã®åå¾ã«å¤±æãã¾ããããã¼ã¸ãåèª­ã¿è¾¼ã¿ãã¦ãã ããã');
+      showAlert('admin-customer-error', '顧客データの取得に失敗しました。ページを再読み込みしてください。');
       container.innerHTML = '';
     }
   }
@@ -2793,13 +2793,13 @@
     const seitaiCount  = parseInt(seitaiInput.value, 10);
     const pilatesCount = parseInt(pilatesInput.value, 10);
     if (isNaN(seitaiCount) || seitaiCount < 0 || isNaN(pilatesCount) || pilatesCount < 0) {
-      showAlert('admin-customer-error', 'æ­£ããåæ°ï¼0ä»¥ä¸ã®æ´æ°ï¼ãå¥åãã¦ãã ããã');
+      showAlert('admin-customer-error', '正しい回数（0以上の整数）を入力してください。');
       return;
     }
     const visitCount = seitaiCount + pilatesCount;
-    console.log('ðµ [updateVisitCount] UPDATEéå§:', { customerId, seitaiCount, pilatesCount, visitCount });
+    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, seitaiCount, pilatesCount, visitCount });
     try {
-      // .select() ãä»ãããã¨ã§ RLS ã§ UPDATE ãæå¦ãããå ´åï¼0è¡æ´æ°ï¼ãæ¤ç¥ã§ãã
+      // .select() を付けることで RLS で UPDATE が拒否された場合（0行更新）を検知できる
       const { data, error } = await sbClient
         .from('customers')
         .update({ visit_count: visitCount, seitai_count: seitaiCount, pilates_count: pilatesCount })
@@ -2807,7 +2807,7 @@
         .select();
 
       if (error) {
-        console.error('â [updateVisitCount] Supabaseã¨ã©ã¼è©³ç´°:', {
+        console.error('❌ [updateVisitCount] Supabaseエラー詳細:', {
           message: error.message,
           code:    error.code,
           details: error.details,
@@ -2815,23 +2815,23 @@
           status:  error.status
         });
         const detail = error.code
-          ? `ï¼${error.code}: ${error.message}ï¼`
-          : `ï¼${error.message}ï¼`;
-        showAlert('admin-customer-error', `æµé¢åæ°ã®æ´æ°ã«å¤±æãã¾ããã${detail}`);
+          ? `（${error.code}: ${error.message}）`
+          : `（${error.message}）`;
+        showAlert('admin-customer-error', `杵院回数の更新に失敗しました。${detail}`);
         return;
       }
 
-      // RLS ã§ UPDATE æ¨©éããªãå ´åãã¨ã©ã¼ã¯åºãã« data ãç©ºéåã§è¿ã£ã¦ãã
+      // RLS で UPDATE 権限がない場合、エラーは出ずに data が空配列で返ってくる
       if (!data || data.length === 0) {
-        console.error('â [updateVisitCount] 0è¡æ´æ°ï¼RLSã®UPDATEããªã·ã¼æªè¨­å®ã®å¯è½æ§ï¼:', { customerId, seitaiCount, pilatesCount });
+        console.error('❌ [updateVisitCount] 0行更新（RLSのUPDATEポリシー未設定の可能性）:', { customerId, seitaiCount, pilatesCount });
         showAlert(
           'admin-customer-error',
-          'æ´æ°ã§ãã¾ããã§ãããSupabase ã® customers ãã¼ãã«ã« UPDATE ç¨ã® RLS ããªã·ã¼ãè¨­å®ããã¦ããããç¢ºèªãã ããã'
+          '更新できませんでした。Supabase の customers テーブルに UPDATE 用の RLS ポリシーが設定されているかご確認ください。'
         );
         return;
       }
 
-      console.log('â [updateVisitCount] UPDATEæå ä¿å­è¡:', data);
+      console.log('✅ [updateVisitCount] UPDATE成功 保存行:', data);
       seitaiInput.style.borderColor  = 'var(--success)';
       pilatesInput.style.borderColor = 'var(--success)';
       setTimeout(() => {
@@ -2840,34 +2840,34 @@
       }, 1500);
       hideAlert('admin-customer-error');
     } catch (e) {
-      console.error('â [updateVisitCount] äºæãã¬ã¨ã©ã¼:', e);
-      showAlert('admin-customer-error', `æ¥é¢åæ°ã®æ´æ°ã«å¤±æãã¾ãããï¼${e.message || 'ä¸æãªã¨ã©ã¼'}ï¼`);
+      console.error('❌ [updateVisitCount] 予期せぬエラー:', e);
+      showAlert('admin-customer-error', `来院回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
     }
   }
 
   async function deleteBookingConfirm(id, name) {
-    if (!confirm(`ã${name}ãããã®äºç´ãåé¤ãã¾ããï¼\nãã®æä½ã¯åãæ¶ãã¾ããã`)) return;
-    showLoading('åé¤ä¸­...');
+    if (!confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) return;
+    showLoading('削除中...');
     try {
       const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
       await renderBookings();
     } catch (e) {
-      showAlert('admin-booking-error', 'äºç´ã®åé¤ã«å¤±æãã¾ããããã°ãããã¦ãããè©¦ããã ããã');
+      showAlert('admin-booking-error', '予約の削除に失敗しました。しばらくしてからお試しください。');
     } finally {
       hideLoading();
     }
   }
 
   async function deleteCustomerConfirm(id, customerNumber, name) {
-    if (!confirm(`é¡§å®¢No.${customerNumber}ã${name}ããåé¤ãã¾ããï¼\nåé¤ããã¨ãã®é¡§å®¢çªå·ã§ã®ã­ã°ã¤ã³ãã§ããªããªãã¾ãã`)) return;
-    showLoading('åé¤ä¸­...');
+    if (!confirm(`顧客No.${customerNumber}「${name}」を削除しますか？\n削除するとこの顧客番号でのログインができなくなります。`)) return;
+    showLoading('削除中...');
     try {
       const { error } = await sbClient.from('customers').delete().eq('id', id);
       if (error) throw error;
       await renderCustomers();
     } catch (e) {
-      showAlert('admin-customer-error', 'é¡§å®¢ã®åé¤ã«å¤±æãã¾ããããã°ãããã¦ãããè©¦ããã ããã');
+      showAlert('admin-customer-error', '顧客の削除に失敗しました。しばらくしてからお試しください。');
     } finally {
       hideLoading();
     }
@@ -2876,43 +2876,43 @@
   async function toggleVisited(bookingId, customerNumber, checkbox) {
     const checked = checkbox.checked;
     const label   = checkbox.closest('.visited-check');
-    checkbox.disabled = true; // äºéæä½é²æ­¢
-    console.log('ðµ [toggleVisited] éå§:', { bookingId, customerNumber, checked });
+    checkbox.disabled = true; // 二重操作防止
+    console.log('🔵 [toggleVisited] 開始:', { bookingId, customerNumber, checked });
 
     try {
-      // â  bookings.visited ãæ´æ°ï¼.select() ã§æ´æ°è¡ãåå¾ã RLS ã® 0 è¡ãã­ãã¯ãæ¤ç¥ï¼
+      // ① bookings.visited を更新（.select() で更新行を取得し RLS の 0 行ブロックを検知）
       const { data: bData, error: bErr } = await sbClient
         .from('bookings')
         .update({ visited: checked })
         .eq('id', bookingId)
         .select();
       if (bErr) {
-        console.error('â [toggleVisited] bookings UPDATE ã¨ã©ã¼:', bErr);
-        throw new Error(`äºç´ã®æ´æ°å¤±æï¼${bErr.code || ''}: ${bErr.message}ï¼`);
+        console.error('❌ [toggleVisited] bookings UPDATE エラー:', bErr);
+        throw new Error(`予約の更新失敗（${bErr.code || ''}: ${bErr.message}）`);
       }
       if (!bData || bData.length === 0) {
-        console.error('â [toggleVisited] bookings 0 aohem è¡æ´æ°ï¼RLSãã­ãã¯ã®å¯è½æ§ï¼');
-        throw new Error('äºç´ã®æ´æ°ã«å¤±æãã¾ãããbookings ãã¼ãã«ã® UPDATE ç¨ RLS ããªã·ã¼ããç¢ºèªãã ããã');
+        console.error('❌ [toggleVisited] bookings 0 aohem 行更新（RLSブロックの可能性）');
+        throw new Error('予約の更新に失敗しました。bookings テーブルの UPDATE 用 RLS ポリシーをご確認ください。');
       }
-      console.log('â [toggleVisited] bookings UPDATE æå:', bData);
+      console.log('✅ [toggleVisited] bookings UPDATE 成功:', bData);
 
-      // â¡ é¡§å®¢çªå·ãããå ´åãcustomers.visit_count ãå¢æ¸
+      // ② 顧客番号がある場合、customers.visit_count を増減
       if (customerNumber) {
         const { data: cust, error: cFetchErr } = await sbClient
           .from('customers')
           .select('id, visit_count, seitai_count, pilates_count')
           .eq('customer_number', customerNumb        .maybeSingle();
         if (cFetchErr) {
-          console.error('â [toggleVisited] customers åå¾ã¨ã©ã¼:', cFetchErr);
-          throw new Error(`é¡§å®¢æå ±ã®åå¾å¤±æï¼${cFetchErr.code || ''}: ${cFetchErr.message}ï¼`);
+          console.error('❌ [toggleVisited] customers 取得エラー:', cFetchErr);
+          throw new Error(`顧客情報の取得失敗（${cFetchErr.code || ''}: ${cFetchErr.message}）`);
         }
         if (!cust) {
-          console.warn('â ï¸ [toggleVisited] customer_number ã«è©²å½ããé¡§å®¢ãè¦ã¤ããã¾ãã:', customerNumber);
-          // é¡§å®¢ãããªãã¦ãäºç´ã®ãã§ãã¯ã¯æåæ±ã
+          console.warn('⚠️ [toggleVisited] customer_number に該当する顧客が見つかりません:', customerNumber);
+          // 顧客がいなくても予約のチェックは成功扱い
         } else {
           const menu       = (bData[0]?.menu || '');
-          const isSeitai   = menu.includes('æ´ä½');
-          const isPilates  = menu.includes('ãã©ãã£ã¹');
+          const isSeitai   = menu.includes('整体');
+          const isPilates  = menu.includes('ピラティス');
 
           const curVisit   = cust.visit_count ?? 0;
           const newVisit   = checked ? curVisit + 1 : Math.max(0, curVisit - 1);
@@ -2927,7 +2927,7 @@
             ? (checked ? curPilates + 1 : Math.max(0, curPilates - 1))
             : curPilates;
 
-          console.log(`ðµ [toggleVisited] æ´æ°: visit_count ${curVisit}â${newVisit}, seitai_count ${curSeitai}â${newSeitai}, pilates_count ${curPilates}â${newPilates}`);
+          console.log(`🔵 [toggleVisited] 更新: visit_count ${curVisit}→${newVisit}, seitai_count ${curSeitai}→${newSeitai}, pilates_count ${curPilates}→${newPilates}`);
 
           const { data: cData, error: cUpdateErr } = await sbClient
             .from('customers')
@@ -2935,30 +2935,30 @@
             .eq('id', cust.id)
             .select();
           if (cUpdateErr) {
-            console.error('â [toggleVisited] customers UPDATE ã¨ã©ã¼:', cUpdateErr);
-            throw new Error(`æ¥é¢åæ°ã®æ´æ°å¤±æï¼${cUpdateErr.code || ''}: ${cUpdateErr.message}ï¼`);
+            console.error('❌ [toggleVisited] customers UPDATE エラー:', cUpdateErr);
+            throw new Error(`来院回数の更新失敗（${cUpdateErr.code || ''}: ${cUpdateErr.message}）`);
           }
           if (!cData || cData.length === 0) {
-            console.error('â [toggleVisited] customers 0 è¡æ´æ°ï¼RLSãã­ãã¯ã®å¯è½æ§ï¼');
-            throw new Error('æ¥é¢åæ°ã®æ´æ°ã«å¤±æãã¾ãããcustomers ãã¼ãã«ã® UPDATE ç¨ RLS ããªã·ã¼ããç¢ºèªãã ããã');
+            console.error('❌ [toggleVisited] customers 0 行更新（RLSブロックの可能性）');
+            throw new Error('来院回数の更新に失敗しました。customers テーブルの UPDATE 用 RLS ポリシーをご確認ください。');
           }
-          console.log('â [toggleVisited] visit_count/seitai_count/pilates_count UPDATE æå:', cData);
+          console.log('✅ [toggleVisited] visit_count/seitai_count/pilates_count UPDATE 成功:', cData);
         }
       } else {
-        console.log('â¹ï¸ [toggleVisited] customer_number ãç©ºã®ãã visit_count æ´æ°ã¯ã¹ã­ãã');
+        console.log('ℹ️ [toggleVisited] customer_number が空のため visit_count 更新はスキップ');
       }
 
       label.classList.toggle('checked-label', checked);
       hideAlert('admin-booking-error');
 
-      // é¡§å®¢ä¸è¦§ã¿ããè¡¨ç¤ºä¸­ãªãèªåæ´æ°
+      // 顧客一覧タブが表示中なら自動更新
       if (document.getElementById('tab-customers').classList.contains('active')) {
         await renderCustomers();
       }
     } catch (e) {
-      console.error('â [toggleVisited] å¤±æ:', e);
-      checkbox.checked = !checked; // å¤±ææã¯åã«æ»ã
-      showAlert('admin-booking-error', `æ¥é¢æ¸ã¿ã®æ´æ°ã«å¤±æãã¾ããã${e.message ? 'ï¼' + e.message + 'ï¼' : ''}`);
+      console.error('❌ [toggleVisited] 失敗:', e);
+      checkbox.checked = !checked; // 失敗時は元に戻す
+      showAlert('admin-booking-error', `来院済みの更新に失敗しました。${e.message ? '（' + e.message + '）' : ''}`);
     } finally {
       checkbox.disabled = false;
     }
@@ -2967,16 +2967,16 @@
   function toggleQ(el) {
     const body = el.nextElementSibling;
     const open = body.classList.toggle('open');
-    el.textContent = open ? 'â¼ åè¨ºåå®¹ãéãã' : 'â¶ åè¨ºåå®¹ãè¦ã';
+    el.textContent = open ? '▼ 問診内容を閉じる' : '▶ 問診内容を見る';
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // Supabase DB æä½
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Supabase DB 操作
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  /** Supabase ã¨ã©ã¼ãæ¥æ¬èªã­ã°ä»ãã§ throw ãããã«ãã¼ */
+  /** Supabase エラーを日本語ログ付きで throw するヘルパー */
   function throwSupabaseError(label, sbError) {
-    console.error(`â [${label}] Supabaseã¨ã©ã¼è©³ç´°:`, {
+    console.error(`❌ [${label}] Supabaseエラー詳細:`, {
       message: sbError.message,
       code:    sbError.code,
       details: sbError.details,
@@ -2988,45 +2988,45 @@
     throw err;
   }
 
-  /** é¡§å®¢ã customer_number ã§æ¤ç´¢ */
+  /** 顧客を customer_number で検索 */
   async function findCustomer(customerNumber) {
-    console.log('ðµ [findCustomer] æ¤ç´¢ä¸­ customer_number:', customerNumber);
+    console.log('🔵 [findCustomer] 検索中 customer_number:', customerNumber);
     const { data, error } = await sbClient
       .from('customers')
       .select('*')
       .eq('customer_number', customerNumber)
       .maybeSingle();
-    if (error) throwSupabaseError('é¡§å®¢æå ±ã®åå¾', error);
-    console.log('ðµ [findCustomer] çµæ:', data);
+    if (error) throwSupabaseError('顧客情報の取得', error);
+    console.log('🔵 [findCustomer] 結果:', data);
     return data; // null if not found
   }
 
-  /** æ¢å­ã® customer_number ä¸è¦§ãåå¾ãã¦éè¤ããªã6æ¡çªå·ãçæ */
+  /** 既存の customer_number 一覧を取得して重複しない6桁番号を生成 */
   async function generateCustomerId() {
-    console.log('ðµ [generateCustomerId] æ¢å­é¡§å®¢çªå·ãåå¾ä¸­...');
+    console.log('🔵 [generateCustomerId] 既存顧客番号を取得中...');
     const { data, error } = await sbClient.from('customers').select('customer_number');
-    if (error) throwSupabaseError('é¡§å®¢çªå·ä¸è¦§ã®åå¾', error);
+    if (error) throwSupabaseError('顧客番号一覧の取得', error);
 
     const existing = (data || []).map(c => c.customer_number);
-    console.log('ðµ [generateCustomerId] æ¢å­çªå·ä¸è¦§:', existing);
+    console.log('🔵 [generateCustomerId] 既存番号一覧:', existing);
 
-    if (existing.length >= 900000) throw new Error('é¡§å®¢çªå·ãä¸éã«éãã¦ãã¾ãã');
+    if (existing.length >= 900000) throw new Error('顧客番号が上限に達しています。');
 
-    // éè¤ããªãçªå·ãç¢ºå®ããã¾ã§ã«ã¼ãï¼100000ã999999 ã®ç¯å²ã§çæï¼
+    // 重複しない番号が確定するまでループ（100000〜999999 の範囲で生成）
     let id;
     let tries = 0;
     do {
       id = String(Math.floor(Math.random() * 900000) + 100000);
       tries++;
-      if (tries > 5000) throw new Error('é¡§å®¢çªå·ã®çæã«å¤±æãã¾ããï¼è©¦è¡ä¸éï¼ã');
-    } while (existing.includes(id)); // â éè¤ããéãå¿ãåçæ
-    console.log(`ðµ [generateCustomerId] æ±ºå®çªå·: ${id}ï¼${tries}åè©¦è¡ï¼`);
+      if (tries > 5000) throw new Error('顧客番号の生成に失敗しました（試行上限）。');
+    } while (existing.includes(id)); // ← 重複する限り必ず再生成
+    console.log(`🔵 [generateCustomerId] 決定番号: ${id}（${tries}回試行）`);
     return id;
   }
 
-  /** é¡§å®¢ãä¿å­ï¼INSERT å¾ã«ä¿å­è¡ãè¿ãï¼ */
+  /** 顧客を保存（INSERT 後に保存行を返す） */
   async function saveCustomer(c) {
-    console.log('ðµ [saveCustomer] INSERTéå§:', c);
+    console.log('🔵 [saveCustomer] INSERT開始:', c);
     const { data, error } = await sbClient
       .from('customers')
       .insert({
@@ -3035,15 +3035,15 @@
         phone:           c.phone,
         email:           c.email
       })
-      .select(); // ä¿å­ãããè¡ãè¿ãã¦ãããç¢ºèª
-    if (error) throwSupabaseError('é¡§å®¢ç»é²', error);
-    console.log('â [saveCustomer] INSERTå®äº ä¿å­è¡:', data);
+      .select(); // 保存された行を返してもらい確認
+    if (error) throwSupabaseError('顧客登録', error);
+    console.log('✅ [saveCustomer] INSERT完了 保存行:', data);
     return data;
   }
 
-  /** äºç´ãä¿å­ */
+  /** 予約を保存 */
   async function saveBooking(b) {
-    console.log('ðµ [saveBooking] INSERTéå§:', b);
+    console.log('🔵 [saveBooking] INSERT開始:', b);
     const { data, error } = await sbClient
       .from('bookings')
       .insert({
@@ -3063,14 +3063,14 @@
         line_user_id:      b.line_user_id      || null
       })
       .select();
-    if (error) throwSupabaseError('äºç´ã®ä¿å­', error);
-    console.log('â [saveBooking] INSERTå®äº ä¿å­è¡:', data);
+    if (error) throwSupabaseError('予約の保存', error);
+    console.log('✅ [saveBooking] INSERT完了 保存行:', data);
     return data;
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // LINEéç¥
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // LINE通知
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   async function sendLineNotify({ name, menu, date, time, phone, memo }) {
     await fetch(
       'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-notify',
@@ -3085,13 +3085,13 @@
     );
   }
 
-  // ââââââââââââââââââââââââââââââââââââââââ
-  // ã¦ã¼ãã£ãªãã£
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ユーティリティ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function formatDate(s) {
     if (!s) return '';
     const [y, m, d] = s.split('-');
-    return `${y}å¹´${parseInt(m)}æ${parseInt(d)}æ¥`;
+    return `${y}年${parseInt(m)}月${parseInt(d)}日`;
   }
   function showAlert(id, msg) {
     const el = document.getElementById(id);
@@ -3113,7 +3113,7 @@
     return `<div class="empty-state"><div class="ei">${icon}</div><p>${msg}</p></div>`;
   }
 
-  // ã©ã¸ãªãã¿ã³ã®ãã¸ã¥ã¢ã«é¸æ
+  // ラジオボタンのビジュアル選択
   document.querySelectorAll('.radio-group').forEach(g => {
     g.querySelectorAll('input[type=radiodio]').forEach(r => {
       r.addEventListener('change', () => {
@@ -3123,35 +3123,35 @@
     });
   });
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // åæå
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 初期化
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   /** è­°å¨ã« Supabase connection ãç¢ºèª */
+   /** 議在に Supabase connection を確認 */
   async function checkConnection() {
     try {
       const { error } = await sbClient.from('customers').select('id').limit(1);
       if (error) {
-        console.error('â [æ¥ç¶ç¢ºèª] Supabaseçéã¨ã©ã¼:', {
+        console.error('❌ [接続確認] Supabase疎通エラー:', {
           message: error.message,
           code:    error.code,
           hint:    error.hint,
           status:  error.status
         });
-        console.warn('â ï¸ èããããåå : APIã­ã¼ã®èª¤ã / RLSããªã·ã¼ã«ããã¢ã¯ã»ã¹æå¦ / ãã¼ãã«åã®ä¸ä¸è´');
+        console.warn('⚠️ 考えられる原因: APIキーの誤り / RLSポリシーによるアクセス拒否 / テーブル名の不一致');
       } else {
-        console.log('â [æ¥ç¶ç¢ºèª] Supabaseæ¥ç¶OKï¼customersãã¼ãã«å°éç¢ºèªï¼');
+        console.log('✅ [接続確認] Supabase接続OK（customersテーブル到達確認）');
       }
     } catch (e) {
-      console.error('â [æ¥ç¶ç¢ºèª] äºæãã¬ã¨ã©ã¼:', e);
+      console.error('❌ [接続確認] 予期せぬエラー:', e);
     }
   }
 
-  // âââââââââââââââââââââââââââââââââââââââââ
-  // LINEé£æº
-  // âââââââââââââââââââââââââââââââââââââââââ
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // LINE連携
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function startLineLogin() {
-    const name  = document.getElementById('qÍname')?.value  || '';
+    const name  = document.getElementById('q�name')?.value  || '';
     const phone = document.getElementById('r-phone')?.value || '';
     const email = document.getElementById('r-email')?.value || '';
     const state = Math.random().toString(36).slice(2);
@@ -3176,7 +3176,7 @@
     const code  = params.get('code');
     if (!code) return;
 
-    // URLããã¯ã¨ãªãã©ã¡ã¼ã¿ãé¤å»
+    // URLからクエリパラメータを除去
     window.history.replaceState({}, document.title, window.location.pathname);
 
     const savedRaw = sessionStorage.getItem('lineLoginState');
@@ -3185,21 +3185,21 @@
     sessionStorage.removeItem('lineLoginState');
     sessionStorage.removeItem('lineState');
 
-    // ãã­ã¼ç¶æãå¾©å
+    // フロー状態を復元
     if (saved.flow) {
       ST.flow = saved.flow;
       ST.menu = saved.menu || '';
     }
-    // ãã¼ã¸ã¸é·ç§»
+    // ページへ遷移
     navigateTo(saved.returnTo || 'page-member-register');
 
-    // ç»é²ãã©ã¼ã ãç¢ºå®ã«è¡¨ç¤ºï¼ä»¥åã« submitRegister ãçµç±ãã¦ããå ´åã«åãï¼
+    // 登録フォームを確実に表示（以前に submitRegister を経由していた場合に備え）
     const _formSec = document.getElementById('register-form-section');
     const _doneSec = document.getElementById('register-done-section');
     if (_formSec) _formSec.style.display = 'block';
     if (_doneSec) _doneSec.style.display = 'none';
 
-    // ãã©ã¼ã å¤ãå¾©åï¼å³æï¼DOMæç»å¾ã®å¿µæ¼ãï¼
+    // フォーム値を復元（即時＋DOM描画後の念押し）
     const _restoreInputs = () => {
       const nameEl  = document.getElementById('r-name');
       const phoneEl = document.getElementById('r-phone');
@@ -3211,8 +3211,8 @@
     _restoreInputs();
     setTimeout(_restoreInputs, 80);
 
-    // LINEèªè¨¼ã³ã¼ããã¦ã¼ã¶ã¼IDã«äº¤æ
-    showLoading('LINEèªè¨¼ä¸­...');
+    // LINE認証コードをユーザーIDに交換
+    showLoading('LINE認証中...');
     try {
       const SUPABASE_URL = 'https://wuthbgxzmvjeosugzfbs.supabase.co';
       const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY';
@@ -3227,32 +3227,32 @@
           redirect_uri: 'https://lactive-okayama.github.io/lactive-booking/'
         })
       });
-      if (!res.ok) throw new Error('LINEèªè¨¼ã«å¤±æãã¾ãã');
+      if (!res.ok) throw new Error('LINE認証に失敗しました');
       const data = await res.json();
       if (data.line_user_id) {
         ST.lineUserId = data.line_user_id;
-        // é£æºæ¸ã¿ããã¸ãè¡¨ç¤º / ãã¿ã³ãéè¡¨ç¤º
+        // 連携済みバッジを表示 / ボタンを非表示
         const statusEl = document.getElementById('line-connect-status');
         const btnEl    = document.getElementById('line-connect-btn');
         if (statusEl) statusEl.style.display = 'block';
         if (btnEl)    btnEl.style.display    = 'none';
-        // æåã¢ã©ã¼ããç®ç«ã¤å½¢ã§è¡¨ç¤º
+        // 成功アラートを目立つ形で表示
         const alertEl = document.getElementById('register-alert');
         if (alertEl) {
           alertEl.className = 'alert alert-success show';
-          alertEl.textContent = 'â LINEã¨é£æºãã¾ããï¼äºç´åæ¥ã«ãªãã¤ã³ãã¡ãã»ã¼ã¸ãå±ãã¾ãã';
+          alertEl.textContent = '✅ LINEと連携しました！予約前日にリマインドメッセージが届きます。';
           alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        console.log('â [LINEé£æº] æå:', data.display_name);
+        console.log('✅ [LINE連携] 成功:', data.display_name);
       } else {
-        throw new Error('line_user_idãåå¾ã§ãã¾ããã§ãã');
+        throw new Error('line_user_idが取得できませんでした');
       }
     } catch (e) {
-      console.error('â [LINEé£æº] ã¨ã©ã¼:', e);
+      console.error('❌ [LINE連携] エラー:', e);
       const alertEl = document.getElementById('register-alert');
       if (alertEl) {
         alertEl.className = 'alert alert-error show';
-        alertEl.textContent = 'â ï¸ LINEé£æºã«å¤±æãã¾ãããããä¸åº¦ãè©¦ããã ããã';
+        alertEl.textContent = '⚠️ LINE連携に失敗しました。もう一度お試しください。';
         alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     } finally {
@@ -3261,11 +3261,11 @@
   }
 
   (function init() {
-    checkConnection(); // éåæã§æ¥ç¶ç¢ºèªï¼ãã¼ã¸è¡¨ç¤ºã¯ãã­ãã¯ããªãï¼
+    checkConnection(); // 非同期で接続確認（ページ表示はブロックしない）
     const isLineCallback = window.location.search.includes('code=') &&
                            window.location.search.includes('state=');
     if (isLineCallback) {
-      handleLineCallback(); // LINE OAuth ã³ã¼ã«ããã¯å¦çï¼åé¨ã§navigateToå¼ã³åºãï¼
+      handleLineCallback(); // LINE OAuth コールバック処理（内部でnavigateTo呼び出し）
     } else if (window.location.search.includes('admin')) {
       navigateTo('page-admin-login');
     } else {
