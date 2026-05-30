@@ -467,7 +467,7 @@
     .empty-state p { font-size: .88rem; }
 
     /* ───────────────────────────────
-       伒業日カレンダー
+       休業日カレンダー
     ─────────────────────────────── */
     .holiday-cal-header {
       display: flex; align-items: center; justify-content: center;
@@ -919,7 +919,7 @@
 </head>
 <body>
 
-<!-- ローディングオーバーレイ -->
+<!-- ローディングアーバーレイ -->
 <div id="loading-overlay">
   <div class="spinner"></div>
   <div class="loading-text" id="loading-text">処理中...</div>
@@ -1068,7 +1068,7 @@
     </div>
   </div>
 
-  <!-- ▼ 問診票（STEP2：初回整体のく） -->
+  <!-- ▼ 問診票（STEP2：初回整体のく㼉 -->
   <div id="page-questionnaire" class="page">
     <div class="card">
       <div class="page-title">
@@ -1085,7 +1085,7 @@
         <label>2. その症状で整体・接骨院・病院に行ったことはありますか？<span class="req">*</span></label>
         <div class="radio-group" id="q2-group">
           <label class="radio-item"><input type="radio" name="q2" value="はい"><span class="radio-label">はえ</span></label>
-          <label class="radio-item"><input type="radio" name="q2" value="いいえ"><span class="radio-label">いいえ</span></label>
+          <label class="radio-item"><input type="radio" name="q2" value="あええ"><span class="radio-label">いいえ</span></label>
           <label class="radio-item"><input type="radio" name="q2" value="以前行っていた"><span class="radio-label">以前行っていた</span></label>
         </div>
       </div>
@@ -1094,7 +1094,7 @@
         <input type="text" id="q3" placeholder="例：3ヶ月前、1年前 など">
       </div>
       <div class="form-group">
-        <label>4. 施術中、身体を動かしていただくことがありますが問題ありませんか？<span class="req">*</span></label>
+        <label>4. 施術中、身体を動かしていただくことがありますが問題ありませんお���<span class="req">*</span></label>
         <div class="radio-group" id="q4-group">
           <label class="radio-item"><input type="radio" name="q4" value="問題ない"><span class="radio-label">問題ない</span></label>
           <label class="radio-item"><input type="radio" name="q4" value="少し不安"><span class="radio-label">少し不安</span></label>
@@ -1106,7 +1106,7 @@
         <div class="radio-group" id="q5-group">
           <label class="radio-item"><input type="radio" name="q5" value="かなり困っている"><span class="radio-label">かなり困っている</span></label>
           <label class="radio-item"><input type="radio" name="q5" value="少し困っている"><span class="radio-label">少し困っている</span></label>
-          <label class="radio-item"><input type="radio" name="q5" value="なんとかなっている"><span class="radio-label">なんとかなっている</span></label>
+          <label class="radio-item"><input type="radio" name="q5" value="なんとかなっている"><span class="radio-label">なろとかなっている</span></label>
         </div>
       </div>
       <div class="btn-actions">
@@ -1215,7 +1215,7 @@
     </div>
   </div>
 
-  <!-- ▼ $��員新規登録 -->
+  <!-- ▼ 会員新規登録 -->
   <div id="page-member-register" class="page">
     <div class="card">
       <div id="register-form-section">
@@ -1239,7 +1239,7 @@
         <label class="consent-box">
           <input type="checkbox" id="register-consent">
           <span class="consent-label">
-            プラアバシーポリシー（ページ下部に記載）を読み、個人情報の取り扱いに同意します。
+            プライバシーポリシー（ページ下部に記載）を読み、個人情報の取り扱いに同意します。
           </span>
         </label>
         <!-- LINE連携（任意） -->
@@ -1260,7 +1260,7 @@
           <h2>顧客番号が発行されました</h2>
         </div>
         <div class="customer-id-display">
-          <div class="customer-id-label">うなたの顧客番号</div>
+          <div class="customer-id-label">あなたの顧客番号</div>
           <div class="customer-id-num" id="issued-id">---</div>
           <div class="customer-id-note">次回からこの番号でログインできます。<br>必ずお控えください。</div>
         </div>
@@ -1325,7 +1325,7 @@
       <div class="done-msg">当日お会いできるのを楽しみにしています！</div>
       <table class="done-table">
         <tr><td>お名前</td><td id="dn-name"></td></tr>
-        <tr><td>メニュー</td><td id="dn-menu"></td></tr>
+        <tr><td>メニ�%ー</td><td id="dn-menu"></td></tr>
         <tr><td>希望日時</td><td id="dn-dt"></td></tr>
         <tr id="dn-id-row" style="display:none;"><td>顧客番号</td><td id="dn-id"></td></tr>
         <tr id="dn-memo-row" style="display:none;"><td>ご要望</td><td id="dn-memo"></td></tr>
@@ -1333,6 +1333,14 @@
       <p style="font-size:.8rem;color:var(--text-light);margin-top:16px;line-height:1.8;">
         ご不明な点はお電話にてお問い合わせください。
       </p>
+      <!-- LINE連携（任意） -->
+      <div id="done-line-section" class="line-connect-box" style="margin-top:24px; text-align:left;">
+        <div class="line-connect-title">🔔 LINEリマインドを受け取る（任意）</div>
+        <div class="line-connect-desc">連携すると予約前日にLINEでリマインドメッセージが届きます。</div>
+        <div id="line-connect-status-done" style="display:none;" class="line-connect-done">✅ LINE連携済み</div>
+        <button class="btn btn-line" id="line-connect-btn-done" type="button" onclick="startLineLoginFromDone()">LINEで連携する</button>
+        <div id="done-line-alert" class="alert" style="margin-top:10px;"></div>
+      </div>
       <button class="btn btn-primary" style="margin-top:22px;" onclick="navigateTo('page-top')">トップに戻る</button>
     </div>
   </div>
@@ -1341,7 +1349,7 @@
   <div id="page-cancel-login" class="page">
     <div class="card">
       <div class="page-title">
-        <h2>予約確認・キャンセル</h2>
+        <h2>予�D確認・キャンセル</h2>
         <p>6桁の顧客番号とお名前（姓）を入力してください</p>
       </div>
       <div id="cancel-login-alert" class="alert alert-error"></div>
@@ -1373,7 +1381,7 @@
       <div class="mypage-stats">
         <div class="stat-card">
           <div class="stat-num" id="mp-total">-</div>
-          <div class="stat-label">総予約回数</div>
+          <div class="stat-label">総予�D回数</div>
         </div>
         <div class="stat-card-sub-row">
           <div class="stat-card-sub">
@@ -1389,7 +1397,7 @@
       <div id="mypage-success" class="alert alert-success"></div>
       <div id="mypage-alert"   class="alert alert-error"></div>
       <div class="mypage-tabs">
-        <button class="tab-btn active" id="mypage-tab-btn-upcoming" onclick="switchMypageTab('upcoming', this)">今後の予約</button>
+        <button class="tab-btn active" id="mypage-tab-btn-upcoming" onclick="switchMypageTab('upcoming', this)">今後の予�D</button>
         <button class="tab-btn"        id="mypage-tab-btn-past"     onclick="switchMypageTab('past', this)">過去の予約</button>
       </div>
       <div id="mypage-tab-upcoming" class="tab-panel active">
@@ -1448,7 +1456,7 @@
         <div class="filter-bar" style="margin:0;flex:1;">
           <input type="text" id="bf-name" placeholder="名前で検索" oninput="renderBookings()">
           <select id="bf-menu" onchange="renderBookings()">
-            <option value="">すべてのメニュー</option>
+            <option value="">すべてのメニ�%ー</option>
             <option>初回整体 90分</option>
             <option>初回ピラティス 60分</option>
             <option>整体（運動療法）30分</option>
@@ -1666,7 +1674,7 @@
     const q4 = document.querySelector('input[name="q4"]:checked')?.value || '';
     const q5 = document.querySelector('input[name="q5"]:checked')?.value || '';
     if (!q1 || !q2 || !q3 || !q4 || !q5) {
-      showAlert('q-alert', 'すべては項目にご回答ください。');
+      showAlert('q-alert', 'すべての項目にご回答ください。');
       return;
     }
     hideAlert('q-alert');
@@ -1686,7 +1694,7 @@
     if (!phone) { showAlert('personal-alert', '電話番号を入力してください。'); return; }
     if (!email) { showAlert('personal-alert', 'メールアドレスを入力してください。'); return; }
     if (!document.getElementById('personal-consent').checked) {
-      showAlert('personal-alert', 'プラアバシーポリシーへの同意が必要です。'); return;
+      showAlert('personal-alert', 'プライバシーポリシーへの同意が必要です。'); return;
     }
     hideAlert('personal-alert');
     ST.personal = { name, phone, email };
@@ -1703,7 +1711,7 @@
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: '', lineUserId: null
     };
-    document.getElementById('member-auth-menu-label').textContent = `メニュー：${menuName}`;
+    document.getElementById('member-auth-menu-label').textContent = `メニ�%ー：${menuName}`;
     navigateTo('page-member-auth');
   }
 
@@ -1711,7 +1719,7 @@
     const raw         = document.getElementById('member-id-input').value.trim();
     const enteredName = document.getElementById('member-name-input').value.trim();
     if (!raw || !/^\d{6}$/.test(raw)) {
-      showAlert('login-alert', '6桁の数字で顧客番号を入力してください。');
+      showAlert('login-alert', '6桁の镰字で顧客番号を入力してください。');
       return;
     }
     if (!enteredName) {
@@ -1807,9 +1815,9 @@
     } catch (e) {
       console.error('❌ [新規登録] エラー発生:', e);
       const detail = e.supabaseError
-        ? `（コード: ${e.supabaseError.code} / ${e.supabaseError.message}）`
+        ? `（Code: ${e.supabaseError.code} / ${e.supabaseError.message}）`
         : `（${e.message}）`;
-      showAlert('register-alert', `登録に失敗しました。しばらくしてからお試しください。${detail}`);
+      showAlert('register-alert', `登録に播敗しました。しばるくしてからお驝ください、${detail}`);
       btn.disabled = false;
     } finally {
       hideLoading();
@@ -1817,29 +1825,29 @@
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 日時選択
+  // 日普選択
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function setupDatetime() {
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     document.getElementById('dt-memo').value = '';
-    // 時間帯グリッドをリセット
+    // 持望師グリッドをリセット
     _dateChangeLast = '';
     document.getElementById('time-slot-placeholder').style.display = 'block';
     document.getElementById('time-slot-loading').style.display     = 'none';
     document.getElementById('time-slot-grid').style.display        = 'none';
     document.getElementById('time-slot-grid').innerHTML            = '';
     hideAlert('datetime-alert');
-    document.getElementById('datetime-menu-label').textContent = `メニュー：${ST.menu}`;
+    document.getElementById('datetime-menu-label').textContent = `メニュゼ：${ST.menu}`;
     const noticeEl = document.getElementById('datetime-newid-notice');
     if (ST.isNewCustomer) {
-      noticeEl.textContent = `顧客番号【${ST.newCustomerId}】が発行されました。次回からこの番号でログインできます。`;
+      noticeEl.textContent = `顧客番号【${ST.newCustomerId}】が発行されました。檍回からこの番号でログインできます。`;
       noticeEl.style.display = 'block';
     } else {
       noticeEl.style.display = 'none';
     }
     document.getElementById('booking-btn').disabled = false;
-    // 予約用カレンダーを今月で初期化
+    // 予約用カレンむーを今月で初期化
     const now = new Date();
     bookingViewYear  = now.getFullYear();
     bookingViewMonth = now.getMonth();
@@ -1868,15 +1876,15 @@
     let fetchFailed = false;
     try {
       holidays = await fetchHolidaysForMonth(bookingViewYear, bookingViewMonth);
-      console.log(`🟢 [renderBookingCalendar] ${bookingViewYear}年${bookingViewMonth + 1}月の休業日:`, holidays);
+      console.log(`🟢 [renderBookingCalendar] ${bookingViewYear}年${bookingViewMonth + 1}月の休業日：`, holidays);
     } catch (e) {
-      console.error('❌ [renderBookingCalendar] 休業日取得エラー:', e);
+      console.error('❌ [renderBookingCalendar] 休業日取得エラー：', e);
       fetchFailed = true;
       const detail = e.supabaseError
         ? `（${e.supabaseError.code}: ${e.supabaseError.message}）`
         : '';
       showAlert('datetime-alert',
-        `休業日情報の取得に失敗しました。${detail}（管理者にお問い合わせください）`);
+        `丑用日も至表の取得に事料しました。${detail}（管理者にお他上けおぱしであみせください）`);
     }
 
     const dows = ['日', '月', '火', '水', '木', '金', '土'];
@@ -1888,7 +1896,7 @@
 
     const firstDow = new Date(bookingViewYear, bookingViewMonth, 1).getDay();
     const numDays  = new Date(bookingViewYear, bookingViewMonth + 1, 0).getDate();
-    const today    = new Date(); today.setHours(0, 0, 0, 0);
+    const today    = new Date(); today.setHours(0,0,0,0);
     const selectedDate = document.getElementById('dt-date').value;
 
     for (let i = 0; i < firstDow; i++) {
@@ -1900,20 +1908,20 @@
       const mm      = String(bookingViewMonth + 1).padStart(2, '0');
       const dd      = String(d).padStart(2, '0');
       const dateStr = `${bookingViewYear}-${mm}-${dd}`;
-      const isPast    = dateObj < today;        // 純粋な過去
+      const isPast    = dateObj < today;        // 純犋な過去
       const isToday   = dateObj.getTime() === today.getTime();
       const isHoliday = holidays[dateStr] !== undefined;
       const isSelected = dateStr === selectedDate;
 
       const classes = ['holiday-cal-day'];
       if (isPast)     classes.push('past');
-      if (isToday)    classes.push('today', 'today-disabled'); // 当日は予約不可
+      if (isToday)    classes.push('today', 'today-disabled'); // 当日8は予約不可
       if (isHoliday)  classes.push('holiday-disabled');
       if (isSelected) classes.push('selected-date');
 
       let onclick = '';
       if (isToday) {
-        // 当日：電話案内アラート
+        // 当日:は電話案内アラート
         onclick = `onclick="alertSameDayBooking()"`;
       } else if (!isPast) {
         onclick = isHoliday
@@ -1933,1346 +1941,74 @@
 
   function selectBookingDate(dateStr) {
     document.getElementById('dt-date').value = dateStr;
-    renderBookingCalendar(); // 選択状態を反映
-    _dateChangeLast = '';     // 強制再取得
+    renderBookingCalendar(); // 選択診内を反昀
+    _dateChangeLast = '';     // 強制Zec希取淛
     onDateChange();
   }
 
   function alertSameDayBooking() {
-    // 当日選択時：日付選択をリセットして電話案内を表示
+    // 当日選択；日仹:選択をリセットして黻話案内オ㨨马
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     _dateChangeLast = '';
     document.getElementById('time-slot-loading').style.display = 'none';
-    document.getElementById('time-slot-grid').style.display    = 'none';
-    document.getElementById('time-slot-grid').innerHTML        = '';
-    const ph = document.getElementById('time-slot-placeholder');
-    ph.textContent = 'まず希望日を選択してください';
-    ph.style.display = 'block';
-    showAlert('datetime-alert', '当日のご予約はお電話でお問い合わせください。');
-  }
-
-  function alertBookingHoliday() {
-    // 日付・時間選択をリセット
-    document.getElementById('dt-date').value = '';
-    document.getElementById('dt-time').value = '';
-    _dateChangeLast = '';
-    // 時間帯ボタンを非表示
-    document.getElementById('time-slot-loading').style.display = 'none';
-    document.getElementById('time-slot-grid').style.display    = 'none';
-    document.getElementById('time-slot-grid').innerHTML        = '';
-    const ph = document.getElementById('time-slot-placeholder');
-    ph.textContent = 'まず希望日を選択してください';
-    ph.style.display = 'block';
-    showAlert('datetime-alert', 'この日は休業日のためご予約いただけません。別の日程をお選びください。');
-    renderBookingCalendar();
-  }
-
-  /** 日付変更時：予約済み時間帯を取得してグリッドを再描画 */
-  let _dateChangeLast = '';
-  async function onDateChange() {
-    const date = document.getElementById('dt-date').value;
-    if (date === _dateChangeLast) return; // oninput+onchange 重複呼び出し防止
-    _dateChangeLast = date;
-    document.getElementById('dt-time').value = '';
-    const phEl = document.getElementById('time-slot-placeholder');
-    if (!date) {
-      phEl.textContent = 'まず希望日を選択してください';
-      phEl.style.display = 'block';
-      document.getElementById('time-slot-loading').style.display = 'none';
-      document.getElementById('time-slot-grid').style.display    = 'none';
-      return;
-    }
-    phEl.style.display = 'none';
-    document.getElementById('time-slot-loading').style.display = 'block';
-    document.getElementById('time-slot-grid').style.display    = 'none';
-    hideAlert('datetime-alert');
-    try {
-      // 休業日チェック
-      const holiday = await checkIsHoliday(date);
-      if (holiday) {
-        // 日付選択をリセット
-        document.getElementById('dt-date').value = '';
-        document.getElementById('dt-time').value = '';
-        _dateChangeLast = '';
-        // 時間帯ボタンを非表示
-        document.getElementById('time-slot-loading').style.display = 'none';
-        document.getElementById('time-slot-grid').style.display    = 'none';
-        document.getElementById('time-slot-grid').innerHTML        = '';
-        phEl.textContent = 'まず希望日を選択してください';
-        phEl.style.display = 'block';
-        const reason = holiday.reason ? `（${holiday.reason}）` : '';
-        showAlert('datetime-alert', `この日は休業日のためご予約いただけません${reason}。別の日程をお選びください。`);
-        return;
-      }
-      const bookedTimes = await fetchBookedTimes(date);
-      renderTimeSlots(bookedTimes);
-    } catch (e) {
-      console.error('時間帯取得エラー:', e);
-      renderTimeSlots([]); // エラー時は全枠を選択可能として表示
-    }
-  }
-
-  /** Supabase から指定日の予約済み時間帯を取得 */
-  async function fetchBookedTimes(date) {
-    const { data, error } = await sbClient
-      .from('bookings')
-      .select('time')
-      .eq('date', date);
-    if (error) throwSupabaseError('予約済み時間帯の取得', error);
-    return (data || []).map(b => b.time);
-  }
-
-  /** 時間帯グリッドを描画 */
-  function renderTimeSlots(bookedTimes) {
-    document.getElementById('time-slot-loading').style.display = 'none';
-    const grid = document.getElementById('time-slot-grid');
-    grid.style.display = 'grid';
-
-    // \u5f53\u65e5\u306e\u5834\u5408\u306e\u307f\u300c\u73fe\u5728\u6642\u523b\u3092\u904e\u304e\u305f\u67a0\u300d\u3092\u30b0\u30ec\u30fc\u30a2\u30a6\u30c8\uff08\u901a\u5e38\u306f\u5f53\u65e5\u9078\u629e\u3092\u5f3e\u3044\u3066\u3044\u308b\u305f\u3081\u4fdd\u967a\uff09
-    const date = document.getElementById('dt-date').value;
-    const now = new Date();
-    const todayStr =
-      now.getFullYear() + '-' +
-      String(now.getMonth() + 1).padStart(2, '0') + '-' +
-      String(now.getDate()).padStart(2, '0');
-    const isToday = date === todayStr;
-    const currentHour = now.getHours();
-
-    let html = '';
-    for (const t of ALL_TIMES) {
-      const slotHour   = parseInt(t.split(':')[0], 10);
-      const isPastTime = isToday && slotHour <= currentHour;
-      const isBooked   = bookedTimes.includes(t);
-      const isDisabled = isBooked || isPastTime;
-      if (isDisabled) {
-        html += '<button type="button" class="time-slot-btn booked" disabled>'
-              + t + '<em class="slot-mark">\u00d7 \u4e0d\u53ef</em></button>';
-      } else {
-        html += '<button type="button" class="time-slot-btn"'
-              + ' onclick="selectTimeSlot(this,\'' + t + '\')">'
-              + t + '</button>';
-      }
-    }
-    grid.innerHTML = html;
-  }
-
-  /** 時間帯を選択 */
-  function selectTimeSlot(el, time) {
-    document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
-    document.getElementById('dt-time').value = time;
-    hideAlert('datetime-alert');
-  }
-
-  function datetimeBack() {
-    if (ST.flow === 'member') {
-      if (ST.isNewCustomer) {
-        document.getElementById('register-form-section').style.display = 'block';
-        document.getElementById('register-done-section').style.display = 'none';
-        navigateTo('page-member-register');
-      } else {
-        navigateTo('page-member-login');
-      }
-    } else {
-      navigateTo('page-personal');
-    }
-  }
-
-  async function submitBooking() {
-    const date = document.getElementById('dt-date').value;
-    const time = document.getElementById('dt-time').value;
-    const memo = document.getElementById('dt-memo').value.trim();
-    if (!date) { showAlert('datetime-alert', '希望日を選択してください。'); return; }
-    if (!time) { showAlert('datetime-alert', '希望時間を選択してください。'); return; }
-    // 当日・過去日チェック（UIバイパス対策）
-    const _now = new Date(); _now.setHours(0,0,0,0);
-    const _selDate = new Date(date + 'T00:00:00');
-    if (_selDate.getTime() === _now.getTime()) {
-      showAlert('datetime-alert', '当日のご予約はお電話でお問い合わせください。');
-      return;
-    }
-    if (_selDate < _now) {
-      showAlert('datetime-alert', '過去の日付は選択できません。');
-      return;
-    }
-    // 確定時に休業日を再チェック（管理側で直前に休業日設定された場合の保険）
-    const holidayCheck = await checkIsHoliday(date).catch(() => null);
-    if (holidayCheck) {
-      const reason = holidayCheck.reason ? `（${holidayCheck.reason}）` : '';
-      showAlert('datetime-alert', `この日は休業日のため予約できません${reason}。別の日付をあ選びください。`);
-      return;
-    }
-    // 確定時に再度重複チェック（二重送信防止）
-    const bookedNow = await fetchBookedTimes(date).catch(() => []);
-    if (bookedNow.includes(time)) {
-      showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をあ選びください。');
-      const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
-      renderTimeSlots(bookedTimesRefresh);
-      document.getElementById('dt-time').value = '';
-      return;
-    }
-
-    const btn = document.getElementById('booking-btn');
-    btn.disabled = true;
-    showLoading('予約を送信中...');
-    try {
-      const q = ST.questionnaire;
-      await saveBooking({
-        customer_number:   ST.customer?.customer_number || (ST.isNewCustomer ? ST.newCustomerId : null),
-        name:              ST.personal.name,
-        phone:             ST.personal.phone,
-        email:             ST.personal.email,
-        menu:              ST.menu,
-        date,
-        time,
-        memo:              memo || null,
-        symptom:           q.q1 || null,
-        treatment_history: q.q2 || null,
-        symptom_start:     q.q3 || null,
-        exercise_ok:       q.q4 || null,
-        daily_impact:      q.q5 || null,
-        line_user_id:      ST.lineUserId || null
-      });
-
-      // LINE通知を送信（失敗しても予約完了は継続）
-      // ※ ペイロードには customerNumber を一切含めない
-      const isFirstVisit = ST.flow !== 'member';
-      const name  = ST.personal.name;
-      const menu  = ST.menu;
-      const phone = ST.personal.phone;
-      const linePayload = {
-        name, menu, date, time, phone,
-        memo: memo || '',
-        isFirstVisit
-      };
-      console.log('LINE送信データ:', linePayload);
-      sendLineNotify(linePayload).catch(e => console.warn('LINE通知エラー（無視）:', e));
-
-      // 完了画面
-      document.getElementById('dn-name').textContent = ST.personal.name;
-      document.getElementById('dn-menu').textContent = ST.menu;
-      document.getElementById('dn-dt').textContent   = `${formatDate(date)} ${time}`;
-      const custId = ST.customer?.customer_number || (ST.isNewCustomer ? ST.newCustomerId : '');
-      const idRow = document.getElementById('dn-id-row');
-      if (custId) { document.getElementById('dn-id').textContent = custId; idRow.style.display = ''; }
-      else { idRow.style.display = 'none'; }
-      const memoRow = document.getElementById('dn-memo-row');
-      if (memo) { document.getElementById('dn-memo').textContent = memo; memoRow.style.display = ''; }
-      else { memoRow.style.display = 'none'; }
-
-      navigateTo('page-done');
-    } catch (e) {
-      showAlert('datetime-alert', '予約の送信に失敗しました。しばらくしてからお試しください。');
-      btn.disabled = false;
-    } finally {
-      hideLoading();
-    }
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // マイページ・キャンセルフロー
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  let cancelCustomer = null;
-
-  function getDayOfWeek(dateStr) {
-    const days = ['日', '月', '火', '水', '木', '金', '土'];
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return days[new Date(y, m - 1, d).getDay()];
-  }
-
-  function todayMidnight() {
-    const t = new Date();
-    t.setHours(0, 0, 0, 0);
-    return t;
-  }
-
-  async function verifyCancelLogin() {
-    const raw         = document.getElementById('cancel-id-input').value.trim();
-    const enteredName = document.getElementById('cancel-name-input').value.trim();
-    if (!raw || !/^\d{6}$/.test(raw)) {
-      showAlert('cancel-login-alert', '6桁の数字で顧客番号を入力してください。');
-      return;
-    }
-    if (!enteredName) {
-      showAlert('cancel-login-alert', 'お名前（姓）を入力してください。');
-      return;
-    }
-    const btn = document.getElementById('cancel-verify-btn');
-    btn.disabled = true;
-    showLoading('予約を確認中...');
-    try {
-      const customer = await findCustomer(raw);
-      const storedName      = (customer?.name || '').replace(/[\s　]/g, '');
-      const normalizedEntry = enteredName.replace(/[\s　]/g, '');
-      if (!customer || !storedName.startsWith(normalizedEntry)) {
-        showAlert('cancel-login-alert', '顧客番号またはお名前が正しくありません。');
-        return;
-      }
-      hideAlert('cancel-login-alert');
-      cancelCustomer = customer;
-      document.getElementById('mypage-customer-name').textContent = `${customer.name} 様`;
-      document.getElementById('mypage-customer-num').textContent  = `顧客番号：${customer.customer_number}`;
-      hideAlert('mypage-success');
-      hideAlert('mypage-alert');
-      await renderMypage();
-      navigateTo('page-cancel-list');
-    } catch (e) {
-      showAlert('cancel-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
-    } finally {
-      btn.disabled = false;
-      hideLoading();
-    }
-  }
-
-  async function renderMypage() {
-    document.getElementById('mypage-upcoming-list').innerHTML =
-      '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
-    document.getElementById('mypage-past-list').innerHTML = '';
-
-    try {
-      const { data, error } = await sbClient
-        .from('bookings')
-        .select('*')
-        .eq('customer_number', cancelCustomer.customer_number)
-        .order('date')
-        .order('time');
-      if (error) throw error;
-
-      const all      = data || [];
-      const today    = todayMidnight();
-      const upcoming = [];
-      const past     = [];
-
-      all.forEach(b => {
-        const [y, m, d] = b.date.split('-').map(Number);
-        const bd = new Date(y, m - 1, d);
-        bd >= today ? upcoming.push(b) : past.push(b);
-      });
-
-      // 統計
-      document.getElementById('mp-total').textContent   = all.length;
-      document.getElementById('mp-seitai').textContent   = cancelCustomer.seitai_count ?? 0;
-      document.getElementById('mp-pilates').textContent  = cancelCustomer.pilates_count ?? 0;
-
-      // 今後の予約
-      if (!upcoming.length) {
-        document.getElementById('mypage-upcoming-list').innerHTML =
-          emptyState('📅', '今後の予約はありません');
-      } else {
-        document.getElementById('mypage-upcoming-list').innerHTML = upcoming.map(b => {
-          const [y, m, d] = b.date.split('-').map(Number);
-          const bd       = new Date(y, m - 1, d);
-          const diffDays = Math.round((bd - today) / 86400000);
-          const dow      = getDayOfWeek(b.date);
-
-          let actionHtml;
-          if (diffDays === 0) {
-            actionHtml = `<div class="cancel-today-note">当日のキャンセルは<br>お電話でご連絡ください</div>`;
-          } else {
-            actionHtml = `<button class="btn-cancel-item" onclick="cancelBookingConfirm('${esc(b.id)}','${esc(b.date)}','${esc(b.time)}','${esc(b.menu).replace(/'/g,'\\u0027')}')">キャンセル</button>`;
-          }
-          return `
-            <div class="booking-upcoming">
-              <div class="booking-info">
-                <div class="booking-date-upcoming">📅 ${formatDate(b.date)}（${dow}）${esc(b.time)}</div>
-                <div class="booking-menu-upcoming">${esc(b.menu)}</div>
-              </div>
-              <div style="flex-shrink:0; text-align:right;">${actionHtml}</div>
-            </div>`;
-        }).join('');
-      }
-
-      // 過去の予約（新しつ順）
-      const pastDesc = [...past].reverse();
-      if (!pastDesc.length) {
-        document.getElementById('mypage-past-list').innerHTML =
-          emptyState('📋', '過去の予約はありません');
-      } else {
-        document.getElementById('mypage-past-list').innerHTML = pastDesc.map(b => {
-          const dow = getDayOfWeek(b.date);
-          return `
-            <div class="booking-past">
-              <div class="booking-info">
-                <div class="booking-date-past">📅 ${formatDate(b.date)}（${dow}）${esc(b.time)}</div>
-                <div class="booking-menu-past">${esc(b.menu)}</div>
-              </div>
-            </div>`;
-        }).join('');
-      }
-    } catch (e) {
-      document.getElementById('mypage-upcoming-list').innerHTML =
-        emptyState('⚠️', '予約データの取得に失敗しました');
-    }
-  }
-
-  function switchMypageTab(tab, btn) {
-    ['upcoming', 'past'].forEach(t => {
-      document.getElementById(`mypage-tab-${t}`).classList.toggle('active', t === tab);
-    });
-    document.querySelectorAll('.mypage-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-
-  async function cancelBookingConfirm(id, date, time, menu) {
-    if (!confirm(`以下の予約をキャンセルしますか？\n\n${formatDate(date)} ${time}\n${menu}\n\nこの操作は取り消せません。`)) return;
-    showLoading('キャンセル処理中...');
-    try {
-      const { error } = await sbClient.from('bookings').delete().eq('id', id);
-      if (error) throw error;
-      await renderMypage();
-      const el = document.getElementById('mypage-success');
-      el.textContent = 'キャンセルが完了しました。またのご利用をお待ちしております。';
-      el.classList.add('show');
-      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    } catch (e) {
-      showAlert('mypage-alert', 'キャンセルに失敗しました。しばらくしてからお試しください。');
-    } finally {
-      hideLoading();
-    }
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 管理画面
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function adminLogin() {
-    const pwInput = document.getElementById('admin-pw');
-    const pw = pwInput.value;
-    if (!pw) {
-      showAlert('admin-login-alert', 'パスワードを入力してください。');
-      pwInput.focus();
-      return;
-    }
-    showLoading('認証中...');
-    try {
-      const res = await fetch(
-        'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/verify-admin',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
-          },
-          body: JSON.stringify({ password: pw })
-        }
-      );
-      const result = await res.json().catch(() => ({}));
-      if (res.ok && result.isValid === true) {
-        pwInput.value = '';
-        hideAlert('admin-login-alert');
-        navigateTo('page-admin');
-        renderBookings();
-        renderCustomers();
-      } else {
-        showAlert('admin-login-alert', 'パスワードが正しくありません。');
-        pwInput.value = '';
-        pwInput.focus();
-      }
-    } catch (e) {
-      console.error('管理者認証エラー:', e);
-      showAlert('admin-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
-      pwInput.focus();
-    } finally {
-      hideLoading();
-    }
-  }
-
-  function adminLogout() { navigateTo('page-top'); }
-
-  function switchTab(tabId, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    btn.classList.add('active');
-    if (tabId === 'tab-bookings')  renderBookings();
-    if (tabId === 'tab-customers') renderCustomers();
-    if (tabId === 'tab-holidays')  initHolidayCalendar();
-    if (tabId === 'tab-calendar')  initCalendarView();
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // カレンダービュー（管理画面）
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  let calViewYear  = null;
-  let calViewMonth = null; // 0-11
-  let _calBookingsByDate = {};
-
-  function initCalendarView() {
-    if (calViewYear === null) {
-      const now = new Date();
-      calViewYear  = now.getFullYear();
-      calViewMonth = now.getMonth();
-    }
-    renderCalendarView();
-  }
-
-  function changeCalendarMonth(delta) {
-    calViewMonth += delta;
-    if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
-    if (calViewMonth > 11) { calViewMonth = 0;  calViewYear++; }
-    renderCalendarView();
-  }
-
-  /** 指定月の予約を取得（map: dateStr -> [bookings]） */
-  async function fetchBookingsForMonth(year, month) {
-    const mm  = String(month + 1).padStart(2, '0');
-    const ld  = new Date(year, month + 1, 0).getDate();
-    const start = `${year}-${mm}-01`;
-    const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
-    const { data, error } = await sbClient
-      .from('bookings')
-      .select('id, name, menu, date, time, customer_number')
-      .gte('date', start)
-      .lte('date', end)
-      .order('date')
-      .order('time');
-    if (error) throwSupabaseError('予約一覧の取得', error);
-    const map = {};
-    (data || []).forEach(b => {
-      if (!map[b.date]) map[b.date] = [];
-      map[b.date].push(b);
-    });
-    return map;
-  }
-
-  async function renderCalendarView() {
-    document.getElementById('cal-month-label').textContent =
-      `${calViewYear}年${calViewMonth + 1}月`;
-    const grid = document.getElementById('cal-view-grid');
-    hideAlert('admin-calendar-error');
-
-    let bookings = {};
-    let holidays = {};
-    try {
-      [bookings, holidays] = await Promise.all([
-        fetchBookingsForMonth(calViewYear, calViewMonth),
-        fetchHolidaysForMonth(calViewYear, calViewMonth),
-      ]);
-    } catch (e) {
-      console.error('❌ [renderCalendarView] エラー:', e);
-      showAlert('admin-calendar-error',
-        `カレンダーデータの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
-    }
-    _calBookingsByDate = bookings;
-
-    const dows = ['日', '月', '火', '水', '木', '金', '土'];
-    let html = '';
-    dows.forEach((d, i) => {
-      const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
-      html += `<div class="cal-view-dow ${cls}">${d}</div>`;
-    });
-
-    const firstDow = new Date(calViewYear, calViewMonth, 1).getDay();
-    const numDays  = new Date(calViewYear, calViewMonth + 1, 0).getDate();
-    const today    = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (let i = 0; i < firstDow; i++) {
-      html += `<div class="cal-view-day empty"></div>`;
-    }
-
-    for (let d = 1; d <= numDays; d++) {
-      const dateObj = new Date(calViewYear, calViewMonth, d);
-      const mm      = String(calViewMonth + 1).padStart(2, '0');
-      const dd      = String(d).padStart(2, '0');
-      const dateStr = `${calViewYear}-${mm}-${dd}`;
-      const dow     = dateObj.getDay();
-      const isToday   = dateObj.getTime() === today.getTime();
-      const isHoliday = holidays[dateStr] !== undefined;
-      const list      = bookings[dateStr] || [];
-      const count     = list.length;
-
-      const classes = ['cal-view-day'];
-      if (dow === 0)   classes.push('sun');
-      if (dow === 6)   classes.push('sat');
-      if (isToday)     classes.push('today');
-      if (isHoliday)   classes.push('holiday');
-
-      let body = `<div class="cal-day-num">${d}</div>`;
-      if (isHoliday) {
-        body += `<div class="cal-holiday-mark">×</div>`;
-      } else if (count > 0) {
-        body += `<div class="cal-count-badge">●${count}件</div>`;
-      }
-
-      // 予約がある日のみクリック可能
-      const onclick = (count > 0 && !isHoliday)
-        ? `onclick="showDayBookings('${dateStr}')"` : '';
-      html += `<div class="${classes.join(' ')}" ${onclick}>${body}</div>`;
-    }
-
-    grid.innerHTML = html;
-  }
-
-  /** 日付クリック時：その日の予約一覧をモーダルで表示 */
-  function showDayBookings(dateStr) {
-    const list = _calBookingsByDate[dateStr] || [];
-    const [y, m, d] = dateStr.split('-');
-    document.getElementById('day-modal-title').textContent =
-      `${y}年${parseInt(m)}月${parseInt(d)}日 の予約（${list.length}件）`;
-    const body = document.getElementById('day-modal-body');
-    if (!list.length) {
-      body.innerHTML = `<div class="day-modal-empty">予約はありません</div>`;
-    } else {
-      body.innerHTML = list.map(b => `
-        <div class="day-modal-item">
-          <div class="day-modal-time">${esc(b.time)}</div>
-          <div class="day-modal-info">
-            <div class="day-modal-name">${esc(b.name)}${b.customer_number ? `<span style="font-size:.72rem;color:var(--text-light);font-weight:400;margin-left:6px;">No.${esc(b.customer_number)}</span>` : ''}</div>
-            <div class="day-modal-menu">${esc(b.menu)}</div>
-          </div>
-        </div>`).join('');
-    }
-    document.getElementById('day-bookings-modal').style.display = 'flex';
-  }
-
-  function closeDayBookingsModal() {
-    document.getElementById('day-bookings-modal').style.display = 'none';
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 休業日設定
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  let holidayViewYear  = null;
-  let holidayViewMonth = null; // 0-11
-
-  function initHolidayCalendar() {
-    if (holidayViewYear === null) {
-      const now = new Date();
-      holidayViewYear  = now.getFullYear();
-      holidayViewMonth = now.getMonth();
-    }
-    renderHolidayCalendar();
-  }
-
-  function changeHolidayMonth(delta) {
-    holidayViewMonth += delta;
-    if (holidayViewMonth < 0)  { holidayViewMonth = 11; holidayViewYear--; }
-    if (holidayViewMonth > 11) { holidayViewMonth = 0;  holidayViewYear++; }
-    renderHolidayCalendar();
-  }
-
-  /** 指定月の休業日を取得（map: dateStr -> reason） */
-  async function fetchHolidaysForMonth(year, month) {
-    const mm  = String(month + 1).padStart(2, '0');
-    const ld  = new Date(year, month + 1, 0).getDate();
-    const start = `${year}-${mm}-01`;
-    const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
-    const { data, error } = await sbClient
-      .from('holidays')
-      .select('date, reason')
-      .gte('date', start)
-      .lte('date', end);
-    if (error) throwSupabaseError('休業日一覧の取得', error);
-    const map = {};
-    (data || []).forEach(h => { map[h.date] = h.reason || ''; });
-    return map;
-  }
-
-  async function renderHolidayCalendar() {
-    document.getElementById('holiday-month-label').textContent =
-      `${holidayViewYear}年${holidayViewMonth + 1}月`;
-    const grid = document.getElementById('holiday-cal-grid');
-    hideAlert('admin-holiday-error');
-
-    let holidays = {};
-    try {
-      holidays = await fetchHolidaysForMonth(holidayViewYear, holidayViewMonth);
-    } catch (e) {
-      console.error('❌ [renderHolidayCalendar] エラー:', e);
-      showAlert('admin-holiday-error', `休業日データの取得に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
-    }
-
-    const dows = ['日', '月', '火', '水', '木', '金', '土'];
-    let html = '';
-    dows.forEach((d, i) => {
-      const cls = i === 0 ? 'sun' : i === 6 ? 'sat' : '';
-      html += `<div class="holiday-cal-dow ${cls}">${d}</div>`;
-    });
-
-    const firstDow = new Date(holidayViewYear, holidayViewMonth, 1).getDay();
-    const numDays  = new Date(holidayViewYear, holidayViewMonth + 1, 0).getDate();
-    const today    = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    for (let i = 0; i < firstDow; i++) {
-      html += `<div class="holiday-cal-day empty"></div>`;
-    }
-
-    for (let d = 1; d <= numDays; d++) {
-      const dateObj = new Date(holidayViewYear, holidayViewMonth, d);
-      const mm      = String(holidayViewMonth + 1).padStart(2, '0');
-      const dd      = String(d).padStart(2, '0');
-      const dateStr = `${holidayViewYear}-${mm}-${dd}`;
-      const isPast    = dateObj < today;
-      const isToday   = dateObj.getTime() === today.getTime();
-      const isHoliday = holidays[dateStr] !== undefined;
-
-      const classes = ['holiday-cal-day'];
-      if (isPast)    classes.push('past');
-      if (isToday)   classes.push('today');
-      if (isHoliday) classes.push('holiday');
-
-      const onclick = isPast ? '' : `onclick="toggleHoliday('${dateStr}', this)"`;
-      const reason  = isHoliday && holidays[dateStr]
-        ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
-      html += `<div class="${classes.join(' ')}" ${onclick}>
-        <span class="holiday-day-num">${d}</span>
-        ${reason}
-      </div>`;
-    }
-
-    grid.innerHTML = html;
-  }
-
-  async function toggleHoliday(dateStr, dayEl) {
-    const isHoliday = dayEl.classList.contains('holiday');
-    if (isHoliday) {
-      if (!confirm(`${dateStr} の休業日設定を解除しますか？`)) return;
-      showLoading('解除中...');
-      try {
-        const { error } = await sbClient.from('holidays').delete().eq('date', dateStr);
-        if (error) throwSupabaseError('休業日の解除', error);
-        await renderHolidayCalendar();
-      } catch (e) {
-        console.error('❌ [toggleHoliday/delete] エラー:', e);
-        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
-        showAlert('admin-holiday-error', `休業日の解除に失敗しました。${detail}`);
-      } finally {
-        hideLoading();
-      }
-    } else {
-      const reason = prompt(`${dateStr} を休業日に設定します。\n理由（任意・空欄でも可）：`, '');
-      if (reason === null) return; // キャンセル
-      showLoading('登録中...');
-      try {
-        const { data, error } = await sbClient
-          .from('holidays')
-          .insert({ date: dateStr, reason: reason.trim() || null })
-          .select();
-        if (error) throwSupabaseError('休業日の登録', error);
-        if (!data || data.length === 0) {
-          showAlert('admin-holiday-error',
-            '休業日を登録できませんでした。Supabase の holidays テーブルに INSERT 用の RLS ポリシーが設定されているかご確認ください。');
-          return;
-        }
-        await renderHolidayCalendar();
-      } catch (e) {
-        console.error('❌ [toggleHoliday/insert] エラー:', e);
-        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
-        showAlert('admin-holiday-error', `休業日の登録に失敗しました。${detail}`);
-      } finally {
-        hideLoading();
-      }
-    }
-  }
-
-  /** 指定日が休業日かどうか確認 */
-  async function checkIsHoliday(dateStr) {
-    const { data, error } = await sbClient
-      .from('holidays')
-      .select('reason')
-      .eq('date', dateStr)
-      .maybeSingle();
-    if (error) throwSupabaseError('休業日チェック', error);
-    return data; // null なら休業日ではない
-  }
-
-  async function renderBookings() {
-    const fName = document.getElementById('bf-name').value.toLowerCase();
-    const fMenu = document.getElementById('bf-menu').value;
-    const container = document.getElementById('booking-list');
-    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
-    hideAlert('admin-booking-error');
-    try {
-      let query = sbClient.from('bookings').select('*').order('date').order('time');
-      if (fMenu) query = query.eq('menu', fMenu);
-      const { data, error } = await query;
-      if (error) throw error;
-
-      let list = data || [];
-      if (fName) list = list.filter(b =>
-        (b.name || '').toLowerCase().includes(fName) ||
-        (b.customer_number || '').includes(fName)
-      );
-      document.getElementById('booking-count').textContent = `${list.length}件`;
-      if (!list.length) { container.innerHTML = emptyState('📋', '予約がありません'); return; }
-
-      container.innerHTML = list.map(b => {
-        const isFirst = (b.menu || '').startsWith('初回');
-        const qHtml = b.symptom ? `
-          <div class="admin-q">
-            <span class="admin-q-toggle" onclick="toggleQ(this)">▶ 問診内容を見る</span>
-            <div class="admin-q-body">
-              <div>① 症状：${esc(b.symptom)}</div>
-              <div>② 受診歴：${esc(b.treatment_history)}</div>
-              <div>③ 発症時期：${esc(b.symptom_start)}</div>
-              <div>④ 動作可否：${esc(b.exercise_ok)}</div>
-              <div>⑤ 日常生活：${esc(b.daily_impact)}</div>
-            </div>
-          </div>` : '';
-        return `
-          <div class="admin-item">
-            <div class="admin-info">
-              <div class="admin-name">${esc(b.name)}</div>
-              <span class="admin-tag${isFirst ? '' : ' blue-tag'}">${esc(b.menu)}</span>
-              <div class="admin-meta">
-                <span>📅 ${formatDate(b.date)} ${esc(b.time)}</span>
-                <span>📞 ${esc(b.phone)}</span>
-                ${b.customer_number ? `<span>🔑 No.${esc(b.customer_number)}</span>` : ''}
-              </div>
-              ${b.memo ? `<div class="admin-memo">📝 ${esc(b.memo)}</div>` : ''}
-              ${qHtml}
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">
-              <label class="visited-check${b.visited ? ' checked-label' : ''}">
-                <input type="checkbox" ${b.visited ? 'checked' : ''}
-                  onchange="toggleVisited('${esc(b.id)}', '${esc(b.customer_number || '')}', this)">
-                来院済み
-              </label>
-              <button class="btn-danger" onclick="deleteBookingConfirm('${esc(b.id)}', '${esc(b.name).replace(/'/g,'\\u0027')}')">削除</button>
-            </div>
-          </div>`;
-      }).join('');
-    } catch (e) {
-      showAlert('admin-booking-error', '予約データの取得に失敗しました。ページを再読み込みしてください。');
-      container.innerHTML = '';
-    }
-  }
-
-  async function renderCustomers() {
-    const fName = document.getElementById('cf-name').value.toLowerCase();
-    const container = document.getElementById('customer-list');
-    container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
-    hideAlert('admin-customer-error');
-    try {
-      const { data, error } = await sbClient.from('customers').select('*').order('customer_number');
-      if (error) throw error;
-
-      let list = data || [];
-      if (fName) list = list.filter(c =>
-        (c.name || '').toLowerCase().includes(fName) ||
-        (c.phone || '').includes(fName) ||
-        (c.customer_number || '').includes(fName)
-      );
-      document.getElementById('customer-count').textContent = `${list.length}件`;
-      if (!list.length) { container.innerHTML = emptyState('👤', '顧客が登録されていません'); return; }
-
-      container.innerHTML = list.map(c => `
-        <div class="admin-item">
-          <div class="admin-info">
-            <div class="admin-name">${esc(c.name)}</div>
-            <span class="admin-tag blue-tag">No.${esc(c.customer_number)}</span>
-            <div class="admin-meta">
-              <span>📞 ${esc(c.phone)}</span>
-              <span>✉️ ${esc(c.email)}</span>
-            </div>
-            <div class="visit-count-wrap">
-              <span class="visit-count-label">整体：</span>
-              <input class="visit-count-input" type="number" min="0"
-                id="vc-seitai-${esc(c.id)}" value="${c.seitai_count ?? 0}">
-              <span class="visit-count-label">回　ピラティス：</span>
-              <input class="visit-count-input" type="number" min="0"
-                id="vc-pilates-${esc(c.id)}" value="${c.pilates_count ?? 0}">
-              <span class="visit-count-label">回</span>
-              <button class="btn-visit-update"
-                onclick="updateVisitCount('${esc(c.id)}')">更新</button>
-            </div>
-          </div>
-          <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
-        </div>`).join('');
-    } catch (e) {
-      showAlert('admin-customer-error', '顧客データの取得に失敗しました。ページを再読み込みしてください。');
-      container.innerHTML = '';
-    }
-  }
-
-  async function updateVisitCount(customerId) {
-    const seitaiInput  = document.getElementById(`vc-seitai-${customerId}`);
-    const pilatesInput = document.getElementById(`vc-pilates-${customerId}`);
-    const seitaiCount  = parseInt(seitaiInput.value, 10);
-    const pilatesCount = parseInt(pilatesInput.value, 10);
-    if (isNaN(seitaiCount) || seitaiCount < 0 || isNaN(pilatesCount) || pilatesCount < 0) {
-      showAlert('admin-customer-error', '正しい回数（0以上の整数）を入力してください。');
-      return;
-    }
-    const visitCount = seitaiCount + pilatesCount;
-    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, seitaiCount, pilatesCount, visitCount });
-    try {
-      // .select() を付けることで RLS で UPDATE が拒否された場合（0行更新）を検知できる
-      const { data, error } = await sbClient
-        .from('customers')
-        .update({ visit_count: visitCount, seitai_count: seitaiCount, pilates_count: pilatesCount })
-        .eq('id', customerId)
-        .select();
-
-      if (error) {
-        console.error('❌ [updateVisitCount] Supabaseエラー詳細:', {
-          message: error.message,
-          code:    error.code,
-          details: error.details,
-          hint:    error.hint,
-          status:  error.status
-        });
-        const detail = error.code
-          ? `（${error.code}: ${error.message}）`
-          : `（${error.message}）`;
-        showAlert('admin-customer-error', `来院回数の更新に失敗しました。${detail}`);
-        return;
-      }
-
-      // RLS で UPDATE 権限がない場合、エラーは出ずに data が空配列で返ってくる
-      if (!data || data.length === 0) {
-        console.error('❌ [updateVisitCount] 0行更新（RLSのUPDATEポリシー未設定の可能性）:', { customerId, seitaiCount, pilatesCount });
-        showAlert(
-          'admin-customer-error',
-          '更新できませんでした。Supabase の customers テーブルに UPDATE 用の RLS ポリシーが設定されているかご確認ください。'
-        );
-        return;
-      }
-
-      console.log('✅ [updateVisitCount] UPDATE成功 保存行:', data);
-      seitaiInput.style.borderColor  = 'var(--success)';
-      pilatesInput.style.borderColor = 'var(--success)';
-      setTimeout(() => {
-        seitaiInput.style.borderColor  = '';
-        pilatesInput.style.borderColor = '';
-      }, 1500);
-      hideAlert('admin-customer-error');
-    } catch (e) {
-      console.error('❌ [updateVisitCount] 予期せぬエラー:', e);
-      showAlert('admin-customer-error', `来院回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
-    }
-  }
-
-  async function deleteBookingConfirm(id, name) {
-    if (!confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) return;
-    showLoading('削除中...');
-    try {
-      const { error } = await sbClient.from('bookings').delete().eq('id', id);
-      if (error) throw error;
-      await renderBookings();
-    } catch (e) {
-      showAlert('admin-booking-error', '予約の削除に失敗しました。しばらくしてからお試しください。');
-    } finally {
-      hideLoading();
-    }
-  }
-
-  async function deleteCustomerConfirm(id, customerNumber, name) {
-    if (!confirm(`顧客No.${customerNumber}「${name}」を削除しますか？\n削除するとこの顧客番号でのログインができなくなります。`)) return;
-    showLoading('削除中...');
-    try {
-      const { error } = await sbClient.from('customers').delete().eq('id', id);
-      if (error) throw error;
-      await renderCustomers();
-    } catch (e) {
-      showAlert('admin-customer-error', '顧客の削除に失敗しました。しばらくしてからお試しください。');
-    } finally {
-      hideLoading();
-    }
-  }
-
-  async function toggleVisited(bookingId, customerNumber, checkbox) {
-    const checked = checkbox.checked;
-    const label   = checkbox.closest('.visited-check');
-    checkbox.disabled = true; // 二重操作防止
-    console.log('🔵 [toggleVisited] 開始:', { bookingId, customerNumber, checked });
-
-    try {
-      // ① bookings.visited を更新（.select() で更新行を取得し RLS の 0 行ブロックを検知）
-      const { data: bData, error: bErr } = await sbClient
-        .from('bookings')
-        .update({ visited: checked })
-        .eq('id', bookingId)
-        .select();
-      if (bErr) {
-        console.error('❌ [toggleVisited] bookings UPDATE エラー:', bErr);
-        throw new Error(`予約の更新失敗（${bErr.code || ''}: ${bErr.message}）`);
-      }
-      if (!bData || bData.length === 0) {
-        console.error('❌ [toggleVisited] bookings 0 4��更新（RLSブロックの可能性）');
-        throw new Error('予約の更新に失敗しました。bookings テーブルの UPDATE 用 RLS ポリシーをご確認ください。');
-      }
-      console.log('✅ [toggleVisited] bookings UPDATE 成功:', bData);
-
-      // ② 顧客番号がある場合、customers.visit_count を増減
-      if (customerNumber) {
-        const { data: cust, error: cFetchErr } = await sbClient
-          .from('customers')
-          .select('id, visit_count, seitai_count, pilates_count')
-          .eq('customer_number', customerNumber)
-          .maybeSingle();
-        if (cFetchErr) {
-          console.error('❌ [toggleVisited] customers 取得エラー:', cFetchErr);
-          throw new Error(`顧客情報の取得失敗（${cFetchErr.code || ''}: ${cFetchErr.message}）`);
-        }
-        if (!cust) {
-          console.warn('⚠️ [toggleVisited] customer_number に該当する顧客が見つかりません:', customerNumber);
-          // 顧客がいなくても予約のチェックは成功扱い
-        } else {
-          const menu       = (bData[0]?.menu || '');
-          const isSeitai   = menu.includes('整$��');
-          const isPilates  = menu.includes('ピラティス');
-
-          const curVisit   = cust.visit_count ?? 0;
-          const newVisit   = checked ? curVisit + 1 : Math.max(0, curVisit - 1);
-
-          const curSeitai  = cust.seitai_count ?? 0;
-          const newSeitai  = isSeitai
-            ? (checked ? curSeitai + 1 : Math.max(0, curSeitai - 1))
-            : curSeitai;
-
-          const curPilates = cust.pilates_count ?? 0;
-          const newPilates = isPilates
-            ? (checked ? curPilates + 1 : Math.max(0, curPilates - 1))
-            : curPilates;
-
-          console.log(`🔵 [toggleVisited] 更新: visit_count ${curVisit}→${newVisit}, seitai_count ${curSeitai}→${newSeitai}, pilates_count ${curPilates}→${newPilates}`);
-
-          const { data: cData, error: cUpdateErr } = await sbClient
-            .from('customers')
-            .update({ visit_count: newVisit, seitai_count: newSeitai, pilates_count: newPilates })
-            .eq('id', cust.id)
-            .select();
-          if (cUpdateErr) {
-            console.error('❌ [toggleVisited] customers UPDATE エラー:', cUpdateErr);
-            throw new Error(`来院回数の更新失敗（${cUpdateErr.code || ''}: ${cUpdateErr.message}）`);
-          }
-          if (!cData || cData.length === 0) {
-            console.error('❌ [toggleVisited] customers 0 行更新（RLSブロックの可能性）');
-            throw new Error('来院回数の更新に失敗しました。customers テーブルの UPDATE 用 RLS ポリシーをご確認ください。');
-          }
-          console.log('✅ [toggleVisited] visit_count/seitai_count/pilates_count UPDATE 成功:', cData);
-        }
-      } else {
-        console.log('ℹ️ [toggleVisited] customer_number が空のため visit_count 更新はスキップ');
-      }
-
-      label.classList.toggle('checked-label', checked);
-      hideAlert('admin-booking-error');
-
-      // 顧客一覧タブが表示中なら自動更新
-      if (document.getElementById('tab-customers').classList.contains('active')) {
-        await renderCustomers();
-      }
-    } catch (e) {
-      console.error('❌ [toggleVisited] 失敗:', e);
-      checkbox.checked = !checked; // 失敗時は元に戻す
-      showAlert('admin-booking-error', `来院済みの更新に失敗しました。${e.message ? '（' + e.message + '）' : ''}`);
-    } finally {
-      checkbox.disabled = false;
-    }
-  }
-
-  function toggleQ(el) {
-    const body = el.nextElementSibling;
-    const open = body.classList.toggle('open');
-    el.textContent = open ? '▼ 問診内容を閉じる' : '▶ 問診内容を見る';
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Supabase DB 操作
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  /** Supabase エラーを日本語ログ付きで throw するヘルパー */
-  function throwSupabaseError(label, sbError) {
-    console.error(`❌ [${label}] Supabaseエラー詳細:`, {
-      message: sbError.message,
-      code:    sbError.code,
-      details: sbError.details,
-      hint:    sbError.hint,
-      status:  sbError.status
-    });
-    const err = new Error(`${label}: ${sbError.message}`);
-    err.supabaseError = sbError;
-    throw err;
-  }
-
-  /** 顧客を customer_number で検索 */
-  async function findCustomer(customerNumber) {
-    console.log('🔵 [findCustomer] 検索中 customer_number:', customerNumber);
-    const { data, error } = await sbClient
-      .from('customers')
-      .select('*')
-      .eq('customer_number', customerNumber)
-      .maybeSingle();
-    if (error) throwSupabaseError('顧客情報の取得', error);
-    console.log('🔵 [findCustomer] 結果:', data);
-    return data; // null if not found
-  }
-
-  /** 既存の customer_number 一覧を取得して重複しない6桁番号を生成 */
-  async function generateCustomerId() {
-    console.log('🔵 [generateCustomerId] 既存顧客番号を取得中...');
-    const { data, error } = await sbClient.from('customers').select('customer_number');
-    if (error) throwSupabaseError('顧客番号一覧の取得', error);
-
-    const existing = (data || []).map(c => c.customer_number);
-    console.log('🔵 [generateCustomerId] 既存番号一覧:', existing);
-
-    if (existing.length >= 900000) throw new Error('顧客番号が上限に達しています。');
-
-    // 重複しない番号が確定するまでループ（100000〜999999 の範囲で生成）
-    let id;
-    let tries = 0;
-    do {
-      id = String(Math.floor(Math.random() * 900000) + 100000);
-      tries++;
-      if (tries > 5000) throw new Error('顧客番号の生成に失敗しました（試行上限）。');
-    } while (existing.includes(id)); // ← 重複する限り必ず再生成
-    console.log(`🔵 [generateCustomerId] 決定番号: ${id}（${tries}回試行）`);
-    return id;
-  }
-
-  /** 顧客を保存（INSERT 後に保存行を返す） */
-  async function saveCustomer(c) {
-    console.log('🔵 [saveCustomer] INSERT開始:', c);
-    const { data, error } = await sbClient
-      .from('customers')
-      .insert({
-        customer_number: c.customer_number,
-        name:            c.name,
-        phone:           c.phone,
-        email:           c.email
-      })
-      .select(); // 保存された行を返してもらい確認
-    if (error) throwSupabaseError('顧客登録', error);
-    console.log('✅ [saveCustomer] INSERT完了 保存行:', data);
-    return data;
-  }
-
-  /** 予約を保存 */
-  async function saveBooking(b) {
-    console.log('🔵 [saveBooking] INSERT開始:', b);
-    const { data, error } = await sbClient
-      .from('bookings')
-      .insert({
-        customer_number:   b.customer_number   || null,
-        name:              b.name,
-        phone:             b.phone,
-        email:             b.email,
-        menu:              b.menu,
-        date:              b.date,
-        time:              b.time,
-        memo:              b.memo              || null,
-        symptom:           b.symptom           || null,
-        treatment_history: b.treatment_history || null,
-        symptom_start:     b.symptom_start     || null,
-        exercise_ok:       b.exercise_ok       || null,
-        daily_impact:      b.daily_impact      || null,
-        line_user_id:      b.line_user_id      || null
-      })
-      .select();
-    if (error) throwSupabaseError('予約の保存', error);
-    console.log('✅ [saveBooking] INSERT完了 保存行:', data);
-    return data;
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LINE通知
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  async function sendLineNotify({ name, menu, date, time, phone, memo }) {
-    await fetch(
-      'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-notify',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
-        },
-        body: JSON.stringify({ name, menu, date, time, phone, memo })
-      }
-    );
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // ユーティリティ
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function formatDate(s) {
-    if (!s) return '';
-    const [y, m, d] = s.split('-');
-    return `${y}年${parseInt(m)}月${parseInt(d)}日`;
-  }
-  function showAlert(id, msg) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (msg) el.textContent = msg;
-    el.classList.add('show');
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-  function hideAlert(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('show');
-  }
-  function esc(s) {
-    return String(s || '')
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-  function emptyState(icon, msg) {
-    return `<div class="empty-state"><div class="ei">${icon}</div><p>${msg}</p></div>`;
-  }
-
-  // ラジオボタンのビジュアル選択
-  document.querySelectorAll('.radio-group').forEach(g => {
-    g.querySelectorAll('input[type=radio]').forEach(r => {
-      r.addEventListener('change', () => {
-        g.querySelectorAll('.radio-item').forEach(i => i.classList.remove('selected'));
-        r.closest('.radio-item').classList.add('selected');
-      });
-    });
-  });
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // 初期化
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  /** 起動時に Supabase 接続を疎通確認 */
-  async function checkConnection() {
-    try {
-      const { error } = await sbClient.from('customers').select('id').limit(1);
-      if (error) {
-        console.error('❌ [接続確認] Supabase疎通エラー:', {
-          message: error.message,
-          code:    error.code,
-          hint:    error.hint,
-          status:  error.status
-        });
-        console.warn('⚠️ 考えられる原因: APIキーの誤り / RLSポリシーによるアクセス拒否 / テーブル名の不一致');
-      } else {
-        console.log('✅ [接続確認] Supabase接続OK（customersテーブル到達確認）');
-      }
-    } catch (e) {
-      console.error('❌ [接続確認] 予期せぬエラー:', e);
-    }
-  }
-
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // LINE連携
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function startLineLogin() {
-    const name  = document.getElementById('r_name')?.value  || '';
-    const phone = document.getElementById('r-phone')?.value || '';
-    const email = document.getElementById('r-email')?.value || '';
-    const state = Math.random().toString(36).slice(2);
-    sessionStorage.setItem('lineLoginState', JSON.stringify({
-      flow: ST.flow, menu: ST.menu,
-      name, phone, email,
-      returnTo: 'page-member-register'
-    }));
-    sessionStorage.setItem('lineState', state);
-    const params = new URLSearchParams({
-      response_type: 'code',
-      client_id: '2004833107',
-      redirect_uri: 'https://lactive-okayama.github.io/lactive-booking/',
-      state,
-      scope: 'profile openid'
-    });
-    window.location.href = 'https://access.line.me/oauth2/v2.1/authorize?' + params.toString();
-  }
-
-  async function handleLineCallback() {
-    const params = new URLSearchParams(window.location.search);
-    const code  = params.get('code');
-    if (!code) return;
-
-    // URLからクエリパラメータを除去
-    window.history.replaceState({}, document.title, window.location.pathname);
-
-    const savedRaw = sessionStorage.getItem('lineLoginState');
-    if (!savedRaw) return;
-    const saved = JSON.parse(savedRaw);
-    sessionStorage.removeItem('lineLoginState');
-    sessionStorage.removeItem('lineState');
-
-    // フロー状態を復元
-    if (saved.flow) {
-      ST.flow = saved.flow;
-      ST.menu = saved.menu || '';
-    }
-    // ページへ遷移
-    navigateTo(saved.returnTo || 'page-member-register');
-
-    // 登録フォームを確実に表示（以前に submitRegister を経由していた場合に備え）
-    const _formSec = document.getElementById('register-form-section');
-    const _doneSec = document.getElementById('register-done-section');
-    if (_formSec) _formSec.style.display = 'block';
-    if (_doneSec) _doneSec.style.display = 'none';
-
-    // フォーム値を復元（即時＋DOM描画後の念押し）
-    const _restoreInputs = () => {
-      const nameEl  = document.getElementById('r-name');
-      const phoneEl = document.getElementById('r-phone');
-      const emailEl = document.getElementById('r-email');
-      if (nameEl  && saved.name  !== undefined) nameEl.value  = saved.name;
-      if (phoneEl && saved.phone !== undefined) phoneEl.value = saved.phone;
-      if (emailEl && saved.email !== undefined) emailEl.value = saved.email;
-    };
-    _restoreInputs();
-    setTimeout(_restoreInputs, 80);
-
-    // LINE認証コードをユーザーIDに交換
-    showLoading('LINE認証中...');
-    try {
-      const SUPABASE_URL = 'https://wuthbgxzmvjeosugzfbs.supabase.co';
-      const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY';
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/line-auth`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${ANON_KEY}`
-        },
-        body: JSON.stringify({
-          code,
-          redirect_uri: 'https://lactive-okayama.github.io/lactive-booking/'
-        })
-      });
-      if (!res.ok) throw new Error('LINE認証に失敗しました');
-      const data = await res.json();
-      if (data.line_user_id) {
-        ST.lineUserId = data.line_user_id;
-        // 連携済みバッジを表示 / ボタンを非表示
-        const statusEl = document.getElementById('line-connect-status');
-        const btnEl    = document.getElementById('line-connect-btn');
-        if (statusEl) statusEl.style.display = 'block';
-        if (btnEl)    btnEl.style.display    = 'none';
-        // 成功アラートを目立つ形で表示
-        const alertEl = document.getElementById('register-alert');
-        if (alertEl) {
-          alertEl.className = 'alert alert-success show';
-          alertEl.textContent = '✅ LINEと連携しました！予約前日にリマインドメッセージが届きます。';
-          alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        console.log('✅ [LINE連携] 成功:', data.display_name);
-      } else {
-        throw new Error('line_user_idが取得できませんでした');
-      }
-    } catch (e) {
-      console.error('❌ [LINE連携] エラー:', e);
-      const alertEl = document.getElementById('register-alert');
-      if (alertEl) {
-        alertEl.className = 'alert alert-error show';
-        alertEl.textContent = '⚠️ LINE連携に失敗しました。もう一度お試しください。';
-        alertEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    } finally {
-      hideLoading();
-    }
-  }
-
-  (function init() {
-    checkConnection(); // 非同期で接続確認（ページ表示はブロックしない）
-    const isLineCallback = window.location.search.includes('code=') &&
-                           window.location.search.includes('state=');
-    if (isLineCallback) {
-      handleLineCallback(); // LINE OAuth コールバック処理（内部でnavigateTo呼び出し）
-    } else if (window.location.search.includes('admin')) {
-      navigateTo('page-admin-login');
-    } else {
-      navigateTo('page-top');
-    }
-  })();
-</script>
-</body>
-</html>
+    document.getElem[��RY
+	�[YK\��YܚY	�K��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�[YK\��YܚY	�K�[��\�SH	���ۜ�H��[Y[���][[Y[��RY
+	�[YK\��\X�Z�\��N�^�۝[�H	��o��f�n#9�&���xऺ`n9����e��i��c��h8�ex�a	���[K�\�^HH	؛�������[\�
+	�]][YKX[\�	�	�od���x�k��e9.�9�!8�k��b:f��*lx�i��b9ec��a9d"8���f��c��h8�ex�a8� ��NB���[��[ۈ[\�����[���Y^J
+H��9��y.�8����`�e��`n9���स������������[Y[���][[Y[��RY
+	�Y]I�K��[YHH	����[Y[���][[Y[��RY
+	�][YI�K��[YHH	���]P�[��S\�H	����9�`�e��n+���8������d�gg�(j9�.����[Y[���][[Y[��RY
+	�[YK\��[�Y[���K��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�[YK\��YܚY	�K��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�[YK\��YܚY	�K�[��\�SH	���ۜ�H��[Y[���][[Y[��RY
+	�[YK\��\X�Z�\��N�^�۝[�H	��o��f�n#9�&���xऺ`n9����e��i��c��h8�ex�a	���[K�\�^HH	؛�������[\�
+	�]][YKX[\�	�	��d��k���x�k�/$y�ky��x�k��g��x�e9.�9�!8�a8�g��h8�dx�o��f���� �b)x�k���y�"�स�b:`n8�l��c��h8�ex�a8� ��N�[�\�����[���[[�\�
+NB��ʊ�9��y.�9i"y��9�`��&�.�9�!9�"8�o��`�e��n+�हc�o���e��i��8�������xहa�y����.�
+�]�]P�[��S\�H	��\�[���[��[ۈۑ]P�[��J
+H�ۜ�]HH��[Y[���][[Y[��RY
+	�Y]I�K��[YNY�
+]HOOH�]P�[��S\�
+H�]\�����ۚ[�]
+�ۘ�[��H:a�z)!�do8�l�a��e�f,��h���]P�[��S\�H]N��[Y[���][[Y[��RY
+	�][YI�K��[YHH	���ۜ�[H��[Y[���][[Y[��RY
+	�[YK\��\X�Z�\��NY�
+Y]JH[�^�۝[�H	��o��f�n#9�&���xऺ`n9����e��i��c��h8�ex�a	�[��[K�\�^HH	؛������[Y[���][[Y[��RY
+	�[YK\��[�Y[���K��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�[YK\��YܚY	�K��[K�\�^HH	ۛۙI��]\��B�[��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�[YK\��[�Y[���K��[K�\�^HH	؛������[Y[���][[Y[��RY
+	�[YK\��YܚY	�K��[K�\�^HH	ۛۙI�YP[\�
+	�]][YKX[\�	�N�H��9���y.�x�bx�������ۜ��Y^HH]�Z]�X��\��Y^J]JNY�
+�Y^JH��9��y.�:`n9���स������������[Y[���][[Y[��RY
+	�Y]I�K��[YHH	����[Y[���][[Y[��RY
+	�][YI�K��[YHH	���]P�[��S\�H	����9�`�e��n+���8�����ह�g�(j���[Y[���][[Y[��RY
+	�[YK\��[�Y[���K��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�[YK\��YܚY	�K��[K�\�^HH	ۛۙI���[Y[���][[Y[��RY
+	�[YK\��YܚY	�K�[��\�SH	��[�^�۝[�H	��o��f�n#9�&���xऺ`n9����e��i��c��h8�ex�a	�[��[K�\�^HH	؛�����ۜ��X\�ۈH�Y^K��X\�ۈ�;�"	��Y^K��X\�۟[�"X�	�����[\�
+	�]][YKX[\�	�8�d��k���x�k�/$y�i���y�j��k��j��i�ecx�b��i��c��h8�ex�a	ܙX\�۟8� �b)y�j��k��lxस�b:`n8�c��h8�ex�a8� �
+N�]\��B��ۜ�����Y[Y\�H]�Z]�]�����Y[Y\�]JN�[�\�[YT�������Y[Y\�NH�]�
+JH�ۜ��K�\��܊	�`n9��yn+�c幭���*:jk��%��JN�[�\�[YT����JN���8�8��x��9�`��k�aj9��8ऺ`n9���c�� �x�j8�e��i�(j9�.��B�B��ʊ��\X�\�H8�b��y�!�k����x�k�.�9�!9�"8�o��`�e��n+�हc�o��
+�\�[���[��[ۈ�]�����Y[Y\�]JH�ۜ��]K\��܈HH]�Z]ؐ�Y[������J	؛���[����B���[X�
+	�[YI�B��\J	�]I�]JNY�
+\��܊H����\X�\�Q\��܊	�.�9�!9�"8�o��`�e��n+��k�c�o���\��܊N�]\��
+]H�JK�X\
+�O���[YJNB��ʊ�9�`�e��n+��8�������xह����.�
+��[��[ۈ�[�\�[YT�������Y[Y\�H��[Y[���][[Y[��RY
+	�[YK\��[�Y[���K��[K�\�^HH	ۛۙI��ۜ�ܚYH��[Y[���][[Y[��RY
+	�[YK\��YܚY	�NܚY��[K�\�^HH	�ܚY	����9od���x�k�h-9d"8�k��o��jx�jx�c9��g'���yb-��k��n�c,�.+x�k��jx�k��k�in��b��iy��y.�9�&��h��b��n�"lx�b��e�`c�c��ह.#x�h8�fx�k�`c�c���k�od���z`n9����i��cx�o��fx� ��SVS3��S3fe�SVcS5�ScVSU�S�s��Sc#�U�S3�%�SVc6U�S3CE�S3ce�S3CE�S3�%�S3Ve�S3��SFfFE�S�cv�Vfc��6��7BFFR�F�7V�V�B�vWDV�V�V�D'��B�vGB�FFRr��f�VS��6��7B��r��WrFFR����6��7BF�F�7G"Т��r�vWDgV�ŖV"���r�r��7G&��r���r�vWD���F������E7F'B�"�sr��r�r��7G&��r���r�vWDFFR����E7F'B�"�sr���6��7B�5F�F��FFR���F�F�7G#��6��7B7W'&V�D��W"���r�vWD��W'2������WB�F���rs��f�"�6��7BB�b���D��U2���6��7B6��D��W"�'6T��B�B�7ƗB�s�r�������6��7B�57EF��R��5F�F�bb6��D��W"��7W'&V�D��W#��6��7B�4&���VB�&���VEF��W2��6�VFW2�B���6��7B�4F�6&�VB��4&���VB���57EF��S���b��4F�6&�VB����F����s�'WGF��G�S�&'WGF��"6�73�'F��R�6��B�'F�&���VB"F�6&�VC�p��B�s�V�6�73�'6��B��&�#��SCr�SFSE�SS6Vc��V����'WGF���s���V�6R���F����s�'WGF��G�S�&'WGF��"6�73�'F��R�6��B�'F�"p��r��6Ɩ6��'6V�V7EF��U6��B�F��2��rr�B�u�r�#�p��B�s��'WGF���s��ТТw&�B���W$�D����F�ð�Р��i�.�i>[��8).��h����gV�7F���6V�V7EF��U6��B�V��F��R���F�7V�V�B�VW'�6V�V7F�$�r�F��R�6��B�'F�r��f�$V6��"��"�6�74Ɨ7B�&V��fR�w6V�V7FVBr����V��6�74Ɨ7B�FB�w6V�V7FVBr���F�7V�V�B�vWDV�V�V�D'��B�vGB�F��Rr��f�VR�F��S����FT�W'B�vFFWF��R��W'Br���Р�gV�7F���FFWF��T&6������b�5B�f��r���v�V�&W"r����b�5B�4�Wt7W7F��W"���F�7V�V�B�vWDV�V�V�D'��B�w&Vv�7FW"�f�&��6V7F���r��7G��R�F�7���v&��6�s��F�7V�V�B�vWDV�V�V�D'��B�w&Vv�7FW"�F��R�6V7F���r��7G��R�F�7���v���Rs���f�vFUF�wvR��V�&W"�&Vv�7FW"r����V�6R���f�vFUF�wvR��V�&W"���v��r���Т�V�6R���f�vFUF�wvR�W'6���r���ТР�7��2gV�7F���7V&֗D&�����r����6��7BFFR�F�7V�V�B�vWDV�V�V�D'��B�vGB�FFRr��f�VS��6��7BF��R�F�7V�V�B�vWDV�V�V�D'��B�vGB�F��Rr��f�VS��6��7B�V���F�7V�V�B�vWDV�V�V�D'��B�vGB��V��r��f�VR�G&�҂����b�FFR��6��t�W'B�vFFWF��R��W'Br�~[��iɾiz^8).��h��8~8n8�88^8N8"r��&WGW&�Т�b�F��R��6��t�W'B�vFFWF��R��W'Br�~[��iɾi�.�i>8).��h��8~8n8�88^8N8"r��&WGW&�Т��[�>iz^8;���X�iz^888*~88>8*��ȅT�898*N898+�Z��z�n�Ȑ�6��7B���r��WrFFR������r�6WD��W'2�������6��7B�6V�FFR��WrFFR�FFR�uC��r����b��6V�FFR�vWEF��R��������r�vWEF��R�����6��t�W'B�vFFWF��R��W'Br�~[�>iz^8�8NK��{HN8�8������8~8�YX�8NY�8(�8�8�88^8N8"r���&WGW&㰢Т�b��6V�FFR����r���6��t�W'B�vFFWF��R��W'Br�~��X�8�iz^K��8���h��8~8�8�8�8)>8"r���&WGW&㰢Т��z+�Z�i�.8�K�jZ�iz^8).Xh�888*~88>8*��Ȏz�ynXN8~y�NX��8�K�jZ�iz^���Z�8^8(�8�ZNY�8�K�ޙ���Ȑ�6��7B��ƖF�6�V6��v�B6�V6��4��ƖF��FFR��6F6�������V����b���ƖF�6�V6����6��7B&V6�����ƖF�6�V6��&V6����ȂG���ƖF�6�V6��&V6����Ȗ�rs��6��t�W'B�vFFWF��R��W'Br�8>8�iz^8�K�jZ�iz^8�8�8(K��{HN8~8�8�8�8)2G�&V6���8.X�^8�iz^K��8).8���8>8�88^8N8&���&WGW&㰢Т��z+�Z�i�.8�Xh�[�n�xފH~888*~88>8*��ȎK�ΘxޘK���.j�.�Ȑ�6��7B&���VD��r�v�BfWF6�&���VEF��W2�FFR��6F6�������ғ���b�&���VD��r��6�VFW2�F��R����6��t�W'B�vFFWF��R��W'Br�~��h��8~8�i�.�i>[��8�8�8~8�K��{HNk��8�8�8�8(�8�8~8�8.X�^8�i�.�i>[��8).8���8>8�88^8N8"r���6��7B&���VEF��W5&Vg&W6��v�BfWF6�&���VEF��W2�FFR��6F6�������ғ��&V�FW%F��U6��G2�&���VEF��W5&Vg&W6����F�7V�V�B�vWDV�V�V�D'��B�vGB�F��Rr��f�VR�rs��&WGW&㰢Р�6��7B'F��F�7V�V�B�vWDV�V�V�D'��B�v&�����r�'F�r���'F��F�6&�VB�G'VS��6��t��F��r�~K��{HN8).�K�K�����r���G'���6��7B�5B�VW7F�����&S��6��7B6fVD&�����r�v�B6fT&�����r���7W7F��W%��V�&W#�5B�7W7F��W#��7W7F��W%��V�&W"���5B�4�Wt7W7F��W"�5B��Wt7W7F��W$�B��V�����S�5B�W'6������R�����S�5B�W'6�������R��V��â5B�W'6����V������V�S�5B��V�R��FFR��F��R���V���V�����V����7��F�Ӣ����V����G&VF�V�E���7F�'���"���V����7��F���7F'C��2���V����W�W&6�6U�����B���V����F�Ǖ���7C��R���V����Ɩ�U�W6W%��C�5B�Ɩ�UW6W$�B���V���ғ��5B�&�����t�B�6fVD&�����s�����B���V�ð����Ĕ�^�	�y�^8).�K��ȎZKiY~8~8n8(.K��{HNZ��K�n8�{i�{i��Ȑ���(�89�8*N8:�8;�88�8�8�7W7F��W$�V�&W"8).K�X�~Y
+�8(8�8@�6��7B�4f�'7Ef�6�B�5B�f��r��v�V�&W"s��6��7B��R�5B�W'6������S��6��7B�V�R�5B��V�S��6��7B���R�5B�W'6�������S��6��7BƖ�U���B�����R��V�R�FFR�F��R����R���V���V����rr���4f�'7Ef�6�@�Ӱ�6��6��R���r�tĔ�^�K�88~8;�8+�r�Ɩ�U���B���6V�DƖ�T��F�g��Ɩ�U���B��6F6��R��6��6��R�v&�tĔ�^�	�y�^8*�8:�8;��ȎxJ�in�ȓ�r�R�������Z��K�nyK��� �F�7V�V�B�vWDV�V�V�D'��B�vF����Rr��FW�D6��FV�B�5B�W'6������S��F�7V�V�B�vWDV�V�V�D'��B�vF���V�Rr��FW�D6��FV�B�5B��V�S��F�7V�V�B�vWDV�V�V�D'��B�vF��GBr��FW�D6��FV�B�G�f�&�DFFR�FFR��G�F��W���6��7B7W7D�B�5B�7W7F��W#��7W7F��W%��V�&W"���5B�4�Wt7W7F��W"�5B��Wt7W7F��W$�B�rr���6��7B�E&�r�F�7V�V�B�vWDV�V�V�D'��B�vF�֖B�&�rr����b�7W7D�B��F�7V�V�B�vWDV�V�V�D'��B�vF�֖Br��FW�D6��FV�B�7W7D�C��E&�r�7G��R�F�7���rs�ТV�6R��E&�r�7G��R�F�7���v���Rs�Т6��7B�V��&�r�F�7V�V�B�vWDV�V�V�D'��B�vF���V���&�rr����b��V���F�7V�V�B�vWDV�V�V�D'��B�vF���V��r��FW�D6��FV�B��V���V��&�r�7G��R�F�7���rs�ТV�6R��V��&�r�7G��R�F�7���v���Rs�Р��f�vFUF�wvR�F��Rr����6F6��R���6��t�W'B�vFFWF��R��W'Br�~K��{HN8�K�8�ZKiY~8~8�8~8�8.8~88(�8�8~8n8�8(�8���n8~8�88^8N8"r���'F��F�6&�VB�f�6S���f���ǒ����FT��F��r����ТР���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���89�8*N89�8;�8+�8;�8*�8:>8;>8+�8:�89^8:�8;����)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H��WB6�6V�7W7F��W"��V�ð��gV�7F���vWDF��evVV��FFU7G"���6��7BF�2��~izRr�~iȂr�~x�r�~kBr�~iʂr�~�yr�~Y��uӰ�6��7B�����E��FFU7G"�7ƗB�r�r�����V�&W"���&WGW&�F�5��WrFFR������B��vWDF���Ӱ�Р�gV�7F���F�F�֖F�v�B����6��7BB��WrFFR����B�6WD��W'2�������&WGW&�C��Р�7��2gV�7F���fW&�g�6�6V���v�ₒ��6��7B&r�F�7V�V�B�vWDV�V�V�D'��B�v6�6V�֖B֖�WBr��f�VR�G&�҂���6��7BV�FW&VD��R�F�7V�V�B�vWDV�V�V�D'��B�v6�6V����R֖�WBr��f�VR�G&�҂����b�&r�����G�g�B��FW7B�&r����6��t�W'B�v6�6V����v����W'Br�snj8�i[Z�~8~�~Z�.yZ�X�~8).XZ^X��8~8n8�88^8N8"r���&WGW&㰢Т�b�V�FW&VD��R���6��t�W'B�v6�6V����v����W'Br�~8�Y�X���ȎZy>�Ȟ8).XZ^X��8~8n8�88^8N8"r���&WGW&㰢Т6��7B'F��F�7V�V�B�vWDV�V�V�D'��B�v6�6V��fW&�g��'F�r���'F��F�6&�VB�G'VS��6��t��F��r�~K��{HN8).z+����K�����r���G'���6��7B7W7F��W"�v�Bf��D7W7F��W"�&r���6��7B7F�&VD��R��7W7F��W#����R��rr��&W�6R����>8��r�rr���6��7B��&�Ɨ�VDV�G'��V�FW&VD��R�&W�6R����>8��r�rr����b�7W7F��W"��7F�&VD��R�7F'G5v�F����&�Ɨ�VDV�G'�����6��t�W'B�v6�6V����v����W'Br�~�~Z�.yZ�X�~8�8�8�8�Y�X��8�j�>8~8�8.8(�8�8�8)>8"r���&WGW&㰢Т��FT�W'B�v6�6V����v����W'Br���6�6V�7W7F��W"�7W7F��W#��F�7V�V�B�vWDV�V�V�D'��B�vחvR�7W7F��W"���Rr��FW�D6��FV�B�G�7W7F��W"���W�jy���F�7V�V�B�vWDV�V�V�D'��B�vחvR�7W7F��W"��V�r��FW�D6��FV�B��~Z�.yZ�X�~�ɢG�7W7F��W"�7W7F��W%��V�&W'�����FT�W'B�vחvR�7V66W72r�����FT�W'B�vחvR��W'Br���v�B&V�FW$חvR�����f�vFUF�wvR�6�6V��Ɨ7Br����6F6��R���6��t�W'B�v6�6V����v����W'Br�~�	�K�8*�8:�8;�8�y��yI�8~8�8~8�8.8~88(�8�8~8n8�8(�8���n8~8�88^8N8"r����f���ǒ��'F��F�6&�VB�f�6S����FT��F��r����ТР�7��2gV�7F���&V�FW$חvR����F�7V�V�B�vWDV�V�V�D'��B�vחvR�W6�֖�r�Ɨ7Br����W$�D��Тs�F�b6�73�&V�G��7FFR#��F�b6�73�&V�#�(�3��F�c���8����8�K����������F�c�s��F�7V�V�B�vWDV�V�V�D'��B�vחvR�7B�Ɨ7Br����W$�D���rs���G'���6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v&�����w2r���6V�V7B�r�r���W�v7W7F��W%��V�&W"r�6�6V�7W7F��W"�7W7F��W%��V�&W"����&FW"�vFFRr����&FW"�wF��Rr����b�W'&�"�F�&�rW'&�#���6��7B���FF���Ӱ�6��7BF�F��F�F�֖F�v�B����6��7BW6�֖�r��Ӱ�6��7B7B��Ӱ�����f�$V6��"����6��7B�����E��"�FFR�7ƗB�r�r�����V�&W"���6��7B&B��WrFFR������B���&B��F�F��W6�֖�r�W6��"��7B�W6��"���ғ�����{[����F�7V�V�B�vWDV�V�V�D'��B�v��F�F�r��FW�D6��FV�B�����V�wF���F�7V�V�B�vWDV�V�V�D'��B�v��6V�F�r��FW�D6��FV�B�6�6V�7W7F��W"�6V�F��6�V�B����F�7V�V�B�vWDV�V�V�D'��B�v����FW2r��FW�D6��FV�B�6�6V�7W7F��W"���FW5�6�V�B�������K��[��8�K��{H@��b�W6�֖�r��V�wF����F�7V�V�B�vWDV�V�V�D'��B�vחvR�W6�֖�r�Ɨ7Br����W$�D��ТV�G�7FFR�	�8Rr�~K��[��8�K��{HN8�8.8(�8�8�8)2r����V�6R��F�7V�V�B�vWDV�V�V�D'��B�vחvR�W6�֖�r�Ɨ7Br����W$�D���W6�֖�r���"����6��7B�����E��"�FFR�7ƗB�r�r�����V�&W"���6��7B&B��WrFFR������B���6��7BF�fdF�2��F��&�V�B��&B�F�F����cC���6��7BF�r�vWDF��evVV��"�FFR�����WB7F���F�ð��b�F�fdF�2������7F���F����F�b6�73�&6�6V��F�F����FR#�[�>iz^8�8*�8:>8;>8+�8:�8��'#�8������8~8N�
+>{Z8�88^8C��F�c����V�6R��7F���F����'WGF��6�73�&'F��6�6V�֗FV�"��6Ɩ6��&6�6V�&�����t6��f�&҂rG�W62�"�B��r�rG�W62�"�FFR��r�rG�W62�"�F��R��r�rG�W62�"��V�R��&W�6R��r�r�u��S#rr��r�#�8*�8:>8;>8+�8:���'WGF�����Т&WGW&� ��F�b6�73�&&�����r�W6�֖�r#��F�b6�73�&&�����r֖�f�#��F�b6�73�&&�����r�FFR�W6�֖�r#�	�8RG�f�&�DFFR�"�FFR���ȂG�F�w��ȒG�W62�"�F��R����F�c��F�b6�73�&&�����r��V�R�W6�֖�r#�G�W62�"��V�R����F�c���F�c��F�b7G��S�&f�W��6�&�泣�FW�B�Ɩv�&�v�C�#�G�7F���F�����F�c���F�c���Ғ����rr���Р�����X�8�K��{HN�Ȏik8~8N�n�Ȑ�6��7B7DFW62�����7E��&WfW'6R�����b�7DFW62��V�wF����F�7V�V�B�vWDV�V�V�D'��B�vחvR�7B�Ɨ7Br����W$�D��ТV�G�7FFR�	�8�r�~��X�8�K��{HN8�8.8(�8�8�8)2r����V�6R��F�7V�V�B�vWDV�V�V�D'��B�vחvR�7B�Ɨ7Br����W$�D���7DFW62���"����6��7BF�r�vWDF��evVV��"�FFR���&WGW&� ��F�b6�73�&&�����r�7B#��F�b6�73�&&�����r֖�f�#��F�b6�73�&&�����r�FFR�7B#�	�8RG�f�&�DFFR�"�FFR���ȂG�F�w��ȒG�W62�"�F��R����F�c��F�b6�73�&&�����r��V�R�7B#�G�W62�"��V�R����F�c���F�c���F�c���Ғ����rr���Т�6F6��R���F�7V�V�B�vWDV�V�V�D'��B�vחvR�W6�֖�r�Ɨ7Br����W$�D��ТV�G�7FFR�~)����r�~K��{HN88~8;�8+�8�X�n[�~8�ZKiY~8~8�8~8�r���ТР�gV�7F���7v�F6�חvUF"�F"�'F����wW6�֖�rr�w7Bu��f�$V6��B����F�7V�V�B�vWDV�V�V�D'��B�חvR�F"�G�G���6�74Ɨ7B�F�vv�R�v7F�fRr�B���F"���ғ��F�7V�V�B�VW'�6V�V7F�$�r�חvR�F'2�F"�'F�r��f�$V6��"��"�6�74Ɨ7B�&V��fR�v7F�fRr����'F��6�74Ɨ7B�FB�v7F�fRr���Р�7��2gV�7F���6�6V�&�����t6��f�&҆�B�FFR�F��R��V�R����b�6��f�&҆K�^K��8�K��{HN8).8*�8:>8;>8+�8:�8~8�8�8��������G�f�&�DFFR�FFR��G�F��W���G��V�W�����8>8�i8�K��8�X�n8(�kh�8�8�8�8)>8&��&WGW&㰢6��t��F��r�~8*�8:>8;>8+�8:�XznynK�����r���G'���6��7B�W'&�"��v�B6$6ƖV�B�g&�҂v&�����w2r��FV�WFR���W�v�Br��B����b�W'&�"�F�&�rW'&�#��v�B&V�FW$חvR����6��7BV��F�7V�V�B�vWDV�V�V�D'��B�vחvR�7V66W72r���V��FW�D6��FV�B�~8*�8:>8;>8+�8:�8�Z��K�n8~8�8~8�8.8�8�8�8NX��yJ�8).8�[�^88~8n8�8(�8�8�8"s��V��6�74Ɨ7B�FB�w6��rr���V��67&��Ė�F�f�Wr��&V�f��#�w6���F�r�&��6��v�V&W7Brғ���6F6��R���6��t�W'B�vחvR��W'Br�~8*�8:>8;>8+�8:�8�ZKiY~8~8�8~8�8.8~88(�8�8~8n8�8(�8���n8~8�88^8N8"r����f���ǒ����FT��F��r����ТР���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���z�ynyK��� ���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H�7��2gV�7F���F֖���v�ₒ��6��7Bt��WB�F�7V�V�B�vWDV�V�V�D'��B�vF֖��rr���6��7Br�t��WB�f�VS���b�r���6��t�W'B�vF֖����v����W'Br�~898+�8:�8;�88�8).XZ^X��8~8n8�88^8N8"r���t��WB�f�7W2����&WGW&㰢Т6��t��F��r�~��ފ��K�����r���G'���6��7B&W2�v�BfWF6���v�GG3���wWF�&w���f�V�7Vw�f'2�7W&6R�6��gV�7F���2�c�fW&�g��F֖�r�����WF��C�u�5Br���VFW'3���t6��FV�B�G�Rs�vƖ6F�����6��r��tWF��&��F���s�t&V&W"W���$v6�����W��攗4��#V44�d���d4���W��34֔����E�&���g��4�4��Ŧ��d��CDv���6�f%���s��EvCe�ԧ���v�6ӗ5�4�d��gV##F��4������S4祓D�D���W4��cF44�d֤T֥��D�$��T4W����'E�s�D��E�ׄ$f�3�dF�#W�4b�U7%�p����&�G���4���7G&��v�g���77v�&C�rҐ�Т���6��7B&W7V�B�v�B&W2�6�ₒ�6F6��������Ғ����b�&W2���bb&W7V�B�5fƖB���G'VR���t��WB�f�VR�rs����FT�W'B�vF֖����v����W'Br����f�vFUF�wvR�F֖�r���&V�FW$&�����w2����&V�FW$7W7F��W'2�����V�6R��6��t�W'B�vF֖����v����W'Br�~898+�8:�8;�88�8�j�>8~8�8.8(�8�8�8)>8"r���t��WB�f�VR�rs��t��WB�f�7W2����Т�6F6��R���6��6��R�W'&�"�~z�yn�^��ފ��8*�8:�8;âr�R���6��t�W'B�vF֖����v����W'Br�~�	�K�8*�8:�8;�8�y��yI�8~8�8~8�8.8~88(�8�8~8n8�8(�8���n8~8�88^8N8"r���t��WB�f�7W2�����f���ǒ����FT��F��r����ТР�gV�7F���F֖���v�WB����f�vFUF�wvR�F�r��Р�gV�7F���7v�F6�F"�F$�B�'F���F�7V�V�B�VW'�6V�V7F�$�r�F"��V�r��f�$V6�����6�74Ɨ7B�&V��fR�v7F�fRr����F�7V�V�B�VW'�6V�V7F�$�r�F"�'F�r��f�$V6��"��"�6�74Ɨ7B�&V��fR�v7F�fRr����F�7V�V�B�vWDV�V�V�D'��B�F$�B��6�74Ɨ7B�FB�v7F�fRr���'F��6�74Ɨ7B�FB�v7F�fRr����b�F$�B���wF"�&�����w2r�&V�FW$&�����w2�����b�F$�B���wF"�7W7F��W'2r�&V�FW$7W7F��W'2�����b�F$�B���wF"ֆ�ƖF�2r���D��ƖF�6�V�F"�����b�F$�B���wF"�6�V�F"r���D6�V�F%f�Wr����Р���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���8*�8:�8;>888;�89>8:^8;��Ȏz�ynyK���.�Ȑ���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H��WB6�f�Wu�V"��V�ð��WB6�f�Wt���F���V�ò�����WB�6�&�����w4'�FFR��Ӱ��gV�7F�����D6�V�F%f�Wr�����b�6�f�Wu�V"����V���6��7B��r��WrFFR����6�f�Wu�V"���r�vWDgV�ŖV"����6�f�Wt���F����r�vWD���F�����Т&V�FW$6�V�F%f�Wr����Р�gV�7F���6��vT6�V�F$���F��FV�F���6�f�Wt���F���FV�F���b�6�f�Wt���F����6�f�Wt���F���6�f�Wu�V"�ӲТ�b�6�f�Wt���F����6�f�Wt���F���6�f�Wu�V"���Т&V�FW$6�V�F%f�Wr����Р��h�~Z�iȎ8�K��{HN8).X�n[�~�Ȇ��FFU7G"���&�����w5��Ȓ��7��2gV�7F���fWF6�&�����w4f�$���F���V"����F����6��7B���7G&��r����F����E7F'B�"�sr���6��7B�B��WrFFR��V"����F�����vWDFFR����6��7B7F'B�G��V'��G�������6��7BV�B�G��V'��G�����G�7G&��r��B��E7F'B�"�sr����6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v&�����w2r���6V�V7B�v�B���R��V�R�FFR�F��R�7W7F��W%��V�&W"r���wFR�vFFRr�7F'B����FR�vFFRr�V�B����&FW"�vFFRr����&FW"�wF��Rr����b�W'&�"�F�&�u7W&6TW'&�"�~K��{HNK��j~8�X�n[�rr�W'&�"���6��7B���Ӱ��FF���Ғ�f�$V6��"�����b���"�FFUҒ��"�FFU���Ӱ���"�FFU��W6��"���ғ��&WGW&����Р�7��2gV�7F���&V�FW$6�V�F%f�Wr����F�7V�V�B�vWDV�V�V�D'��B�v6�����F���&V�r��FW�D6��FV�BТG�6�f�Wu�V'�[�BG�6�f�Wt���F���iȆ��6��7Bw&�B�F�7V�V�B�vWDV�V�V�D'��B�v6��f�Wr�w&�Br�����FT�W'B�vF֖��6�V�F"�W'&�"r�����WB&�����w2��Ӱ��WB��ƖF�2��Ӱ�G'����&�����w2���ƖF�5��v�B&�֗6R����fWF6�&�����w4f�$���F��6�f�Wu�V"�6�f�Wt���F����fWF6���ƖF�4f�$���F��6�f�Wu�V"�6�f�Wt���F����ғ���6F6��R���6��6��R�W'&�"�~)���&V�FW$6�V�F%f�Wu�8*�8:�8;âr�R���6��t�W'B�vF֖��6�V�F"�W'&�"r��8*�8:�8;>888;�88~8;�8+�8�X�n[�~8�ZKiY~8~8�8~8�8"G�R�7W&6TW'&�"�~�Ȃr�R�7W&6TW'&�"�6�FR�~�Ȓr�rw����Т�6�&�����w4'�FFR�&�����w3���6��7BF�w2��~izRr�~iȂr�~x�r�~kBr�~iʂr�~�yr�~Y��uӰ��WB�F���rs��F�w2�f�$V6���B�������6��7B6�2������w7V�r�����b�w6Br�rs���F�����F�b6�73�&6��f�Wr�F�rG�6�7�#�G�G���F�c���ғ���6��7Bf�'7DF�r��WrFFR�6�f�Wu�V"�6�f�Wt���F����vWDF�����6��7B�V�F�2��WrFFR�6�f�Wu�V"�6�f�Wt���F�����vWDFFR����6��7BF�F���WrFFR����F�F��6WD��W'2��������f�"��WB�����f�'7DF�s��������F�����F�b6�73�&6��f�Wr�F�V�G�#���F�c���Р�f�"��WBB��B���V�F�3�B�����6��7BFFT�&���WrFFR�6�f�Wu�V"�6�f�Wt���F��B���6��7B���7G&��r�6�f�Wt���F����E7F'B�"�sr���6��7BFB�7G&��r�B��E7F'B�"�sr���6��7BFFU7G"�G�6�f�Wu�V'��G�����G�FG���6��7BF�r�FFT�&��vWDF�����6��7B�5F�F��FFT�&��vWEF��R�����F�F��vWEF��R����6��7B�4��ƖF����ƖF�5�FFU7G%���V�FVf��VC��6��7BƗ7B�&�����w5�FFU7G%����Ӱ�6��7B6�V�B�Ɨ7B��V�wF����6��7B6�76W2��v6��f�Wr�F�uӰ��b�F�r����6�76W2�W6��w7V�r����b�F�r���b�6�76W2�W6��w6Br����b��5F�F��6�76W2�W6��wF�F�r����b��4��ƖF��6�76W2�W6��v��ƖF�r�����WB&�G���F�b6�73�&6��F���V�#�G�G���F�c����b��4��ƖF����&�G����F�b6�73�&6�ֆ�ƖF���&�#�9s��F�c����V�6R�b�6�V�B����&�G����F�b6�73�&6��6�V�B�&FvR#�)x�G�6�V�G�K�c��F�c���Р���K��{HN8�8.8(�iz^8�8�8*�8:�88>8*�X���;Т6��7B��6Ɩ6���6�V�B�bb�4��ƖF������6Ɩ6��'6��tF�&�����w2�rG�FFU7G'�r�&�rs���F�����F�b6�73�"G�6�76W2����rr��"G���6Ɩ6���G�&�G����F�c���Р�w&�B���W$�D����F�ð�Р��iz^K��8*�8:�88>8*�i�.�ɮ8�8�iz^8�K��{HNK��j~8).8:.8;�888:�8~��zK���gV�7F���6��tF�&�����w2�FFU7G"���6��7BƗ7B��6�&�����w4'�FFU�FFU7G%����Ӱ�6��7B�����E��FFU7G"�7ƗB�r�r���F�7V�V�B�vWDV�V�V�D'��B�vF����F��F�F�Rr��FW�D6��FV�BТG���[�BG�'6T��B�җ�iȂG�'6T��B�B��izR8�K��{HN�ȂG�Ɨ7B��V�wF��K�n�Ȗ��6��7B&�G��F�7V�V�B�vWDV�V�V�D'��B�vF����F��&�G�r����b�Ɨ7B��V�wF����&�G����W$�D����F�b6�73�&F����F��V�G�#�K��{HN8�8.8(�8�8�8)3��F�c����V�6R��&�G����W$�D���Ɨ7B���"�� ��F�b6�73�&F����F�֗FV�#��F�b6�73�&F����F��F��R#�G�W62�"�F��R����F�c��F�b6�73�&F����F�֖�f�#��F�b6�73�&F����F����R#�G�W62�"���R��G�"�7W7F��W%��V�&W"��7�7G��S�&f��B�6��S��s'&VӶ6���#�f"���FW�B�Ɩv�B��f��B�vV�v�C�C��&v����VgC�g��#����G�W62�"�7W7F��W%��V�&W"����7���rw���F�c��F�b6�73�&F����F���V�R#�G�W62�"��V�R����F�c���F�c���F�c������rr���ТF�7V�V�B�vWDV�V�V�D'��B�vF��&�����w2���F�r��7G��R�F�7���vf�W�s��Р�gV�7F���6��6TF�&�����w4��F���F�7V�V�B�vWDV�V�V�D'��B�vF��&�����w2���F�r��7G��R�F�7���v���Rs��Р���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���K�jZ�iz^���Z頢��)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H��WB��ƖF�f�Wu�V"��V�ð��WB��ƖF�f�Wt���F���V�ò�����gV�7F�����D��ƖF�6�V�F"�����b���ƖF�f�Wu�V"����V���6��7B��r��WrFFR������ƖF�f�Wu�V"���r�vWDgV�ŖV"������ƖF�f�Wt���F����r�vWD���F�����Т&V�FW$��ƖF�6�V�F"����Р�gV�7F���6��vT��ƖF����F��FV�F�����ƖF�f�Wt���F���FV�F���b���ƖF�f�Wt���F������ƖF�f�Wt���F�����ƖF�f�Wu�V"�ӲТ�b���ƖF�f�Wt���F������ƖF�f�Wt���F�����ƖF�f�Wu�V"���Т&V�FW$��ƖF�6�V�F"����Р��h�~Z�iȎ8�K�jZ�iz^8).X�n[�~�Ȇ��FFU7G"��&V6���Ȓ��7��2gV�7F���fWF6���ƖF�4f�$���F���V"����F����6��7B���7G&��r����F����E7F'B�"�sr���6��7B�B��WrFFR��V"����F�����vWDFFR����6��7B7F'B�G��V'��G�������6��7BV�B�G��V'��G�����G�7G&��r��B��E7F'B�"�sr����6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v��ƖF�2r���6V�V7B�vFFR�&V6��r���wFR�vFFRr�7F'B����FR�vFFRr�V�B����b�W'&�"�F�&�u7W&6TW'&�"�~K�jZ�iz^K��j~8�X�n[�rr�W'&�"���6��7B���Ӱ��FF���Ғ�f�$V6����������FFU����&V6����rs�ғ��&WGW&����Р�7��2gV�7F���&V�FW$��ƖF�6�V�F"����F�7V�V�B�vWDV�V�V�D'��B�v��ƖF�����F���&V�r��FW�D6��FV�BТG���ƖF�f�Wu�V'�[�BG���ƖF�f�Wt���F���iȆ��6��7Bw&�B�F�7V�V�B�vWDV�V�V�D'��B�v��ƖF��6��w&�Br�����FT�W'B�vF֖�ֆ�ƖF��W'&�"r�����WB��ƖF�2��Ӱ�G'�����ƖF�2�v�BfWF6���ƖF�4f�$���F����ƖF�f�Wu�V"���ƖF�f�Wt���F�����6F6��R���6��6��R�W'&�"�~)���&V�FW$��ƖF�6�V�F%�8*�8:�8;âr�R���6��t�W'B�vF֖�ֆ�ƖF��W'&�"r�K�jZ�iz^88~8;�8+�8�X�n[�~8�ZKiY~8~8�8~8�8"G�R�7W&6TW'&�"�~�Ȃr�R�7W&6TW'&�"�6�FR�~�Ȓr�rw����Р�6��7BF�w2��~izRr�~iȂr�~x�r�~kBr�~iʂr�~�yr�~Y��uӰ��WB�F���rs��F�w2�f�$V6���B�������6��7B6�2������w7V�r�����b�w6Br�rs���F�����F�b6�73�&��ƖF��6��F�rG�6�7�#�G�G���F�c���ғ���6��7Bf�'7DF�r��WrFFR���ƖF�f�Wu�V"���ƖF�f�Wt���F����vWDF�����6��7B�V�F�2��WrFFR���ƖF�f�Wu�V"���ƖF�f�Wt���F�����vWDFFR����6��7BF�F���WrFFR����F�F��6WD��W'2��������f�"��WB�����f�'7DF�s��������F�����F�b6�73�&��ƖF��6��F�V�G�#���F�c���Р�f�"��WBB��B���V�F�3�B�����6��7BFFT�&���WrFFR���ƖF�f�Wu�V"���ƖF�f�Wt���F��B���6��7B���7G&��r���ƖF�f�Wt���F����E7F'B�"�sr���6��7BFB�7G&��r�B��E7F'B�"�sr���6��7BFFU7G"�G���ƖF�f�Wu�V'��G�����G�FG���6��7B�57B�FFT�&��F�F���6��7B�5F�F��FFT�&��vWEF��R�����F�F��vWEF��R����6��7B�4��ƖF����ƖF�5�FFU7G%���V�FVf��VC���6��7B6�76W2��v��ƖF��6��F�uӰ��b��57B�6�76W2�W6��w7Br����b��5F�F��6�76W2�W6��wF�F�r����b��4��ƖF��6�76W2�W6��v��ƖF�r����6��7B��6Ɩ6���57B�rr���6Ɩ6��'F�vv�T��ƖF��rG�FFU7G'�r�F��2�&��6��7B&V6����4��ƖF�bb��ƖF�5�FFU7G%Т��7�6�73�&��ƖF��F��&V6��#�G�W62���ƖF�5�FFU7G%җ���7���rs���F�����F�b6�73�"G�6�76W2����rr��"G���6Ɩ6����7�6�73�&��ƖF��F���V�#�G�G���7��G�&V6��Т��F�c���Р�w&�B���W$�D����F�ð�Р�7��2gV�7F���F�vv�T��ƖF��FFU7G"�F�V��6��7B�4��ƖF��F�V��6�74Ɨ7B�6��F��2�v��ƖF�r����b��4��ƖF�����b�6��f�&҆G�FFU7G'�8�K�jZ�iz^���Z�8).�z>��N8~8�8�8������&WGW&㰢6��t��F��r�~�z>��NK�����r���G'���6��7B�W'&�"��v�B6$6ƖV�B�g&�҂v��ƖF�2r��FV�WFR���W�vFFRr�FFU7G"����b�W'&�"�F�&�u7W&6TW'&�"�~K�jZ�iz^8�z>��Br�W'&�"���v�B&V�FW$��ƖF�6�V�F"�����6F6��R���6��6��R�W'&�"�~)���F�vv�T��ƖF��FV�WFU�8*�8:�8;âr�R���6��7BFWF���R�7W&6TW'&�"��ȂG�R�7W&6TW'&�"�6�FWӢG�R�7W&6TW'&�"��W76vW��Ȗ�rs��6��t�W'B�vF֖�ֆ�ƖF��W'&�"r�K�jZ�iz^8�z>��N8�ZKiY~8~8�8~8�8"G�FWF�������f���ǒ����FT��F��r����Т�V�6R��6��7B&V6���&��B�G�FFU7G'�8).K�jZ�iz^8����Z�8~8�8�8%��ynyK�ȎK��hH�8;�z��j�N8~8(.X���Ȟ�ɦ�rr����b�&V6������V�&WGW&���8*�8:>8;>8+�8:��6��t��F��r�~y����.K�����r���G'���6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v��ƖF�2r����6W'B��FFS�FFU7G"�&V6��&V6���G&�҂����V��Ґ��6V�V7B�����b�W'&�"�F�&�u7W&6TW'&�"�~K�jZ�iz^8�y����"r�W'&�"����b�FF��FF��V�wF�������6��t�W'B�vF֖�ֆ�ƖF��W'&�"r��~K�jZ�iz^8).y����.8~8�8�8�8)>8~8~8�8%7W&6R8���ƖF�288n8;�89n8:�8���4U%ByJ�8�$�289�8:�8+~8;�8Ί��Z�8^8(�8n8N8(�8�8Nz+����8�88^8N8"r���&WGW&㰢Тv�B&V�FW$��ƖF�6�V�F"�����6F6��R���6��6��R�W'&�"�~)���F�vv�T��ƖF����6W'E�8*�8:�8;âr�R���6��7BFWF���R�7W&6TW'&�"��ȂG�R�7W&6TW'&�"�6�FWӢG�R�7W&6TW'&�"��W76vW��Ȗ�rs��6��t�W'B�vF֖�ֆ�ƖF��W'&�"r�K�jZ�iz^8�y����.8�ZKiY~8~8�8~8�8"G�FWF�������f���ǒ����FT��F��r����ТТР��h�~Z�iz^8�K�jZ�iz^8�8�8n8�z+������7��2gV�7F���6�V6��4��ƖF��FFU7G"���6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v��ƖF�2r���6V�V7B�w&V6��r���W�vFFRr�FFU7G"�����&U6��v�R�����b�W'&�"�F�&�u7W&6TW'&�"�~K�jZ�iz^888*~88>8*�r�W'&�"���&WGW&�FF����V��8�8(�K�jZ�iz^8~8�8�8@�Р�7��2gV�7F���&V�FW$&�����w2����6��7Bd��R�F�7V�V�B�vWDV�V�V�D'��B�v&b���Rr��f�VR�F���vW$66R����6��7Bd�V�R�F�7V�V�B�vWDV�V�V�D'��B�v&b��V�Rr��f�VS��6��7B6��F��W"�F�7V�V�B�vWDV�V�V�D'��B�v&�����r�Ɨ7Br���6��F��W"���W$�D���s�F�b6�73�&V�G��7FFR#��F�b6�73�&V�#�(�3��F�c���8����8�K����������F�c�s����FT�W'B�vF֖��&�����r�W'&�"r���G'����WBVW'��6$6ƖV�B�g&�҂v&�����w2r��6V�V7B�r�r���&FW"�vFFRr���&FW"�wF��Rr����b�d�V�R�VW'��VW'��W�v�V�Rr�d�V�R���6��7B�FF�W'&�"��v�BVW'����b�W'&�"�F�&�rW'&�#����WBƗ7B�FF���Ӱ��b�d��R�Ɨ7B�Ɨ7B�f��FW"�"���"���R��rr��F���vW$66R����6�VFW2�d��R�����"�7W7F��W%��V�&W"��rr���6�VFW2�d��R�����F�7V�V�B�vWDV�V�V�D'��B�v&�����r�6�V�Br��FW�D6��FV�B�G�Ɨ7B��V�wF��K�f���b�Ɨ7B��V�wF���6��F��W"���W$�D���V�G�7FFR�	�8�r�~K��{HN8�8.8(�8�8�8)2r��&WGW&�Р�6��F��W"���W$�D���Ɨ7B���"����6��7B�4f�'7B��"��V�R��rr��7F'G5v�F��~X��Y��r���6��7B�F���"�7��F��� ��F�b6�73�&F֖��#��7�6�73�&F֖���F�vv�R"��6Ɩ6��'F�vv�U�F��2�#�)kbYX����Xh^Z�8).�h�8(���7���F�b6�73�&F֖���&�G�#��F�c�)yx~x�n�ɢG�W62�"�7��F�җ���F�c��F�c�)X�~���j�N�ɢG�W62�"�G&VF�V�E���7F�'�����F�c��F�c�)"y��yx~i�.i���ɢG�W62�"�7��F���7F'B����F�c��F�c�)2X�^K��X��Y
+n�ɢG�W62�"�W�W&6�6U�������F�c��F�c�)Biz^[��yI�kK��ɢG�W62�"�F�Ǖ���7B����F�c���F�c���F�c��rs��&WGW&� ��F�b6�73�&F֖�֗FV�#��F�b6�73�&F֖�֖�f�#��F�b6�73�&F֖����R#�G�W62�"���R����F�c��7�6�73�&F֖��FrG��4f�'7B�rr�r&�VR�Frw�#�G�W62�"��V�R����7���F�b6�73�&F֖���WF#��7��	�8RG�f�&�DFFR�"�FFR��G�W62�"�F��R����7���7��	�9�G�W62�"����R����7��G�"�7W7F��W%��V�&W"��7��	�I���G�W62�"�7W7F��W%��V�&W"����7���rwТ��F�c�G�"��V����F�b6�73�&F֖���V��#�	�9�G�W62�"��V�����F�c��rwТG��F��Т��F�c��F�b7G��S�&F�7���f�W��f�W��F�&V7F���6��V��Ɩv�֗FV�3�f�W��V�C�v����f�W��6�&�泣�#���&V�6�73�'f�6�FVB�6�V6�G�"�f�6�FVB�r6�V6�VB��&V�r�rw�#�Ɩ�WBG�S�&6�V6�&��"G�"�f�6�FVB�v6�V6�VBr�rwТ��6��vS�'F�vv�Uf�6�FVB�rG�W62�"�B��r�rG�W62�"�7W7F��W%��V�&W"��rr��r�F��2�#�i�^��.k��8����&V���'WGF��6�73�&'F��F�vW""��6Ɩ6��&FV�WFT&�����t6��f�&҂rG�W62�"�B��r�rG�W62�"���R��&W�6R��r�r�u��S#rr��r�#�X����C��'WGF�����F�c���F�c���Ғ����rr����6F6��R���6��t�W'B�vF֖��&�����r�W'&�"r�~K��{HN88~8;�8+�8�X�n[�~8�ZKiY~8~8�8~8�8.89�8;�8+�8).Xhފ��8����8�8~8n8�88^8N8"r���6��F��W"���W$�D���rs��ТР�7��2gV�7F���&V�FW$7W7F��W'2����6��7Bd��R�F�7V�V�B�vWDV�V�V�D'��B�v6b���Rr��f�VR�F���vW$66R����6��7B6��F��W"�F�7V�V�B�vWDV�V�V�D'��B�v7W7F��W"�Ɨ7Br���6��F��W"���W$�D���s�F�b6�73�&V�G��7FFR#��F�b6�73�&V�#�(�3��F�c���8����8�K����������F�c�s����FT�W'B�vF֖��7W7F��W"�W'&�"r���G'���6��7B�FF�W'&�"��v�B6$6ƖV�B�g&�҂v7W7F��W'2r��6V�V7B�r�r���&FW"�v7W7F��W%��V�&W"r����b�W'&�"�F�&�rW'&�#����WBƗ7B�FF���Ӱ��b�d��R�Ɨ7B�Ɨ7B�f��FW"�2���2���R��rr��F���vW$66R����6�VFW2�d��R�����2����R��rr���6�VFW2�d��R�����2�7W7F��W%��V�&W"��rr���6�VFW2�d��R�����F�7V�V�B�vWDV�V�V�D'��B�v7W7F��W"�6�V�Br��FW�D6��FV�B�G�Ɨ7B��V�wF��K�f���b�Ɨ7B��V�wF���6��F��W"���W$�D���V�G�7FFR�	�Br�~�~Z�.8�y����.8^8(�8n8N8�8�8)2r��&WGW&�Р�6��F��W"���W$�D���Ɨ7B���2�� ��F�b6�73�&F֖�֗FV�#��F�b6�73�&F֖�֖�f�#��F�b6�73�&F֖����R#�G�W62�2���R����F�c��7�6�73�&F֖��Fr&�VR�Fr#����G�W62�2�7W7F��W%��V�&W"����7���F�b6�73�&F֖���WF#��7��	�9�G�W62�2����R����7���7��)Ȟ���G�W62�2�V�����7����F�c��F�b6�73�'f�6�B�6�V�B�w&#��7�6�73�'f�6�B�6�V�B��&V�#�i[NK�>�ɣ��7��Ɩ�WB6�73�'f�6�B�6�V�B֖�WB"G�S�&�V�&W""֖��# ��C�'f2�6V�F��G�W62�2�B��"f�VS�"G�2�6V�F��6�V�B���#��7�6�73�'f�6�B�6�V�B��&V�#�Y��889N8:�88n8*>8+��ɣ��7��Ɩ�WB6�73�'f�6�B�6�V�B֖�WB"G�S�&�V�&W""֖��# ��C�'f2���FW2�G�W62�2�B��"f�VS�"G�2���FW5�6�V�B���#��7�6�73�'f�6�B�6�V�B��&V�#�Y����7���'WGF��6�73�&'F��f�6�B�WFFR ���6Ɩ6��'WFFUf�6�D6�V�B�rG�W62�2�B��r�#�i�Nik��'WGF�����F�c���F�c��'WGF��6�73�&'F��F�vW""��6Ɩ6��&FV�WFT7W7F��W$6��f�&҂rG�W62�2�B��r�rG�W62�2�7W7F��W%��V�&W"��r�rG�W62�2���R��&W�6R��r�r�u��S#rr��r�#�X����C��'WGF�����F�c������rr����6F6��R���6��t�W'B�vF֖��7W7F��W"�W'&�"r�~�~Z�.88~8;�8+�8�X�n[�~8�ZKiY~8~8�8~8�8.89�8;�8+�8).Xhފ��8����8�8~8n8�88^8N8"r���6��F��W"���W$�D���rs��ТР�7��2gV�7F���WFFUf�6�D6�V�B�7W7F��W$�B���6��7B6V�F���WB�F�7V�V�B�vWDV�V�V�D'��B�f2�6V�F��G�7W7F��W$�G����6��7B��FW4��WB�F�7V�V�B�vWDV�V�V�D'��B�f2���FW2�G�7W7F��W$�G����6��7B6V�F�6�V�B�'6T��B�6V�F���WB�f�VR����6��7B��FW46�V�B�'6T��B���FW4��WB�f�VR�����b��4��6V�F�6�V�B���6V�F�6�V�B����4����FW46�V�B�����FW46�V�B����6��t�W'B�vF֖��7W7F��W"�W'&�"r�~j�>8~8NY��i[�ȃK�^K��8�i[Ni[�Ȟ8).XZ^X��8~8n8�88^8N8"r���&WGW&㰢Т6��7Bf�6�D6�V�B�6V�F�6�V�B���FW46�V�C��6��6��R���r�	�KR�WFFUf�6�D6�V�E�UDD^�h�Zx��r��7W7F��W$�B�6V�F�6�V�B���FW46�V�B�f�6�D6�V�Bғ��G'������6V�V7B��8).K��88(�8>8�8r$�28rUDDR8�h�.Y
+n8^8(�8�ZNY��ȃ��i�Nik�Ȟ8).jI�y�^8~8�8(��6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v7W7F��W'2r���WFFR��f�6�E�6�V�C�f�6�D6�V�B�6V�F��6�V�C�6V�F�6�V�B���FW5�6�V�C���FW46�V�BҐ��W�v�Br�7W7F��W$�B���6V�V7B������b�W'&�"���6��6��R�W'&�"�~)���WFFUf�6�D6�V�E�7W&6^8*�8:�8;Ί�>{K�r����W76vS�W'&�"��W76vR��6�FS�W'&�"�6�FR��FWF��3�W'&�"�FWF��2�����C�W'&�"憖�B��7FGW3�W'&�"�7FGW0�ғ��6��7BFWF���W'&�"�6�FP���ȂG�W'&�"�6�FWӢG�W'&�"��W76vW��Ȗ ���ȂG�W'&�"��W76vW��Ȗ��6��t�W'B�vF֖��7W7F��W"�W'&�"r�i�^��.Y��i[8�i�Nik8�ZKiY~8~8�8~8�8"G�FWF������&WGW&㰢Р���$�28rUDDRj����8�8�8NZNY�88*�8:�8;�8�X{�8�8�FF8�z���X�X�~8~��N8>8n8�8(���b�FF��FF��V�wF�������6��6��R�W'&�"�~)���WFFUf�6�D6�V�E���i�Nik�ȅ$�>8�UDD^89�8:�8+~8;�iʮ���Z�8�X���;�h
+~�ȓ�r��7W7F��W$�B�6V�F�6�V�B���FW46�V�Bғ��6��t�W'B��vF֖��7W7F��W"�W'&�"r��~i�Nik8~8�8�8�8)>8~8~8�8%7W&6R8�7W7F��W'288n8;�89n8:�8�UDDRyJ�8�$�289�8:�8+~8;�8Ί��Z�8^8(�8n8N8(�8�8Nz+����8�88^8N8"p����&WGW&㰢Р�6��6��R���r�~)�R�WFFUf�6�D6�V�E�UDD^h�X��K��Zَ�âr�FF���6V�F���WB�7G��R�&�&FW$6���"�wf"���7V66W72�s����FW4��WB�7G��R�&�&FW$6���"�wf"���7V66W72�s��6WEF��V�WB�������6V�F���WB�7G��R�&�&FW$6���"�rs����FW4��WB�7G��R�&�&FW$6���"�rs����S�����FT�W'B�vF֖��7W7F��W"�W'&�"r����6F6��R���6��6��R�W'&�"�~)���WFFUf�6�D6�V�E�K��i��8�8�8*�8:�8;âr�R���6��t�W'B�vF֖��7W7F��W"�W'&�"r�i�^��.Y��i[8�i�Nik8�ZKiY~8~8�8~8�8.�ȂG�R��W76vR��~K��i��8�8*�8:�8;�w��Ȗ���ТР�7��2gV�7F���FV�WFT&�����t6��f�&҆�B���R����b�6��f�&҆8�G���W�8�8^8)>8�K��{HN8).X����N8~8�8�8������8>8�i8�K��8�X�n8(�kh�8�8�8�8)>8&��&WGW&㰢6��t��F��r�~X����NK�����r���G'���6��7B�W'&�"��v�B6$6ƖV�B�g&�҂v&�����w2r��FV�WFR���W�v�Br��B����b�W'&�"�F�&�rW'&�#��v�B&V�FW$&�����w2�����6F6��R���6��t�W'B�vF֖��&�����r�W'&�"r�~K��{HN8�X����N8�ZKiY~8~8�8~8�8.8~88(�8�8~8n8�8(�8���n8~8�88^8N8"r����f���ǒ����FT��F��r����ТР�7��2gV�7F���FV�WFT7W7F��W$6��f�&҆�B�7W7F��W$�V�&W"���R����b�6��f�&҆�~Z�$���G�7W7F��W$�V�&W'�8�G���W�8�8).X����N8~8�8�8������X����N8�8(�8�8>8�~Z�.yZ�X�~8~8�8:�8+8*N8;>8�8~8�8�8�8�8(�8�8�8&��&WGW&㰢6��t��F��r�~X����NK�����r���G'���6��7B�W'&�"��v�B6$6ƖV�B�g&�҂v7W7F��W'2r��FV�WFR���W�v�Br��B����b�W'&�"�F�&�rW'&�#��v�B&V�FW$7W7F��W'2�����6F6��R���6��t�W'B�vF֖��7W7F��W"�W'&�"r�~�~Z�.8�X����N8�ZKiY~8~8�8~8�8.8~88(�8�8~8n8�8(�8���n8~8�88^8N8"r����f���ǒ����FT��F��r����ТР�7��2gV�7F���F�vv�Uf�6�FVB�&�����t�B�7W7F��W$�V�&W"�6�V6�&�����6��7B6�V6�VB�6�V6�&���6�V6�VC��6��7B�&V��6�V6�&���6��6W7B�r�f�6�FVB�6�V6�r���6�V6�&���F�6&�VB�G'VS���K�Θx�i8�K�Ι�.j� �6��6��R���r�	�KR�F�vv�Uf�6�FVE��h�Zx��r��&�����t�B�7W7F��W$�V�&W"�6�V6�VBғ���G'�����)&�����w2�f�6�FVB8).i�Nik�Ȃ�6V�V7B��8~i�Nik��8).X�n[�~8r$�28���89n8:�88>8*�8).jI�y�^�Ȑ�6��7B�FF�$FF�W'&�#�$W'"��v�B6$6ƖV�@��g&�҂v&�����w2r���WFFR��f�6�FVC�6�V6�VBҐ��W�v�Br�&�����t�B���6V�V7B�����b�$W'"���6��6��R�W'&�"�~)���F�vv�Uf�6�FVE�&�����w2UDDR8*�8:�8;âr�$W'"���F�&�r�WrW'&�"�K��{HN8�i�NikZKiY~�ȂG�$W'"�6�FR��rwӢG�$W'"��W76vW��Ȗ���Т�b�$FF��$FF��V�wF�������6��6��R�W'&�"�~)���F�vv�Uf�6�FVE�&�����w2��i�Nik�ȅ$�>89n8:�88>8*�8�X���;�h
+~�Ȓr���F�&�r�WrW'&�"�~K��{HN8�i�Nik8�ZKiY~8~8�8~8�8&&�����w288n8;�89n8:�8�UDDRyJ�$�289�8:�8+~8;�8).8Nz+����8�88^8N8"r���Т6��6��R���r�~)�R�F�vv�Uf�6�FVE�&�����w2UDDRh�X��r�$FF������)�~Z�.yZ�X�~8�8.8(�ZNY�87W7F��W'2�f�6�E�6�V�B8).Z)~k����b�7W7F��W$�V�&W"���6��7B�FF�7W7B�W'&�#�4fWF6�W'"��v�B6$6ƖV�@��g&�҂v7W7F��W'2r���6V�V7B�v�B�f�6�E�6�V�B�6V�F��6�V�B���FW5�6�V�Br���W�v7W7F��W%��V�&W"r�7W7F��W$�V�&W"�����&U6��v�R�����b�4fWF6�W'"���6��6��R�W'&�"�~)���F�vv�Uf�6�FVE�7W7F��W'2X�n[�~8*�8:�8;âr�4fWF6�W'"���F�&�r�WrW'&�"��~Z�.h8^Z8�X�n[�~ZKiY~�ȂG�4fWF6�W'"�6�FR��rwӢG�4fWF6�W'"��W76vW��Ȗ���Т�b�7W7B���6��6��R�v&�~)�����F�vv�Uf�6�FVE�7W7F��W%��V�&W"8���.[�>8�8(��~Z�.8Ίh�8N8�8(�8�8�8)3�r�7W7F��W$�V�&W"������~Z�.8�8N8�8�8n8(.K��{HN8�888*~88>8*�8�h�X��h�8@��V�6R��6��7B�V�R��$FF�����V�R��rr���6��7B�56V�F���V�R��6�VFW2�~i[NK�2r���6��7B�5��FW2��V�R��6�VFW2�~89N8:�88n8*>8+�r����6��7B7W%f�6�B�7W7B�f�6�E�6�V�B����6��7B�Wuf�6�B�6�V6�VB�7W%f�6�B���F������7W%f�6�B�����6��7B7W%6V�F��7W7B�6V�F��6�V�B����6��7B�Wu6V�F���56V�F����6�V6�VB�7W%6V�F����F������7W%6V�F������7W%6V�F����6��7B7W%��FW2�7W7B���FW5�6�V�B����6��7B�Wu��FW2��5��FW0���6�V6�VB�7W%��FW2���F������7W%��FW2�����7W%��FW3���6��6��R���r�	�KR�F�vv�Uf�6�FVE�i�Nik�f�6�E�6�V�BG�7W%f�6�G�(i"G��Wuf�6�G��6V�F��6�V�BG�7W%6V�F��(i"G��Wu6V�F�����FW5�6�V�BG�7W%��FW7�(i"G��Wu��FW7�����6��7B�FF�4FF�W'&�#�5WFFTW'"��v�B6$6ƖV�@��g&�҂v7W7F��W'2r���WFFR��f�6�E�6�V�C��Wuf�6�B�6V�F��6�V�C��Wu6V�F����FW5�6�V�C��Wu��FW2Ґ��W�v�Br�7W7B�B���6V�V7B�����b�5WFFTW'"���6��6��R�W'&�"�~)���F�vv�Uf�6�FVE�7W7F��W'2UDDR8*�8:�8;âr�5WFFTW'"���F�&�r�WrW'&�"�i�^��.Y��i[8�i�NikZKiY~�ȂG�5WFFTW'"�6�FR��rwӢG�5WFFTW'"��W76vW��Ȗ���Т�b�4FF��4FF��V�wF�������6��6��R�W'&�"�~)���F�vv�Uf�6�FVE�7W7F��W'2��i�Nik�ȅ$�>89n8:�88>8*�8�X���;�h
+~�Ȓr���F�&�r�WrW'&�"�~i�^��.Y��i[8�i�Nik8�ZKiY~8~8�8~8�8&7W7F��W'288n8;�89n8:�8�UDDRyJ�$�289�8:�8+~8;�8).8Nz+����8�88^8N8"r���Т6��6��R���r�~)�R�F�vv�Uf�6�FVE�f�6�E�6�V�B�6V�F��6�V�B���FW5�6�V�BUDDRh�X��r�4FF���Т�V�6R��6��6��R���r�~(K�����F�vv�Uf�6�FVE�7W7F��W%��V�&W"8�z��8�8�8(f�6�E�6�V�Bi�Nik8�8+�8*�88>89rr���Р��&V��6�74Ɨ7B�F�vv�R�v6�V6�VB��&V�r�6�V6�VB�����FT�W'B�vF֖��&�����r�W'&�"r�������~Z�.K��j~8+�89n8Ί�zK�K��8�8(��z�X�^i�Nik ��b�F�7V�V�B�vWDV�V�V�D'��B�wF"�7W7F��W'2r��6�74Ɨ7B�6��F��2�v7F�fRr����v�B&V�FW$7W7F��W'2����Т�6F6��R���6��6��R�W'&�"�~)���F�vv�Uf�6�FVE�ZKiYs�r�R���6�V6�&���6�V6�VB�6�V6�VC���ZKiY~i�.8�XX>8�h��8��6��t�W'B�vF֖��&�����r�W'&�"r�i�^��.k��8�8�i�Nik8�ZKiY~8~8�8~8�8"G�R��W76vR�~�Ȃr�R��W76vR�~�Ȓr�rw�����f���ǒ��6�V6�&���F�6&�VB�f�6S��ТР�gV�7F���F�vv�U�V��6��7B&�G��V���W�DV�V�V�E6�&Ɩ�s��6��7B�V��&�G��6�74Ɨ7B�F�vv�R�v�V�r���V��FW�D6��FV�B��V��~)k�YX����Xh^Z�8).�h�8�8(�r�~)kbYX����Xh^Z�8).�h�8(�s��Р���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���7W&6RD"i8�K�����)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���7W&6R8*�8:�8;�8).iz^i�Ί��8:�8+K��8�8rF�&�r8�8(�89�8:�898;���gV�7F���F�&�u7W&6TW'&�"��&V��6$W'&�"���6��6��R�W'&�"�)���G��&V���7W&6^8*�8:�8;Ί�>{K�����W76vS�6$W'&�"��W76vR��6�FS�6$W'&�"�6�FR��FWF��3�6$W'&�"�FWF��2�����C�6$W'&�"憖�B��7FGW3�6$W'&�"�7FGW0�ғ��6��7BW'"��WrW'&�"�G��&V�ӢG�6$W'&�"��W76vW����W'"�7W&6TW'&�"�6$W'&�#��F�&�rW'#��Р���~Z�.8)"7W7F��W%��V�&W"8~jI�{J"��7��2gV�7F���f��D7W7F��W"�7W7F��W$�V�&W"���6��6��R���r�	�KR�f��D7W7F��W%�jI�{J.K��7W7F��W%��V�&W#�r�7W7F��W$�V�&W"���6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v7W7F��W'2r���6V�V7B�r�r���W�v7W7F��W%��V�&W"r�7W7F��W$�V�&W"�����&U6��v�R�����b�W'&�"�F�&�u7W&6TW'&�"�~�~Z�.h8^Z8�X�n[�rr�W'&�"���6��6��R���r�	�KR�f��D7W7F��W%�{Yi�âr�FF���&WGW&�FF����V���b��Bf�V�@�Р��iz.Zَ8�7W7F��W%��V�&W"K��j~8).X�n[�~8~8n�xފH~8~8�8Cn�yZ�X�~8).yI�h���7��2gV�7F���vV�W&FT7W7F��W$�B����6��6��R���r�	�KR�vV�W&FT7W7F��W$�E�iz.Zَ�~Z�.yZ�X�~8).X�n[�~K�����r���6��7B�FF�W'&�"��v�B6$6ƖV�B�g&�҂v7W7F��W'2r��6V�V7B�v7W7F��W%��V�&W"r����b�W'&�"�F�&�u7W&6TW'&�"�~�~Z�.yZ�X�~K��j~8�X�n[�rr�W'&�"����6��7BW��7F��r��FF���Ғ���2��2�7W7F��W%��V�&W"���6��6��R���r�	�KR�vV�W&FT7W7F��W$�E�iz.ZَyZ�X�~K��js�r�W��7F��r�����b�W��7F��r��V�wF�����F�&�r�WrW'&�"�~�~Z�.yZ�X�~8�K����8��N8~8n8N8�8�8"r�������xފH~8~8�8NyZ�X�~8�z+�Z�8�8(�8�8~8:�8;�89~�ȃ8	Ó�����8�z�NY�.8~yI�h��Ȑ��WB�C���WBG&�W2���F����B�7G&��r��F��f���"��F��&�F�҂��������G&�W2�����b�G&�W2�S�F�&�r�WrW'&�"�~�~Z�.yZ�X�~8�yI�h�8�ZKiY~8~8�8~8��Ȏ��n��K�����Ȟ8"r����v���R�W��7F��r��6�VFW2��B�����(i�xފH~8�8(���8(�[�^8�Xh�yI�h� �6��6��R���r�	�KR�vV�W&FT7W7F��W$�E�k�Z�yZ�X�s�G��G��ȂG�G&�W7�Y�n���Ȗ���&WGW&��C��Р���~Z�.8).K��Zَ�Ȅ��4U%B[��8�K��Zَ��8).��N8��Ȓ��7��2gV�7F���6fT7W7F��W"�2���6��6��R���r�	�KR�6fT7W7F��W%���4U%N�h�Zx��r�2���6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v7W7F��W'2r����6W'B���7W7F��W%��V�&W#�2�7W7F��W%��V�&W"����S�2���R�����S�2����R��V��â2�V����Ґ��6V�V7B�����K��Zَ8^8(�8���8).��N8~8n8(.8(�8Nz+���Т�b�W'&�"�F�&�u7W&6TW'&�"�~�~Z�.y����"r�W'&�"���6��6��R���r�~)�R�6fT7W7F��W%���4U%NZ��K�bK��Zَ�âr�FF���&WGW&�FF��Р��K��{HN8).K��Zق��7��2gV�7F���6fT&�����r�"���6��6��R���r�	�KR�6fT&�����u���4U%N�h�Zx��r�"���6��7B�FF�W'&�"��v�B6$6ƖV�@��g&�҂v&�����w2r����6W'B���7W7F��W%��V�&W#�"�7W7F��W%��V�&W"���V������S�"���R�����S�"����R��V��â"�V������V�S�"��V�R��FFS�"�FFR��F��S�"�F��R���V��"��V�����V����7��F�Ӣ"�7��F�����V����G&VF�V�E���7F�'��"�G&VF�V�E���7F�'����V����7��F���7F'C�"�7��F���7F'B���V����W�W&6�6U����"�W�W&6�6U������V����F�Ǖ���7C�"�F�Ǖ���7B���V����Ɩ�U�W6W%��C�"�Ɩ�U�W6W%��B���V���Ґ��6V�V7B�����b�W'&�"�F�&�u7W&6TW'&�"�~K��{HN8�K��Zقr�W'&�"���6��6��R���r�~)�R�6fT&�����u���4U%NZ��K�bK��Zَ�âr�FF���&WGW&�FF��Р���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���Ĕ�^�	�y�P���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H�7��2gV�7F���6V�DƖ�T��F�g�����R��V�R�FFR�F��R����R��V��Ғ��v�BfWF6���v�GG3���wWF�&w���f�V�7Vw�f'2�7W&6R�6��gV�7F���2�c�6V�B�Ɩ�R���F�g�r�����WF��C�u�5Br���VFW'3���t6��FV�B�G�Rs�vƖ6F�����6��r��tWF��&��F���s�t&V&W"W���$v6�����W��攗4��#V44�d���d4���W��34֔����E�&���g��4�4��Ŧ��d��CDv���6�f%���s��EvCe�ԧ���v�6ӗ5�4�d��gV##F��4������S4祓D�D���W4��cF44�d֤T֥��D�$��T4W����'E�s�D��E�ׄ$f�3�dF�#W�4b�U7%�p����&�G���4���7G&��v�g�����R��V�R�FFR�F��R����R��V��Ґ�Т���Р���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���8:n8;�88n8*>8:�88n8*0���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H�gV�7F���f�&�DFFR�2����b�2�&WGW&�rs��6��7B�����E��2�7ƗB�r�r���&WGW&�G���[�BG�'6T��B�җ�iȂG�'6T��B�B��izV��ТgV�7F���6��t�W'B��B��6r���6��7BV��F�7V�V�B�vWDV�V�V�D'��B��B����b�V&WGW&㰢�b��6r�V��FW�D6��FV�B��6s��V��6�74Ɨ7B�FB�w6��rr���V��67&��Ė�F�f�Wr��&V�f��#�w6���F�r�&��6��v�V&W7Brғ��ТgV�7F�����FT�W'B��B���6��7BV��F�7V�V�B�vWDV�V�V�D'��B��B����b�VV��6�74Ɨ7B�&V��fR�w6��rr���ТgV�7F���W62�2���&WGW&�7G&��r�2��rr���&W�6R��b�r�rf��r��&W�6R����r�rf�C�r���&W�6R����r�rfwC�r��&W�6R��"�r�rgV�C�r��&W�6R��r�r�rb33��r���ТgV�7F���V�G�7FFR��6����6r���&WGW&��F�b6�73�&V�G��7FFR#��F�b6�73�&V�#�G��6�����F�c���G��6w������F�c���Р���8:�8+�8*�89�8+�8;>8�89>8+�8:^8*.8:���h��F�7V�V�B�VW'�6V�V7F�$�r�&F���w&�Wr��f�$V6��r����r�VW'�6V�V7F�$�v��WE�G�S�&F���r��f�$V6��"����"�FDWfV�DƗ7FV�W"�v6��vRr�������r�VW'�6V�V7F�$�r�&F��֗FV�r��f�$V6�������6�74Ɨ7B�&V��fR�w6V�V7FVBr����"�6��6W7B�r�&F��֗FV�r��6�74Ɨ7B�FB�w6V�V7FVBr���ғ��ғ��ғ�����)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���X��i��X�`���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H����[~X�^i�.8�7W&6Rh�^{i�8).yh�	�z+������7��2gV�7F���6�V6�6���V7F��ₒ��G'���6��7B�W'&�"��v�B6$6ƖV�B�g&�҂v7W7F��W'2r��6V�V7B�v�Br��Ɩ֗B�����b�W'&�"���6��6��R�W'&�"�~)���h�^{i�z+�����7W&6^yh�	�8*�8:�8;âr����W76vS�W'&�"��W76vR��6�FS�W'&�"�6�FR�����C�W'&�"憖�B��7FGW3�W'&�"�7FGW0�ғ��6��6��R�v&�~)�����>8�8(�8(�8(�X��Y���8*�8;�8N8(��$�>89�8:�8+~8;�8�8(�8(�8*.8*�8+�8+�h�.Y
+b�88n8;�89n8:�Y�8�K��K��{Br����V�6R��6��6��R���r�~)�R�h�^{i�z+�����7W&6^h�^{i����Ȇ7W7F��W'>88n8;�89n8:�X��Nz+�����Ȓr���Т�6F6��R���6��6��R�W'&�"�~)���h�^{i�z+�����K��i��8�8�8*�8:�8;âr�R���ТР���)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H���Ĕ�^�
+>i����)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H)H�gV�7F���7F'DƖ�T��v��g&��F��R����6��7B7FFR��F��&�F�҂��F�7G&��r�3b��6Ɩ6R�"���6W76���7F�&vR�6WD�FV҂vƖ�T��v��7FFRr��4���7G&��v�g����f��s�5B�f��r��V�S�5B��V�R����S�5B�W'6�������R��rr�����S�5B�W'6��������R��rr��V��â5B�W'6�����V�����rr��&�����t�C�5B�&�����t�B���V����&WGW&�F�wvR�F��Rp�Ғ���6W76���7F�&vR�6WD�FV҂vƖ�U7FFRr�7FFR���6��7B&�2��WrU$�6V&6�&�2���&W7��6U�G�S�v6�FRr��6ƖV�E��C�s#C�33rr��&VF�&V7E�W&��v�GG3����7F�fR������v�F�V"����7F�fR�&�����r�r��7FFR��66�S�w&�f��R�V�Bp�ғ��v��F�r���6F����&Vb�v�GG3���66W72�Ɩ�R��R��WF�"�c"��WF��&��S�r�&�2�F�7G&��r����Р�gV�7F���7F'DƖ�T��v�ₒ��6��7B��R�F�7V�V�B�vWDV�V�V�D'��B�w%���Rr���f�VR��rs��6��7B���R�F�7V�V�B�vWDV�V�V�D'��B�w"����Rr���f�VR��rs��6��7BV����F�7V�V�B�vWDV�V�V�D'��B�w"�V���r���f�VR��rs��6��7B7FFR��F��&�F�҂��F�7G&��r�3b��6Ɩ6R�"���6W76���7F�&vR�6WD�FV҂vƖ�T��v��7FFRr��4���7G&��v�g����f��s�5B�f��r��V�S�5B��V�R����R����R�V�����&WGW&�F�wvR��V�&W"�&Vv�7FW"p�Ғ���6W76���7F�&vR�6WD�FV҂vƖ�U7FFRr�7FFR���6��7B&�2��WrU$�6V&6�&�2���&W7��6U�G�S�v6�FRr��6ƖV�E��C�s#C�33rr��&VF�&V7E�W&��v�GG3����7F�fR������v�F�V"����7F�fR�&�����r�r��7FFR��66�S�w&�f��R�V�Bp�ғ��v��F�r���6F����&Vb�v�GG3���66W72�Ɩ�R��R��WF�"�c"��WF��&��S�r�&�2�F�7G&��r����Р�7��2gV�7F�����F�TƖ�T6��&6�����6��7B&�2��WrU$�6V&6�&�2�v��F�r���6F����6V&6����6��7B6�FR�&�2�vWB�v6�FRr����b�6�FR�&WGW&㰠���U$�8�8(�8*�8*�8:�898:�8:8;�8+�8).��NX밢v��F�r憗7F�'��&W�6U7FFR����F�7V�V�B�F�F�R�v��F�r���6F����F���R����6��7B6fVE&r�6W76���7F�&vR�vWD�FV҂vƖ�T��v��7FFRr����b�6fVE&r�&WGW&㰢6��7B6fVB��4���'6R�6fVE&r���6W76���7F�&vR�&V��fT�FV҂vƖ�T��v��7FFRr���6W76���7F�&vR�&V��fT�FV҂vƖ�U7FFRr������89^8:�8;�x�nhX�8).[�XX0��b�6fVB�f��r���5B�f��r�6fVB�f��s��5B��V�R�6fVB��V�R��rs��Т��89�8;�8+�8��~z{���f�vFUF�6fVB�&WGW&�F���wvR��V�&W"�&Vv�7FW"r������y����.89^8*�8;�8:8).z+�Z��8���zK��ȎK�^X��8�7V&֗E&Vv�7FW"8).{X�yK8~8n8N8�ZNY�8�X)�8��Ȑ�6��7B�f�&�6V2�F�7V�V�B�vWDV�V�V�D'��B�w&Vv�7FW"�f�&��6V7F���r���6��7B�F��U6V2�F�7V�V�B�vWDV�V�V�D'��B�w&Vv�7FW"�F��R�6V7F���r����b��f�&�6V2��f�&�6V2�7G��R�F�7���v&��6�s���b��F��U6V2��F��U6V2�7G��R�F�7���v���Rs�����89^8*�8;�8:X
+N8).[�XX>�ȎX�>i�.�ȴD��h��yK�[��8�[�^h��8~�Ȑ�6��7B�&W7F�&T��WG2�������6��7B��TV��F�7V�V�B�vWDV�V�V�D'��B�w"���Rr���6��7B���TV��F�7V�V�B�vWDV�V�V�D'��B�w"����Rr���6��7BV���V��F�7V�V�B�vWDV�V�V�D'��B�w"�V���r����b���TV�bb6fVB���R��V�FVf��VB���TV��f�VR�6fVB���S���b����TV�bb6fVB����R��V�FVf��VB����TV��f�VR�6fVB����S���b�V���V�bb6fVB�V�����V�FVf��VB�V���V��f�VR�6fVB�V��ð�Ӱ��&W7F�&T��WG2����6WEF��V�WB��&W7F�&T��WG2��������Ĕ�^��ފ��8+>8;�88�8).8:n8;�8+n8;ĔN8�K�Nh���6��t��F��r�tĔ�^��ފ��K�����r���G'���6��7B5U$4U�U$��v�GG3���wWF�&w���f�V�7Vw�f'2�7W&6R�6�s��6��7B�����U��vW���$v6�����W��攗4��#V44�d���d4���W��34֔����E�&���g��4�4��Ŧ��d��CDv���6�f%���s��EvCe�ԧ���v�6ӗ5�4�d��gV##F��4������S4祓D�D���W4��cF44�d֤T֥��D�$��T4W����'E�s�D��E�ׄ$f�3�dF�#W�4b�U7%�s��6��7B&W2�v�BfWF6��G�5U$4U�U$���gV�7F���2�c�Ɩ�R�WF�����WF��C�u�5Br���VFW'3���t6��FV�B�G�Rs�vƖ6F�����6��r��tWF��&��F���s�&V&W"G������U�� ����&�G���4���7G&��v�g����6�FR��&VF�&V7E�W&��v�GG3����7F�fR������v�F�V"����7F�fR�&�����r�p�Ґ�ғ���b�&W2����F�&�r�WrW'&�"�tĔ�^��ފ��8�ZKiY~8~8�8~8�r���6��7BFF�v�B&W2�6�ₓ���b�FF�Ɩ�U�W6W%��B���5B�Ɩ�UW6W$�B�FF�Ɩ�U�W6W%��C��6��7B�4g&��F��R�6fVB�&WGW&�F����wvR�F��Rs�����
+>i�k��8�8988>8+���zK��89�8+�8;>����zK��6��7B7FGW4V��F�7V�V�B�vWDV�V�V�D'��B��4g&��F��R�vƖ�R�6���V7B�7FGW2�F��Rr�vƖ�R�6���V7B�7FGW2r���6��7B'F�V��F�7V�V�B�vWDV�V�V�D'��B��4g&��F��R�vƖ�R�6���V7B�'F��F��Rr�vƖ�R�6���V7B�'F�r����b�7FGW4V7FGW4V��7G��R�F�7���v&��6�s���b�'F�V'F�V��7G��R�F�7���v���Rs����h�X��8*.8:�8;�88��6��7B�W'DVĖB��4g&��F��R�vF��R�Ɩ�R��W'Br�w&Vv�7FW"��W'Bs��6��7B�W'DV��F�7V�V�B�vWDV�V�V�D'��B��W'DVĖB����b��W'DV���W'DV��6�74��R�v�W'B�W'B�7V66W726��rs���W'DV��FW�D6��FV�B�~)�RĔ�^8��
+>i�8~8�8~8���K��{HNX��iz^8�8:�89�8*N8;>88�8:88>8+�8;�8+�8�[�8�8�8�8"s���W'DV��67&��Ė�F�f�Wr��&V�f��#�w6���F�r�&��6��v�V&W7Brғ��Т��vR�F��^8�8(�8�ZNY�8K��{HN8:�8+>8;�88�8)$Ĕ�R�N8~i�Nik ��b��4g&��F��Rbb6fVB�&�����t�B���6$6ƖV�B�g&�҂v&�����w2r���WFFR��Ɩ�U�W6W%��C�FF�Ɩ�U�W6W%��BҐ��W�v�Br�6fVB�&�����t�B���F�V₇�W'&�"Ғ�����b�W'&�"�6��6��R�v&�~)����&�����rĔ�R�Ni�Nik8*�8:�8;âr�W'&�"���V�6R6��6��R���r�~)�R&�����rĔ�R�Ni�NikZ��K�br���ғ��Т6��6��R���r�~)�R�Ĕ�^�
+>i��h�X��r�FF�F�7�����R����V�6R��F�&�r�WrW'&�"�vƖ�U�W6W%��N8�X�n[�~8~8�8�8�8)>8~8~8�r���Т�6F6��R���6��6��R�W'&�"�~)���Ĕ�^�
+>i��8*�8:�8;âr�R���6��7B�4g&��F��R�6fVC��&WGW&�F����wvR�F��Rs��6��7B�W'DV��F�7V�V�B�vWDV�V�V�D'��B��4g&��F��R�vF��R�Ɩ�R��W'Br�w&Vv�7FW"��W'Br����b��W'DV���W'DV��6�74��R�v�W'B�W'B�W'&�"6��rs���W'DV��FW�D6��FV�B�~)����Ĕ�^�
+>i�8�ZKiY~8~8�8~8�8.8(.8nK�[�n8���n8~8�88^8N8"s���W'DV��67&��Ė�F�f�Wr��&V�f��#�w6���F�r�&��6��v�V&W7Brғ��Т�f���ǒ����FT��F��r����ТР��gV�7F�����B����6�V6�6���V7F��ₓ������Y�i��8~h�^{i�z+�����Ȏ89�8;�8+���zK�8�89n8:�88>8*�8~8�8N�Ȑ�6��7B�4Ɩ�T6��&6��v��F�r���6F����6V&6���6�VFW2�v6�FS�r�b`�v��F�r���6F����6V&6���6�VFW2�w7FFS�r����b��4Ɩ�T6��&6������F�TƖ�T6��&6������Ĕ�R�WF�8+>8;�8:�8988>8*�Xznyn�ȎXh^�:�8v�f�vFUF�Y�8>X{�8~�Ȑ��V�6R�b�v��F�r���6F����6V&6���6�VFW2�vF֖�r�����f�vFUF�wvR�F֖����v��r����V�6R���f�vFUF�wvR�F�r���ТҒ������67&�C���&�G�����F��
