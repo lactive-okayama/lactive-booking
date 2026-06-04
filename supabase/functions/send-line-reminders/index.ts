@@ -54,7 +54,7 @@ serve(async (req) => {
     const results: { id: string; name: string; success: boolean; error?: string }[] = [];
 
     for (const booking of bookings) {
-      const message = `${booking.name} さま\nご予約の【1日前】となりましたので、念のためお知らせ申し上げます。\nご予約内容は下記の通りとなります。\n◇ 予約日時\n　${booking.date} ${booking.time}\n　${booking.menu}\n※ キャンセルの場合はサイトよりお願いいたします。\n一緒に痛みのもどらない身体を作っていきましょう！\n当日お会いできるのを楽しみにしております☺\n【注意事項&お願い】\n・動きやすい服装&5本指ソックスの着用\n・来院はご予約の5分前もしくは時間ちょうど\n・遅刻された場合は、遅刻分を差し引いた施術時間となります\n・当日キャンセルは1回分の消化となります`;
+      const message = `${booking.name} さま\nご予約の【1日前】となりましたので、念のためお知らせ申し上げます。\nご予約内容は下記の通りとなります。\n\n◇ 予約日時\n　${booking.date} ${booking.time}\n　${booking.menu}\n※ キャンセルの場合はサイトよりお願いいたします。\n\n一緒に痛みのもどらない身体を作っていきましょう！\n当日お会いできるのを楽しみにしております☺\n\n【注意事項&お願い】\n・動きやすい服装&5本指ソックスの着用\n・来院はご予約の5分前もしくは時間ちょうど\n・遅刻された場合は、遅刻分を差し引いた施術時間となります\n・当日キャンセルは1回分の消化となります`;
 
       const lineRes = await fetch("https://api.line.me/v2/bot/message/push", {
         method: "POST",
