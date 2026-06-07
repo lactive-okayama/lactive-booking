@@ -506,6 +506,12 @@
     }
     .holiday-cal-day.holiday:hover { background: var(--orange-dark) !important; }
     .holiday-cal-day.today { box-shadow: inset 0 0 0 2px var(--orange-deep); }
+    .holiday-cal-day.custom-hours {
+      background: #E3F0FF !important; border-color: #4A90D9;
+      color: #1a5fa8; font-weight: 700;
+    }
+    .holiday-cal-day.custom-hours:hover { background: #bdd8f7 !important; }
+    .holiday-day-hours { font-size: .65rem; color: inherit; line-height: 1.1; }
     .holiday-cal-day.selected-date {
       background: var(--orange-pale) !important;
       border: 2px solid var(--orange);
@@ -1517,8 +1523,56 @@
       <div id="admin-holiday-error" class="alert alert-error"></div>
       <div class="holiday-cal-grid" id="holiday-cal-grid"></div>
       <div class="holiday-help">
-        💡 日付をクリックすると休業日に設定できます（理由の入力欄が表示されます）。<br>
-        休業日（オレンジ表示）をもう一度クリックすると解除できます。
+        💡 日付をクリックして営業設定を変更できます。<br>
+        🟠 オレンジ = 休業日 &nbsp;／&nbsp; 🔵 青 = 営業時間変更あり<br>
+        設定済みの日も再クリックで変更・解除できます。
+      </div>
+    </div>
+  </div>
+
+  <!-- ▼ 営業日設定モーダル -->
+  <div id="day-settings-modal" class="day-modal" style="display:none;" onclick="if(event.target===this)closeDaySettingsModal()">
+    <div class="day-modal-card" style="max-width:360px;">
+      <div class="day-modal-header">
+        <h3 id="day-settings-title">日付設定</h3>
+        <button class="day-modal-close" onclick="closeDaySettingsModal()">×</button>
+      </div>
+      <div class="day-modal-body" style="padding:16px 20px 20px;">
+        <p id="day-settings-date-label" style="font-weight:700;font-size:1rem;margin-bottom:14px;color:var(--text);"></p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="radio" name="day-mode" value="normal" onchange="onDayModeChange(this.value)" checked>
+            <span>通常営業（設定なし）</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="radio" name="day-mode" value="custom" onchange="onDayModeChange(this.value)">
+            <span>⏰ 営業時間を変更</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="radio" name="day-mode" value="holiday" onchange="onDayModeChange(this.value)">
+            <span>🏖️ 休業日</span>
+          </label>
+        </div>
+        <div id="custom-hours-form" style="display:none;background:#f0f7ff;border-radius:8px;padding:12px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <label style="font-size:.88rem;white-space:nowrap;">開始</label>
+              <select id="custom-open-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;"></select>
+            </div>
+            <span style="color:var(--text-light);">〜</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <label style="font-size:.88rem;white-space:nowrap;">終了</label>
+              <select id="custom-close-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;"></select>
+            </div>
+          </div>
+        </div>
+        <div id="holiday-reason-form" style="display:none;margin-bottom:14px;">
+          <input type="text" id="holiday-reason-input" placeholder="理由（任意）" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;box-sizing:border-box;">
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn btn-secondary" onclick="closeDaySettingsModal()">キャンセル</button>
+          <button class="btn" onclick="saveDaySettings()" style="background:var(--orange);color:#fff;border:none;">保存</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1920,26 +1974,28 @@
       const dateStr = `${bookingViewYear}-${mm}-${dd}`;
       const isPast    = dateObj < today;        // 純粋な過去
       const isToday   = dateObj.getTime() === today.getTime();
-      const isHoliday = holidays[dateStr] !== undefined;
+      const hdEntry = holidays[dateStr];
+      const isHolidayRow  = hdEntry !== undefined;
+      const isCustomHours = isHolidayRow && hdEntry.open_time && hdEntry.close_time;
+      const isFullHoliday = isHolidayRow && !isCustomHours;
       const isSelected = dateStr === selectedDate;
 
       const classes = ['holiday-cal-day'];
-      if (isPast)     classes.push('past');
-      if (isToday)    classes.push('today', 'today-disabled'); // 当日は予約不可
-      if (isHoliday)  classes.push('holiday-disabled');
-      if (isSelected) classes.push('selected-date');
+      if (isPast)         classes.push('past');
+      if (isToday)        classes.push('today', 'today-disabled'); // 当日は予約不可
+      if (isFullHoliday)  classes.push('holiday-disabled');
+      if (isSelected)     classes.push('selected-date');
 
       let onclick = '';
       if (isToday) {
-        // 当日：電話案内アラート
         onclick = `onclick="alertSameDayBooking()"`;
       } else if (!isPast) {
-        onclick = isHoliday
+        onclick = isFullHoliday
           ? `onclick="alertBookingHoliday()"`
           : `onclick="selectBookingDate('${dateStr}')"`;
       }
-      const reason = isHoliday && holidays[dateStr]
-        ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
+      const reason = isFullHoliday && hdEntry.reason
+        ? `<span class="holiday-day-reason">${esc(hdEntry.reason)}</span>` : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>
         <span class="holiday-day-num">${d}</span>
         ${reason}
@@ -2006,10 +2062,12 @@
     document.getElementById('time-slot-grid').style.display    = 'none';
     hideAlert('datetime-alert');
     try {
-      // 休業日チェック
+      // 休業日・時間変更チェック
       const holiday = await checkIsHoliday(date);
-      if (holiday) {
-        // 日付選択をリセット
+      const isFullHoliday   = holiday && !(holiday.open_time && holiday.close_time);
+      const isCustomHours   = holiday && holiday.open_time && holiday.close_time;
+      if (isFullHoliday) {
+        // 休業日：日付選択をリセット
         document.getElementById('dt-date').value = '';
         document.getElementById('dt-time').value = '';
         _dateChangeLast = '';
@@ -2023,8 +2081,9 @@
         showAlert('datetime-alert', `この日は休業日のためご予約いただけません${reason}。別の日程をお選びください。`);
         return;
       }
-      const bookedTimes = await fetchBookedTimes(date);
-      renderTimeSlots(bookedTimes);
+      const bookedTimes  = await fetchBookedTimes(date);
+      const customHours  = isCustomHours ? { open_time: holiday.open_time, close_time: holiday.close_time } : null;
+      renderTimeSlots(bookedTimes, customHours);
     } catch (e) {
       console.error('時間帯取得エラー:', e);
       renderTimeSlots([]); // エラー時は全枠を選択可能として表示
@@ -2042,7 +2101,7 @@
   }
 
   /** 時間帯グリッドを描画 */
-  function renderTimeSlots(bookedTimes) {
+  function renderTimeSlots(bookedTimes, customHours) {
     document.getElementById('time-slot-loading').style.display = 'none';
     const grid = document.getElementById('time-slot-grid');
     grid.style.display = 'grid';
@@ -2058,8 +2117,23 @@
     const currentHour = now.getHours();
 
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    // 営業時間フィルタ（customHoursが指定されている場合）
+    let availableTimes = ALL_TIMES;
+    if (customHours) {
+      const [oh, om] = customHours.open_time.split(':').map(Number);
+      const [ch, cm] = customHours.close_time.split(':').map(Number);
+      const openMins  = oh * 60 + om;
+      const closeMins = ch * 60 + cm;
+      availableTimes = ALL_TIMES.filter(t => {
+        const [h, m] = t.split(':').map(Number);
+        const mins = h * 60 + m;
+        return mins >= openMins && mins <= closeMins;
+      });
+    }
+
     let html = '';
-    for (const t of ALL_TIMES) {
+    for (const t of availableTimes) {
       const [sh, sm] = t.split(':').map(Number);
       const slotMinutes = sh * 60 + sm;
       const isPastTime = isToday && slotMinutes <= currentMinutes;
@@ -2117,18 +2191,35 @@
       return;
     }
     // 確定時に休業日を再チェック（管理側で直前に休業日設定された場合の保険）
+    // 確定時に休業日・時間変更を再チェック（管理側で直前に変更された場合の保険）
     const holidayCheck = await checkIsHoliday(date).catch(() => null);
     if (holidayCheck) {
-      const reason = holidayCheck.reason ? `（${holidayCheck.reason}）` : '';
-      showAlert('datetime-alert', `この日は休業日のため予約できません${reason}。別の日付をお選びください。`);
-      return;
+      const hcIsFullHoliday = !(holidayCheck.open_time && holidayCheck.close_time);
+      if (hcIsFullHoliday) {
+        const reason = holidayCheck.reason ? `（${holidayCheck.reason}）` : '';
+        showAlert('datetime-alert', `この日は休業日のため予約できません${reason}。別の日付をお選びください。`);
+        return;
+      }
+      // カスタム営業時間：選択した時刻が範囲内か確認
+      const [oh, om] = holidayCheck.open_time.split(':').map(Number);
+      const [ch, cm] = holidayCheck.close_time.split(':').map(Number);
+      const [th, tm] = time.split(':').map(Number);
+      if ((th * 60 + tm) < (oh * 60 + om) || (th * 60 + tm) > (ch * 60 + cm)) {
+        showAlert('datetime-alert', '選択した時間帯は営業時間外です。別の時間帯をお選びください。');
+        const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
+        renderTimeSlots(bookedTimesRefresh, { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time });
+        document.getElementById('dt-time').value = '';
+        return;
+      }
     }
     // 確定時に再度重複チェック（二重送信防止）
     const bookedNow = await fetchBookedTimes(date).catch(() => []);
     if (bookedNow.includes(time)) {
       showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
       const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
-      renderTimeSlots(bookedTimesRefresh);
+      const customHoursCheck = (holidayCheck && holidayCheck.open_time && holidayCheck.close_time)
+        ? { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time } : null;
+      renderTimeSlots(bookedTimesRefresh, customHoursCheck);
       document.getElementById('dt-time').value = '';
       return;
     }
@@ -2499,26 +2590,27 @@
       const dateStr = `${calViewYear}-${mm}-${dd}`;
       const dow     = dateObj.getDay();
       const isToday   = dateObj.getTime() === today.getTime();
-      const isHoliday = holidays[dateStr] !== undefined;
+      const hdEntry    = holidays[dateStr];
+      const isFullHoliday = hdEntry && !(hdEntry.open_time && hdEntry.close_time);
       const list      = bookings[dateStr] || [];
       const count     = list.length;
 
       const classes = ['cal-view-day'];
-      if (dow === 0)   classes.push('sun');
-      if (dow === 6)   classes.push('sat');
-      if (isToday)     classes.push('today');
-      if (isHoliday)   classes.push('holiday');
+      if (dow === 0)      classes.push('sun');
+      if (dow === 6)      classes.push('sat');
+      if (isToday)        classes.push('today');
+      if (isFullHoliday)  classes.push('holiday');
 
       let body = `<div class="cal-day-num">${d}</div>`;
-      if (isHoliday) {
+      if (isFullHoliday) {
         body += `<div class="cal-holiday-mark">×</div>`;
       } else if (count > 0) {
         body += `<div class="cal-count-badge">●${count}件</div>`;
       }
 
       // 予約がある日のみクリック可能
-      const onclick = (count > 0 && !isHoliday)
-        ? `onclick="showDayBookings('${dateStr}')"` : '';
+      const onclick = (count > 0 && !isFullHoliday)
+        ? `onclick="showDayBookings('${dateStr}')"`` : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>${body}</div>`;
     }
 
@@ -2573,7 +2665,7 @@
     renderHolidayCalendar();
   }
 
-  /** 指定月の休業日を取得（map: dateStr -> reason） */
+  /** 指定月の営業日設定を取得（map: dateStr -> { reason, open_time, close_time }） */
   async function fetchHolidaysForMonth(year, month) {
     const mm  = String(month + 1).padStart(2, '0');
     const ld  = new Date(year, month + 1, 0).getDate();
@@ -2581,12 +2673,14 @@
     const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
     const { data, error } = await sbClient
       .from('holidays')
-      .select('date, reason')
+      .select('date, reason, open_time, close_time')
       .gte('date', start)
       .lte('date', end);
     if (error) throwSupabaseError('休業日一覧の取得', error);
     const map = {};
-    (data || []).forEach(h => { map[h.date] = h.reason || ''; });
+    (data || []).forEach(h => {
+      map[h.date] = { reason: h.reason || '', open_time: h.open_time || null, close_time: h.close_time || null };
+    });
     return map;
   }
 
@@ -2627,76 +2721,139 @@
       const dateStr = `${holidayViewYear}-${mm}-${dd}`;
       const isPast    = dateObj < today;
       const isToday   = dateObj.getTime() === today.getTime();
-      const isHoliday = holidays[dateStr] !== undefined;
+const hdEntry       = holidays[dateStr];
+      const isHolidayRow  = hdEntry !== undefined;
+      const isCustomHours = isHolidayRow && hdEntry.open_time && hdEntry.close_time;
+      const isFullHoliday = isHolidayRow && !isCustomHours;
 
       const classes = ['holiday-cal-day'];
-      if (isPast)    classes.push('past');
-      if (isToday)   classes.push('today');
-      if (isHoliday) classes.push('holiday');
+      if (isPast)         classes.push('past');
+      if (isToday)        classes.push('today');
+      if (isFullHoliday)  classes.push('holiday');
+      if (isCustomHours)  classes.push('custom-hours');
 
-      const onclick = isPast ? '' : `onclick="toggleHoliday('${dateStr}', this)"`;
-      const reason  = isHoliday && holidays[dateStr]
-        ? `<span class="holiday-day-reason">${esc(holidays[dateStr])}</span>` : '';
+      const onclick = isPast ? '' : `onclick="openDaySettingsModal('${dateStr}')"`;
+      const info = isFullHoliday && hdEntry.reason
+        ? `<span class="holiday-day-reason">${esc(hdEntry.reason)}</span>`
+        : isCustomHours
+          ? `<span class="holiday-day-hours">${hdEntry.open_time}〜${hdEntry.close_time}</span>`
+          : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>
         <span class="holiday-day-num">${d}</span>
-        ${reason}
+        ${info}
       </div>`;
     }
 
     grid.innerHTML = html;
   }
 
-  async function toggleHoliday(dateStr, dayEl) {
-    const isHoliday = dayEl.classList.contains('holiday');
-    if (isHoliday) {
-      if (!confirm(`${dateStr} の休業日設定を解除しますか？`)) return;
-      showLoading('解除中...');
-      try {
-        const { error } = await sbClient.from('holidays').delete().eq('date', dateStr);
-        if (error) throwSupabaseError('休業日の解除', error);
-        await renderHolidayCalendar();
-      } catch (e) {
-        console.error('❌ [toggleHoliday/delete] エラー:', e);
-        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
-        showAlert('admin-holiday-error', `休業日の解除に失敗しました。${detail}`);
-      } finally {
-        hideLoading();
-      }
-    } else {
-      const reason = prompt(`${dateStr} を休業日に設定します。\n理由（任意・空欄でも可）：`, '');
-      if (reason === null) return; // キャンセル
-      showLoading('登録中...');
-      try {
-        const { data, error } = await sbClient
-          .from('holidays')
-          .insert({ date: dateStr, reason: reason.trim() || null })
-          .select();
-        if (error) throwSupabaseError('休業日の登録', error);
-        if (!data || data.length === 0) {
-          showAlert('admin-holiday-error',
-            '休業日を登録できませんでした。Supabase の holidays テーブルに INSERT 用の RLS ポリシーが設定されているかご確認ください。');
-          return;
-        }
-        await renderHolidayCalendar();
-      } catch (e) {
-        console.error('❌ [toggleHoliday/insert] エラー:', e);
-        const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
-        showAlert('admin-holiday-error', `休業日の登録に失敗しました。${detail}`);
-      } finally {
-        hideLoading();
-      }
+  // ── 営業日設定モーダル ──────────────────────────────────────
+  let _daySettingsDate = '';
+
+  function openDaySettingsModal(dateStr) {
+    _daySettingsDate = dateStr;
+    const d = new Date(dateStr + 'T00:00:00');
+    const dows = ['日', '月', '火', '水', '木', '金', '土'];
+    document.getElementById('day-settings-date-label').textContent =
+      `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${dows[d.getDay()]}）`;
+    populateDaySettingsTimes();
+    _loadDaySettingsState(dateStr);
+    document.getElementById('day-settings-modal').style.display = 'flex';
+  }
+
+  async function _loadDaySettingsState(dateStr) {
+    const { data } = await sbClient
+      .from('holidays')
+      .select('reason, open_time, close_time')
+      .eq('date', dateStr)
+      .maybeSingle();
+    let mode = 'normal';
+    if (data) {
+      mode = (data.open_time && data.close_time) ? 'custom' : 'holiday';
+    }
+    document.querySelectorAll('input[name="day-mode"]').forEach(r => { r.checked = r.value === mode; });
+    onDayModeChange(mode);
+    if (mode === 'custom') {
+      document.getElementById('custom-open-time').value  = data.open_time  || '9:00';
+      document.getElementById('custom-close-time').value = data.close_time || '19:00';
+    }
+    if (mode === 'holiday') {
+      document.getElementById('holiday-reason-input').value = data.reason || '';
     }
   }
 
-  /** 指定日が休業日かどうか確認 */
-  async function checkIsHoliday(dateStr) {
+  function closeDaySettingsModal() {
+    document.getElementById('day-settings-modal').style.display = 'none';
+  }
+
+  function onDayModeChange(value) {
+    document.getElementById('custom-hours-form').style.display   = value === 'custom'  ? 'block' : 'none';
+    document.getElementById('holiday-reason-form').style.display = value === 'holiday' ? 'block' : 'none';
+  }
+
+  function populateDaySettingsTimes() {
+    const openSel  = document.getElementById('custom-open-time');
+    const closeSel = document.getElementById('custom-close-time');
+    if (openSel.options.length > 0) return; // already populated
+    ALL_TIMES.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = t;
+      openSel.appendChild(opt);
+    });
+    [...ALL_TIMES, '19:40', '20:00'].forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = t;
+      closeSel.appendChild(opt);
+    });
+    openSel.value  = '9:00';
+    closeSel.value = '19:00';
+  }
+
+  async function saveDaySettings() {
+    const mode    = document.querySelector('input[name="day-mode"]:checked').value;
+    const dateStr = _daySettingsDate;
+    showLoading('保存中...');
+    try {
+      if (mode === 'normal') {
+        const { error } = await sbClient.from('holidays').delete().eq('date', dateStr);
+        if (error && error.code !== 'PGRST116') throwSupabaseError('設定の削除', error);
+      } else if (mode === 'custom') {
+        const openTime  = document.getElementById('custom-open-time').value;
+        const closeTime = document.getElementById('custom-close-time').value;
+        if (!openTime || !closeTime) {
+          hideLoading();
+          alert('開始時間と終了時間を選択してください。');
+          return;
+        }
+        const { error } = await sbClient.from('holidays')
+          .upsert({ date: dateStr, reason: null, open_time: openTime, close_time: closeTime }, { onConflict: 'date' });
+        if (error) throwSupabaseError('時間設定の保存', error);
+      } else if (mode === 'holiday') {
+        const reason = document.getElementById('holiday-reason-input').value.trim() || null;
+        const { error } = await sbClient.from('holidays')
+          .upsert({ date: dateStr, reason, open_time: null, close_time: null }, { onConflict: 'date' });
+        if (error) throwSupabaseError('休業日の保存', error);
+      }
+      closeDaySettingsModal();
+      await renderHolidayCalendar();
+    } catch (e) {
+      console.error('❌ [saveDaySettings] エラー:', e);
+      const detail = e.supabaseError ? `（${e.supabaseError.code}: ${e.supabaseError.message}）` : '';
+      showAlert('admin-holiday-error', `設定の保存に失敗しました。${detail}`);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  /** 指定日の営業設定を確認。null=通常営業、{open_time, close_time}あり=時間変更、なし=休業日 */
+    async function checkIsHoliday(dateStr) {
     const { data, error } = await sbClient
       .from('holidays')
-      .select('reason')
+      .select('reason, open_time, close_time')
       .eq('date', dateStr)
       .maybeSingle();
     if (error) throwSupabaseError('休業日チェック', error);
-    return data; // null なら休業日ではない
+    return data; // null なら特別設定なし
   }
 
   async function renderBookings() {
