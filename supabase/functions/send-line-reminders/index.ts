@@ -22,14 +22,23 @@ serve(async (req) => {
       );
     }
 
-    // 明日の日付を JST (UTC+9) で計算
-    const nowUtc = new Date();
-    const jstOffset = 9 * 60 * 60 * 1000;
-    const nowJst = new Date(nowUtc.getTime() + jstOffset);
-    const tomorrow = new Date(nowJst.getTime() + 24 * 60 * 60 * 1000);
-    const tomorrowStr = tomorrow.toISOString().slice(0, 10); // YYYY-MM-DD
+    // 対象日付の決定（リクエストに target_date があればそれを使用、なければ明日）
+    let targetDate: string;
+    try {
+      const body = await req.json().catch(() => ({}));
+      targetDate = body.target_date ?? "";
+    } catch { targetDate = ""; }
 
-    // 明日の予約でLINE連携済みのものを取得
+    if (!targetDate) {
+      const nowUtc = new Date();
+      const jstOffset = 9 * 60 * 60 * 1000;
+      const nowJst = new Date(nowUtc.getTime() + jstOffset);
+      const tomorrow = new Date(nowJst.getTime() + 24 * 60 * 60 * 1000);
+      targetDate = tomorrow.toISOString().slice(0, 10);
+    }
+    const tomorrowStr = targetDate;
+
+    // 対象日の予約でLINE連携済みのものを取得
     const dbRes = await fetch(
       `${supabaseUrl}/rest/v1/bookings?date=eq.${tomorrowStr}&line_user_id=not.is.null&select=id,name,menu,date,time,line_user_id`,
       {
