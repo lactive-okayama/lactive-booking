@@ -1,0 +1,53 @@
+name: Daily LINE Reminders
+
+on:
+  # 毎朝 9:00 JST (= 00:00 UTC) に自動実行
+  schedule:
+    - cron: '0 0 * * *'
+  # 手動実行（テスト用）
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '送信モード: confirmation（2日前）/ reminder（前日）/ both（両方）'
+        required: false
+        default: 'both'
+      target_date:
+        description: '対象日付（YYYY-MM-DD）を直接指定する場合（省略時は自動計算）'
+        required: false
+        default: ''
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      # ── 2日前：予約確認メッセージ ───────────────────────────────
+      - name: Send 2-day confirmation
+        if: ${{ github.event_name == 'schedule' || inputs.mode == 'both' || inputs.mode == 'confirmation' }}
+        run: |
+          BODY='{"mode":"confirmation"}'
+          if [ -n "${{ inputs.target_date }}" ]; then
+            BODY=$(echo $BODY | sed 's/}/, "target_date":"${{ inputs.target_date }}"}/g' || echo '{"mode":"confirmation","target_date":"${{ inputs.target_date }}"}')
+          fi
+          echo "Sending confirmation for $(date -u '+%Y-%m-%d %H:%M UTC')"
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" \
+            https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-reminders)
+          echo "$RESPONSE"
+
+      # ── 前日：リマインドメッセージ ─────────────────────────────
+      - name: Send 1-day reminder
+        if: ${{ github.event_name == 'schedule' || inputs.mode == 'both' || inputs.mode == 'reminder' }}
+        run: |
+          BODY='{"mode":"reminder"}'
+          if [ -n "${{ inputs.target_date }}" ]; then
+            BODY='{"mode":"reminder","target_date":"${{ inputs.target_date }}"}'
+          fi
+          echo "Sending reminder for $(date -u '+%Y-%m-%d %H:%M UTC')"
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" \
+            https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-reminders)
+          echo "$RESPONSE"
