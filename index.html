@@ -2610,7 +2610,7 @@
 
       // 予約がある日のみクリック可能
       const onclick = (count > 0 && !isFullHoliday)
-        ? `onclick="showDayBookings('${dateStr}')"`` : '';
+        ? `onclick="showDayBookings('${dateStr}')"` : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>${body}</div>`;
     }
 
