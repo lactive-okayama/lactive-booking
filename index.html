@@ -291,6 +291,38 @@
     .line-connect-title { font-weight: 700; font-size: .95rem; color: #059245; margin-bottom: 6px; }
     .line-connect-desc { font-size: .82rem; color: var(--text-light); margin-bottom: 12px; }
     .line-connect-done { font-size: .9rem; color: #059245; font-weight: 600; margin-bottom: 8px; }
+
+    /* ───────────────────────────────
+       初回お問い合わせ
+    ─────────────────────────────── */
+    .inq-notice {
+      background: #FFF8F0; border-left: 3px solid var(--orange);
+      border-radius: 6px; padding: 14px 16px; margin-bottom: 20px;
+      font-size: .88rem; line-height: 1.8; color: var(--text);
+    }
+    .inq-line-box {
+      background: #F0FFF5; border: 1.5px solid #06C755;
+      border-radius: 12px; padding: 18px; margin: 20px 0; text-align: center;
+    }
+    .inq-line-title { font-weight: 700; font-size: .95rem; color: #059245; margin-bottom: 6px; }
+    .inq-line-desc  { font-size: .82rem; color: var(--text-light); line-height: 1.7; margin-bottom: 14px; }
+    .btn-line-add {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #06C755; color: #fff; font-weight: 700; font-size: .9rem;
+      padding: 12px 28px; border-radius: 40px; text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn-line-add:hover { opacity: .85; }
+    .inq-done-info {
+      margin: 20px auto; text-align: left; max-width: 260px;
+      font-size: .9rem; line-height: 2; color: var(--text);
+      background: var(--bg); border-radius: 8px; padding: 12px 18px;
+    }
+    .inq-done-line {
+      margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border);
+      font-size: .82rem; color: var(--text-light); margin-bottom: 10px;
+    }
+    .inq-done-line p { margin-bottom: 10px; }
     .btn-actions { display: flex; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
     .btn-actions .btn { flex: 1; min-width: 110px; }
 
@@ -993,6 +1025,74 @@
       </div>
     </div>
   </div><!-- /page-first-select -->
+
+  <!-- ▼ 初回：お問い合わせフォーム -->
+  <div id="page-first-inquiry" class="page">
+    <div class="card">
+      <div class="page-title">
+        <h2>初回のお問い合わせ</h2>
+        <p id="inq-menu-label"></p>
+      </div>
+      <div class="inq-notice">
+        初回来院の方は、まず下記フォームよりお問い合わせください。<br>
+        LINEまたはお電話にて事前問診のうえ、日程をご案内いたします。
+      </div>
+      <div id="inq-alert" class="alert alert-error"></div>
+
+      <div class="form-group">
+        <label>お名前 <span class="req">*</span></label>
+        <input type="text" id="inq-name" placeholder="例：山田 花子" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>電話番号 <span class="req">*</span></label>
+        <input type="tel" id="inq-phone" placeholder="例：090-1234-5678" inputmode="tel" autocomplete="tel">
+      </div>
+      <div class="form-group">
+        <label>お悩み・症状（任意）</label>
+        <textarea id="inq-symptoms" rows="4" placeholder="腰痛・肩こり・姿勢改善など、お気軽にお書きください"></textarea>
+      </div>
+
+      <div class="inq-line-box">
+        <p class="inq-line-title">📱 LINEでのご連絡がスムーズです</p>
+        <p class="inq-line-desc">Lactiveの公式LINEを友達追加いただくと、<br>スタッフよりLINEにてご連絡いたします。</p>
+        <a href="https://lin.ee/DiOaYva" target="_blank" class="btn-line-add">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M19.365 9.863c.349 0 .63.285.63.63 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+          </svg>
+          LINE友達追加
+        </a>
+      </div>
+
+      <div class="btn-actions">
+        <button class="btn btn-secondary" onclick="navigateTo('page-first-select')">← 戻る</button>
+        <button class="btn btn-primary" id="inq-submit-btn" onclick="submitFirstInquiry()">送信する</button>
+      </div>
+    </div>
+  </div><!-- /page-first-inquiry -->
+
+  <!-- ▼ 初回問い合わせ完了 -->
+  <div id="page-inquiry-done" class="page">
+    <div class="card" style="text-align:center; padding:40px 28px;">
+      <div class="done-icon">🌿</div>
+      <div class="done-title">お問い合わせありがとうございます</div>
+      <div class="done-msg">LINEまたはお電話にてご連絡いたします。<br>しばらくお待ちください。</div>
+      <div class="inq-done-info">
+        <p id="inq-dn-name"></p>
+        <p id="inq-dn-phone"></p>
+        <p id="inq-dn-menu"></p>
+      </div>
+      <div class="inq-done-line">
+        <p>まだLINE友達追加がお済みでない方はこちら</p>
+        <a href="https://lin.ee/DiOaYva" target="_blank" class="btn-line-add">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+            <path d="M19.365 9.863c.349 0 .63.285.63.63 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+          </svg>
+          LINE友達追加
+        </a>
+      </div>
+      <button class="btn btn-primary" style="margin-top:22px;" onclick="navigateTo('page-top')">トップに戻る</button>
+    </div>
+  </div><!-- /page-inquiry-done -->
 
   <!-- ▼ 会員の方：選択 -->
   <div id="page-member-choice" class="page">
@@ -1749,7 +1849,52 @@
       questionnaire: {}, personal: { name: '', phone: '', email: '' },
       customer: null, isNewCustomer: false, newCustomerId: '', lineUserId: null
     };
-    navigateTo('page-notice');
+    // 初回はお問い合わせフォームへ（直接予約不可）
+    document.getElementById('inq-menu-label').textContent = ST.menu + ' のお問い合わせ';
+    // フォームをリセット
+    ['inq-name','inq-phone','inq-symptoms'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    const btn = document.getElementById('inq-submit-btn');
+    if (btn) { btn.disabled = false; btn.textContent = '送信する'; }
+    navigateTo('page-first-inquiry');
+  }
+
+  async function submitFirstInquiry() {
+    const name     = document.getElementById('inq-name').value.trim();
+    const phone    = document.getElementById('inq-phone').value.trim();
+    const symptoms = document.getElementById('inq-symptoms').value.trim();
+
+    if (!name)  { showAlert('inq-alert', 'お名前を入力してください。'); return; }
+    if (!phone) { showAlert('inq-alert', '電話番号を入力してください。'); return; }
+    hideAlert('inq-alert');
+
+    const btn = document.getElementById('inq-submit-btn');
+    btn.disabled = true;
+    btn.textContent = '送信中...';
+
+    try {
+      await sendLineNotify({
+        name,
+        menu: '【初回お問い合わせ】' + ST.menu,
+        date: '要調整',
+        time: '—',
+        phone,
+        memo: symptoms || '（お悩み・症状の入力なし）'
+      });
+
+      // 完了画面へ
+      document.getElementById('inq-dn-name').textContent  = '👤 ' + name;
+      document.getElementById('inq-dn-phone').textContent = '📞 ' + phone;
+      document.getElementById('inq-dn-menu').textContent  = '📋 ' + ST.menu;
+      navigateTo('page-inquiry-done');
+    } catch(e) {
+      console.error('[submitFirstInquiry] エラー:', e);
+      showAlert('inq-alert', '送信中にエラーが発生しました。お電話（または公式LINE）にてお問い合わせください。');
+      btn.disabled = false;
+      btn.textContent = '送信する';
+    }
   }
 
   function noticeAgree() {
