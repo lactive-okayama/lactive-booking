@@ -1656,21 +1656,13 @@
           </label>
         </div>
 
-        <!-- 時間変更フォーム -->
+        <!-- 時間変更フォーム（複数時間帯対応） -->
         <div id="custom-hours-form" style="display:none;background:#f0f7ff;border-radius:8px;padding:12px;margin-bottom:14px;">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <label style="font-size:.88rem;white-space:nowrap;">開始</label>
-              <select id="custom-open-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;">
-              </select>
-            </div>
-            <span style="color:var(--text-light);">〜</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <label style="font-size:.88rem;white-space:nowrap;">終了</label>
-              <select id="custom-close-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;">
-              </select>
-            </div>
-          </div>
+          <div id="time-ranges-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+          <button type="button" onclick="addTimeRange()"
+            style="font-size:.82rem;padding:5px 14px;background:#e0efff;border:1.5px dashed #7aaddc;border-radius:6px;cursor:pointer;color:#1a6fb5;display:inline-flex;align-items:center;gap:4px;">
+            ＋ 時間帯を追加
+          </button>
         </div>
 
         <!-- 休業日フォーム -->
@@ -2311,17 +2303,20 @@
 
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-    // \u55b6\u696d\u6642\u9593\u30d5\u30a3\u30eb\u30bf\uff08customHours\u304c\u6307\u5b9a\u3055\u308c\u3066\u3044\u308b\u5834\u5408\uff09
+    // \u55b6\u696d\u6642\u9593\u30d5\u30a3\u30eb\u30bf\uff08\u8907\u6570\u6642\u9593\u5e2f\u5bfe\u5fdc\uff09
     let availableTimes = ALL_TIMES;
     if (customHours) {
-      const [oh, om] = customHours.open_time.split(':').map(Number);
-      const [ch, cm] = customHours.close_time.split(':').map(Number);
-      const openMins  = oh * 60 + om;
-      const closeMins = ch * 60 + cm;
+      // time_ranges\u512a\u5148\u3001\u306a\u3051\u308c\u3070open_time/close_time\u30921\u67a0\u3068\u3057\u3066\u4f7f\u7528
+      const ranges = customHours.time_ranges ||
+        [{ open: customHours.open_time, close: customHours.close_time }];
       availableTimes = ALL_TIMES.filter(t => {
         const [h, m] = t.split(':').map(Number);
         const mins = h * 60 + m;
-        return mins >= openMins && mins <= closeMins;
+        return ranges.some(r => {
+          const [oh, om] = r.open.split(':').map(Number);
+          const [ch, cm] = r.close.split(':').map(Number);
+          return mins >= oh * 60 + om && mins <= ch * 60 + cm;
+        });
       });
     }
 
@@ -2859,7 +2854,7 @@
     renderHolidayCalendar();
   }
 
-  /** 指定月の営業日設定を取得（map: dateStr -> { reason, open_time, close_time }） */
+  /** 指定月の営業日設定を取得（map: dateStr -> { reason, open_time, close_time, time_ranges }） */
   async function fetchHolidaysForMonth(year, month) {
     const mm  = String(month + 1).padStart(2, '0');
     const ld  = new Date(year, month + 1, 0).getDate();
@@ -2867,13 +2862,18 @@
     const end   = `${year}-${mm}-${String(ld).padStart(2, '0')}`;
     const { data, error } = await sbClient
       .from('holidays')
-      .select('date, reason, open_time, close_time')
+      .select('date, reason, open_time, close_time, time_ranges')
       .gte('date', start)
       .lte('date', end);
     if (error) throwSupabaseError('休業日一覧の取得', error);
     const map = {};
     (data || []).forEach(h => {
-      map[h.date] = { reason: h.reason || '', open_time: h.open_time || null, close_time: h.close_time || null };
+      map[h.date] = {
+        reason:      h.reason      || '',
+        open_time:   h.open_time   || null,
+        close_time:  h.close_time  || null,
+        time_ranges: h.time_ranges || null
+      };
     });
     return map;
   }
@@ -2927,10 +2927,15 @@
       if (isCustomHours)  classes.push('custom-hours');
 
       const onclick = isPast ? '' : `onclick="openDaySettingsModal('${dateStr}')"`;
+      let customHoursLabel = '';
+      if (isCustomHours) {
+        const ranges = hdEntry.time_ranges || [{ open: hdEntry.open_time, close: hdEntry.close_time }];
+        customHoursLabel = ranges.map(r => `${r.open}〜${r.close}`).join(' / ');
+      }
       const info = isFullHoliday && hdEntry.reason
         ? `<span class="holiday-day-reason">${esc(hdEntry.reason)}</span>`
         : isCustomHours
-          ? `<span class="holiday-day-hours">${hdEntry.open_time}〜${hdEntry.close_time}</span>`
+          ? `<span class="holiday-day-hours">${customHoursLabel}</span>`
           : '';
       html += `<div class="${classes.join(' ')}" ${onclick}>
         <span class="holiday-day-num">${d}</span>
@@ -2950,7 +2955,6 @@
     const dows = ['日', '月', '火', '水', '木', '金', '土'];
     document.getElementById('day-settings-date-label').textContent =
       `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（${dows[d.getDay()]}）`;
-    populateDaySettingsTimes();
     _loadDaySettingsState(dateStr);
     document.getElementById('day-settings-modal').style.display = 'flex';
   }
@@ -2958,18 +2962,20 @@
   async function _loadDaySettingsState(dateStr) {
     const { data } = await sbClient
       .from('holidays')
-      .select('reason, open_time, close_time')
+      .select('reason, open_time, close_time, time_ranges')
       .eq('date', dateStr)
       .maybeSingle();
     let mode = 'normal';
     if (data) {
-      mode = (data.open_time && data.close_time) ? 'custom' : 'holiday';
+      mode = (data.open_time || data.time_ranges) ? 'custom' : 'holiday';
     }
     document.querySelectorAll('input[name="day-mode"]').forEach(r => { r.checked = r.value === mode; });
     onDayModeChange(mode);
     if (mode === 'custom') {
-      document.getElementById('custom-open-time').value  = data.open_time  || '9:00';
-      document.getElementById('custom-close-time').value = data.close_time || '19:00';
+      // time_rangesがあればそれを使用、なければopen_time/close_timeから1枠生成
+      const ranges = data.time_ranges ||
+        [{ open: data.open_time || '9:00', close: data.close_time || '19:00' }];
+      renderTimeRangeRows(ranges);
     }
     if (mode === 'holiday') {
       document.getElementById('holiday-reason-input').value = data.reason || '';
@@ -2985,22 +2991,53 @@
     document.getElementById('holiday-reason-form').style.display = value === 'holiday' ? 'block' : 'none';
   }
 
-  function populateDaySettingsTimes() {
-    const openSel  = document.getElementById('custom-open-time');
-    const closeSel = document.getElementById('custom-close-time');
-    if (openSel.options.length > 0) return; // already populated
-    ALL_TIMES.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = t;
-      openSel.appendChild(opt);
-    });
-    [...ALL_TIMES, '19:40', '20:00'].forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = t;
-      closeSel.appendChild(opt);
-    });
-    openSel.value  = '9:00';
-    closeSel.value = '19:00';
+  function renderTimeRangeRows(ranges) {
+    const list = document.getElementById('time-ranges-list');
+    list.innerHTML = '';
+    ranges.forEach(r => addTimeRangeRow(r));
+    if (list.children.length === 0) addTimeRangeRow({ open: '9:00', close: '19:00' });
+  }
+
+  function addTimeRangeRow(range) {
+    const list = document.getElementById('time-ranges-list');
+    const openOpts  = ALL_TIMES.map(t => `<option value="${t}">${t}</option>`).join('');
+    const closeOpts = [...ALL_TIMES, '19:40', '20:00'].map(t => `<option value="${t}">${t}</option>`).join('');
+    const row = document.createElement('div');
+    row.className = 'time-range-row';
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:5px;">
+        <label style="font-size:.82rem;white-space:nowrap;">開始</label>
+        <select class="range-open" style="padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:.88rem;">${openOpts}</select>
+      </div>
+      <span style="color:var(--text-light);">〜</span>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <label style="font-size:.82rem;white-space:nowrap;">終了</label>
+        <select class="range-close" style="padding:5px 7px;border:1.5px solid var(--border);border-radius:6px;font-size:.88rem;">${closeOpts}</select>
+      </div>
+      <button type="button" onclick="removeTimeRange(this)"
+        style="padding:3px 8px;background:#fff0f0;border:1px solid #f5c0c0;border-radius:4px;color:#c33;font-size:.82rem;cursor:pointer;">✕</button>
+    `;
+    row.querySelector('.range-open').value  = range.open  || '9:00';
+    row.querySelector('.range-close').value = range.close || '19:00';
+    list.appendChild(row);
+  }
+
+  function addTimeRange() {
+    addTimeRangeRow({ open: '9:00', close: '19:00' });
+  }
+
+  function removeTimeRange(btn) {
+    const list = document.getElementById('time-ranges-list');
+    if (list.children.length <= 1) return;
+    btn.closest('.time-range-row').remove();
+  }
+
+  function getTimeRangesFromForm() {
+    return [...document.querySelectorAll('#time-ranges-list .time-range-row')].map(row => ({
+      open:  row.querySelector('.range-open').value,
+      close: row.querySelector('.range-close').value
+    }));
   }
 
   async function saveDaySettings() {
@@ -3012,15 +3049,21 @@
         const { error } = await sbClient.from('holidays').delete().eq('date', dateStr);
         if (error && error.code !== 'PGRST116') throwSupabaseError('設定の削除', error);
       } else if (mode === 'custom') {
-        const openTime  = document.getElementById('custom-open-time').value;
-        const closeTime = document.getElementById('custom-close-time').value;
-        if (!openTime || !closeTime) {
+        const ranges = getTimeRangesFromForm();
+        if (ranges.length === 0) {
           hideLoading();
-          alert('開始時間と終了時間を選択してください。');
+          alert('時間帯を1つ以上追加してください。');
           return;
         }
+        // 後方互換のためopen_time/close_timeも最初の枠の値を保存
         const { error } = await sbClient.from('holidays')
-          .upsert({ date: dateStr, reason: null, open_time: openTime, close_time: closeTime }, { onConflict: 'date' });
+          .upsert({
+            date:        dateStr,
+            reason:      null,
+            open_time:   ranges[0].open,
+            close_time:  ranges[0].close,
+            time_ranges: ranges
+          }, { onConflict: 'date' });
         if (error) throwSupabaseError('時間設定の保存', error);
       } else if (mode === 'holiday') {
         const reason = document.getElementById('holiday-reason-input').value.trim() || null;
@@ -3039,11 +3082,11 @@
     }
   }
 
-  /** 指定日の営業設定を確認。null=通常営業、{open_time, close_time}あり=時間変更、なし=休業日 */
+  /** 指定日の営業設定を確認。null=通常営業、{open_time, close_time, time_ranges}あり=時間変更、なし=休業日 */
   async function checkIsHoliday(dateStr) {
     const { data, error } = await sbClient
       .from('holidays')
-      .select('reason, open_time, close_time')
+      .select('reason, open_time, close_time, time_ranges')
       .eq('date', dateStr)
       .maybeSingle();
     if (error) throwSupabaseError('休業日チェック', error);
