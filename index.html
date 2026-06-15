@@ -542,7 +542,7 @@
       color: #1a5fa8; font-weight: 700;
     }
     .holiday-cal-day.custom-hours:hover { background: #bdd8f7 !important; }
-    .holiday-day-hours { font-size: .65rem; color: inherit; line-height: 1.1; }
+    .holiday-day-hours { font-size: .6rem; color: inherit; line-height: 1.3; text-align: center; }
     .holiday-cal-day.today { box-shadow: inset 0 0 0 2px var(--orange-deep); }
     .holiday-cal-day.selected-date {
       background: var(--orange-pale) !important;
@@ -2387,14 +2387,19 @@
         showAlert('datetime-alert', `この日は休業日のため予約できません${reason}。別の日付をお選びください。`);
         return;
       }
-      // カスタム営業時間：選択した時刻が範囲内か確認
-      const [oh, om] = holidayCheck.open_time.split(':').map(Number);
-      const [ch, cm] = holidayCheck.close_time.split(':').map(Number);
+      // カスタム営業時間：選択した時刻が範囲内か確認（複数時間帯対応）
+      const hcRanges = holidayCheck.time_ranges || [{ open: holidayCheck.open_time, close: holidayCheck.close_time }];
       const [th, tm] = time.split(':').map(Number);
-      if ((th * 60 + tm) < (oh * 60 + om) || (th * 60 + tm) > (ch * 60 + cm)) {
+      const tMins = th * 60 + tm;
+      const isInAnyRange = hcRanges.some(r => {
+        const [oh, om] = r.open.split(':').map(Number);
+        const [ch, cm] = r.close.split(':').map(Number);
+        return tMins >= oh * 60 + om && tMins <= ch * 60 + cm;
+      });
+      if (!isInAnyRange) {
         showAlert('datetime-alert', '選択した時間帯は営業時間外です。別の時間帯をお選びください。');
         const bookedRangesRefresh1 = await fetchBookedRanges(date).catch(() => []);
-        renderTimeSlots(bookedRangesRefresh1, { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time }, getMenuDuration(ST.menu));
+        renderTimeSlots(bookedRangesRefresh1, { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time, time_ranges: holidayCheck.time_ranges }, getMenuDuration(ST.menu));
         document.getElementById('dt-time').value = '';
         return;
       }
@@ -2930,7 +2935,7 @@
       let customHoursLabel = '';
       if (isCustomHours) {
         const ranges = hdEntry.time_ranges || [{ open: hdEntry.open_time, close: hdEntry.close_time }];
-        customHoursLabel = ranges.map(r => `${r.open}〜${r.close}`).join(' / ');
+        customHoursLabel = ranges.map(r => `${r.open}〜${r.close}`).join('<br>');
       }
       const info = isFullHoliday && hdEntry.reason
         ? `<span class="holiday-day-reason">${esc(hdEntry.reason)}</span>`
