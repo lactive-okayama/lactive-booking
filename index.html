@@ -2138,7 +2138,7 @@
       const isToday   = dateObj.getTime() === today.getTime();
       const hdEntry = holidays[dateStr];
       const isHolidayRow  = hdEntry !== undefined;
-      const isCustomHours = isHolidayRow && hdEntry.open_time && hdEntry.close_time;
+      const isCustomHours = isHolidayRow && (hdEntry.open_time || hdEntry.time_ranges);
       const isFullHoliday = isHolidayRow && !isCustomHours;
       const isSelected = dateStr === selectedDate;
 
@@ -2226,8 +2226,8 @@
     try {
       // 休業日・時間変更チェック
       const holiday = await checkIsHoliday(date);
-      const isFullHoliday   = holiday && !(holiday.open_time && holiday.close_time);
-      const isCustomHours   = holiday && holiday.open_time && holiday.close_time;
+      const isCustomHours   = holiday && (holiday.open_time || holiday.time_ranges);
+      const isFullHoliday   = holiday && !isCustomHours;
       if (isFullHoliday) {
         // 休業日：日付選択をリセット
         document.getElementById('dt-date').value = '';
@@ -2243,7 +2243,7 @@
         return;
       }
       const bookedRanges = await fetchBookedRanges(date);
-      const customHours  = isCustomHours ? { open_time: holiday.open_time, close_time: holiday.close_time } : null;
+      const customHours  = isCustomHours ? { open_time: holiday.open_time, close_time: holiday.close_time, time_ranges: holiday.time_ranges } : null;
       const slotDuration = getMenuDuration(ST.menu);
       renderTimeSlots(bookedRanges, customHours, slotDuration);
     } catch (e) {
@@ -2405,8 +2405,8 @@
     if (isSlotConflict(time, menuDuration, bookedRangesNow)) {
       showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
       const bookedRangesRefresh2 = await fetchBookedRanges(date).catch(() => []);
-      const customHoursCheck = (holidayCheck && holidayCheck.open_time && holidayCheck.close_time)
-        ? { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time } : null;
+      const customHoursCheck = (holidayCheck && (holidayCheck.open_time || holidayCheck.time_ranges))
+        ? { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time, time_ranges: holidayCheck.time_ranges } : null;
       renderTimeSlots(bookedRangesRefresh2, customHoursCheck, menuDuration);
       document.getElementById('dt-time').value = '';
       return;
@@ -2917,7 +2917,7 @@
       const isToday   = dateObj.getTime() === today.getTime();
       const hdEntry       = holidays[dateStr];
       const isHolidayRow  = hdEntry !== undefined;
-      const isCustomHours = isHolidayRow && hdEntry.open_time && hdEntry.close_time;
+      const isCustomHours = isHolidayRow && (hdEntry.open_time || hdEntry.time_ranges);
       const isFullHoliday = isHolidayRow && !isCustomHours;
 
       const classes = ['holiday-cal-day'];
@@ -2984,11 +2984,21 @@
 
   function closeDaySettingsModal() {
     document.getElementById('day-settings-modal').style.display = 'none';
+    // 次回モーダルを開く時のために時間帯リストをクリア
+    const list = document.getElementById('time-ranges-list');
+    if (list) list.innerHTML = '';
   }
 
   function onDayModeChange(value) {
     document.getElementById('custom-hours-form').style.display   = value === 'custom'  ? 'block' : 'none';
     document.getElementById('holiday-reason-form').style.display = value === 'holiday' ? 'block' : 'none';
+    // customに切り替えた時、リストが空なら初期行を追加
+    if (value === 'custom') {
+      const list = document.getElementById('time-ranges-list');
+      if (list && list.children.length === 0) {
+        addTimeRangeRow({ open: '9:00', close: '19:00' });
+      }
+    }
   }
 
   function renderTimeRangeRows(ranges) {
