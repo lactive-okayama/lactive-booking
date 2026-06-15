@@ -505,13 +505,13 @@
       color: #fff; font-weight: 700;
     }
     .holiday-cal-day.holiday:hover { background: var(--orange-dark) !important; }
-    .holiday-cal-day.today { box-shadow: inset 0 0 0 2px var(--orange-deep); }
     .holiday-cal-day.custom-hours {
       background: #E3F0FF !important; border-color: #4A90D9;
       color: #1a5fa8; font-weight: 700;
     }
     .holiday-cal-day.custom-hours:hover { background: #bdd8f7 !important; }
     .holiday-day-hours { font-size: .65rem; color: inherit; line-height: 1.1; }
+    .holiday-cal-day.today { box-shadow: inset 0 0 0 2px var(--orange-deep); }
     .holiday-cal-day.selected-date {
       background: var(--orange-pale) !important;
       border: 2px solid var(--orange);
@@ -1539,6 +1539,8 @@
       </div>
       <div class="day-modal-body" style="padding:16px 20px 20px;">
         <p id="day-settings-date-label" style="font-weight:700;font-size:1rem;margin-bottom:14px;color:var(--text);"></p>
+
+        <!-- モード選択 -->
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
             <input type="radio" name="day-mode" value="normal" onchange="onDayModeChange(this.value)" checked>
@@ -1553,22 +1555,29 @@
             <span>🏖️ 休業日</span>
           </label>
         </div>
+
+        <!-- 時間変更フォーム -->
         <div id="custom-hours-form" style="display:none;background:#f0f7ff;border-radius:8px;padding:12px;margin-bottom:14px;">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:6px;">
               <label style="font-size:.88rem;white-space:nowrap;">開始</label>
-              <select id="custom-open-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;"></select>
+              <select id="custom-open-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;">
+              </select>
             </div>
             <span style="color:var(--text-light);">〜</span>
             <div style="display:flex;align-items:center;gap:6px;">
               <label style="font-size:.88rem;white-space:nowrap;">終了</label>
-              <select id="custom-close-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;"></select>
+              <select id="custom-close-time" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;">
+              </select>
             </div>
           </div>
         </div>
+
+        <!-- 休業日フォーム -->
         <div id="holiday-reason-form" style="display:none;margin-bottom:14px;">
           <input type="text" id="holiday-reason-input" placeholder="理由（任意）" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.9rem;box-sizing:border-box;">
         </div>
+
         <div style="display:flex;gap:8px;justify-content:flex-end;">
           <button class="btn btn-secondary" onclick="closeDaySettingsModal()">キャンセル</button>
           <button class="btn" onclick="saveDaySettings()" style="background:var(--orange);color:#fff;border:none;">保存</button>
@@ -1609,6 +1618,22 @@
     '13:00','13:40','14:20','15:00','15:40','16:20',
     '17:00','17:40','18:20','19:00'
   ];
+
+  // メニューごとの所要時間（施術時間 + インターバル）
+  const MENU_DURATIONS = {
+    '初回整体 90分':       100,  // 90分施術 + 10分インターバル
+    '初回ピラティス 60分':  70,  // 60分施術 + 10分インターバル
+    '整体（運動療法）30分': 40,  // 30分施術 + 10分インターバル
+    '整体×ピラティス 45分': 55, // 45分施術 + 10分インターバル
+    'マシンピラティス 45分': 55, // 45分施術 + 10分インターバル
+    'マットピラティス 45分': 55, // 45分施術 + 10分インターバル
+  };
+  const DEFAULT_DURATION = 40;
+
+  function getMenuDuration(menuName) {
+    if (!menuName) return DEFAULT_DURATION;
+    return MENU_DURATIONS[menuName] ?? DEFAULT_DURATION;
+  }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // Supabase 初期化
@@ -2071,7 +2096,6 @@
         document.getElementById('dt-date').value = '';
         document.getElementById('dt-time').value = '';
         _dateChangeLast = '';
-        // 時間帯ボタンを非表示
         document.getElementById('time-slot-loading').style.display = 'none';
         document.getElementById('time-slot-grid').style.display    = 'none';
         document.getElementById('time-slot-grid').innerHTML        = '';
@@ -2081,16 +2105,17 @@
         showAlert('datetime-alert', `この日は休業日のためご予約いただけません${reason}。別の日程をお選びください。`);
         return;
       }
-      const bookedTimes  = await fetchBookedTimes(date);
+      const bookedRanges = await fetchBookedRanges(date);
       const customHours  = isCustomHours ? { open_time: holiday.open_time, close_time: holiday.close_time } : null;
-      renderTimeSlots(bookedTimes, customHours);
+      const slotDuration = getMenuDuration(ST.menu);
+      renderTimeSlots(bookedRanges, customHours, slotDuration);
     } catch (e) {
       console.error('時間帯取得エラー:', e);
-      renderTimeSlots([]); // エラー時は全枠を選択可能として表示
+      renderTimeSlots([], null, DEFAULT_DURATION); // エラー時は全枠を選択可能として表示
     }
   }
 
-  /** Supabase から指定日の予約済み時間帯を取得 */
+  /** Supabase から指定日の予約済み時間帯を取得（後方互換のため残す） */
   async function fetchBookedTimes(date) {
     const { data, error } = await sbClient
       .from('bookings')
@@ -2100,13 +2125,35 @@
     return (data || []).map(b => b.time);
   }
 
+  /** Supabase から指定日の予約済み時間範囲を取得（所要時間ベース） */
+  async function fetchBookedRanges(date) {
+    const { data, error } = await sbClient
+      .from('bookings')
+      .select('time, duration')
+      .eq('date', date);
+    if (error) throwSupabaseError('予約済み時間帯の取得', error);
+    return (data || []).map(b => {
+      const [h, m] = b.time.split(':').map(Number);
+      const startMin = h * 60 + m;
+      const endMin   = startMin + (b.duration || DEFAULT_DURATION);
+      return { start: startMin, end: endMin };
+    });
+  }
+
+  /** スロットが既存予約と重複するか判定（区間重複チェック） */
+  function isSlotConflict(slotTime, slotDuration, bookedRanges) {
+    const [h, m] = slotTime.split(':').map(Number);
+    const slotStart = h * 60 + m;
+    const slotEnd   = slotStart + slotDuration;
+    return bookedRanges.some(r => slotStart < r.end && slotEnd > r.start);
+  }
+
   /** 時間帯グリッドを描画 */
-  function renderTimeSlots(bookedTimes, customHours) {
+  function renderTimeSlots(bookedRanges, customHours, slotDuration = DEFAULT_DURATION) {
     document.getElementById('time-slot-loading').style.display = 'none';
     const grid = document.getElementById('time-slot-grid');
     grid.style.display = 'grid';
 
-    // \u5f53\u65e5\u306e\u5834\u5408\u306e\u307f\u300c\u73fe\u5728\u6642\u523b\u3092\u904e\u304e\u305f\u67a0\u300d\u3092\u30b0\u30ec\u30fc\u30a2\u30a6\u30c8\uff08\u901a\u5e38\u306f\u5f53\u65e5\u9078\u629e\u3092\u5f3e\u3044\u3066\u3044\u308b\u305f\u3081\u4fdd\u967a\uff09
     const date = document.getElementById('dt-date').value;
     const now = new Date();
     const todayStr =
@@ -2114,11 +2161,10 @@
       String(now.getMonth() + 1).padStart(2, '0') + '-' +
       String(now.getDate()).padStart(2, '0');
     const isToday = date === todayStr;
-    const currentHour = now.getHours();
 
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-    // 営業時間フィルタ（customHoursが指定されている場合）
+    // \u55b6\u696d\u6642\u9593\u30d5\u30a3\u30eb\u30bf\uff08customHours\u304c\u6307\u5b9a\u3055\u308c\u3066\u3044\u308b\u5834\u5408\uff09
     let availableTimes = ALL_TIMES;
     if (customHours) {
       const [oh, om] = customHours.open_time.split(':').map(Number);
@@ -2137,7 +2183,7 @@
       const [sh, sm] = t.split(':').map(Number);
       const slotMinutes = sh * 60 + sm;
       const isPastTime = isToday && slotMinutes <= currentMinutes;
-      const isBooked   = bookedTimes.includes(t);
+      const isBooked   = isSlotConflict(t, slotDuration, bookedRanges);
       const isDisabled = isBooked || isPastTime;
       if (isDisabled) {
         html += '<button type="button" class="time-slot-btn booked" disabled>'
@@ -2190,7 +2236,6 @@
       showAlert('datetime-alert', '過去の日付は選択できません。');
       return;
     }
-    // 確定時に休業日を再チェック（管理側で直前に休業日設定された場合の保険）
     // 確定時に休業日・時間変更を再チェック（管理側で直前に変更された場合の保険）
     const holidayCheck = await checkIsHoliday(date).catch(() => null);
     if (holidayCheck) {
@@ -2206,20 +2251,21 @@
       const [th, tm] = time.split(':').map(Number);
       if ((th * 60 + tm) < (oh * 60 + om) || (th * 60 + tm) > (ch * 60 + cm)) {
         showAlert('datetime-alert', '選択した時間帯は営業時間外です。別の時間帯をお選びください。');
-        const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
-        renderTimeSlots(bookedTimesRefresh, { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time });
+        const bookedRangesRefresh1 = await fetchBookedRanges(date).catch(() => []);
+        renderTimeSlots(bookedRangesRefresh1, { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time }, getMenuDuration(ST.menu));
         document.getElementById('dt-time').value = '';
         return;
       }
     }
     // 確定時に再度重複チェック（二重送信防止）
-    const bookedNow = await fetchBookedTimes(date).catch(() => []);
-    if (bookedNow.includes(time)) {
+    const menuDuration = getMenuDuration(ST.menu);
+    const bookedRangesNow = await fetchBookedRanges(date).catch(() => []);
+    if (isSlotConflict(time, menuDuration, bookedRangesNow)) {
       showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
-      const bookedTimesRefresh = await fetchBookedTimes(date).catch(() => []);
+      const bookedRangesRefresh2 = await fetchBookedRanges(date).catch(() => []);
       const customHoursCheck = (holidayCheck && holidayCheck.open_time && holidayCheck.close_time)
         ? { open_time: holidayCheck.open_time, close_time: holidayCheck.close_time } : null;
-      renderTimeSlots(bookedTimesRefresh, customHoursCheck);
+      renderTimeSlots(bookedRangesRefresh2, customHoursCheck, menuDuration);
       document.getElementById('dt-time').value = '';
       return;
     }
@@ -2237,6 +2283,7 @@
         menu:              ST.menu,
         date,
         time,
+        duration:          getMenuDuration(ST.menu),
         memo:              memo || null,
         symptom:           q.q1 || null,
         treatment_history: q.q2 || null,
@@ -2721,7 +2768,7 @@
       const dateStr = `${holidayViewYear}-${mm}-${dd}`;
       const isPast    = dateObj < today;
       const isToday   = dateObj.getTime() === today.getTime();
-const hdEntry       = holidays[dateStr];
+      const hdEntry       = holidays[dateStr];
       const isHolidayRow  = hdEntry !== undefined;
       const isCustomHours = isHolidayRow && hdEntry.open_time && hdEntry.close_time;
       const isFullHoliday = isHolidayRow && !isCustomHours;
@@ -2846,7 +2893,7 @@ const hdEntry       = holidays[dateStr];
   }
 
   /** 指定日の営業設定を確認。null=通常営業、{open_time, close_time}あり=時間変更、なし=休業日 */
-    async function checkIsHoliday(dateStr) {
+  async function checkIsHoliday(dateStr) {
     const { data, error } = await sbClient
       .from('holidays')
       .select('reason, open_time, close_time')
@@ -3233,6 +3280,7 @@ const hdEntry       = holidays[dateStr];
         menu:              b.menu,
         date:              b.date,
         time:              b.time,
+        duration:          b.duration          || DEFAULT_DURATION,
         memo:              b.memo              || null,
         symptom:           b.symptom           || null,
         treatment_history: b.treatment_history || null,
