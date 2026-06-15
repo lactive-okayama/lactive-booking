@@ -2140,12 +2140,14 @@
     });
   }
 
-  /** スロットが既存予約と重複するか判定（区間重複チェック） */
+  /** スロットが既存予約と重複するか判定
+   * 「スロット開始時刻が既存予約の開始〜終了内に入るか」で判定する。
+   * これにより、既存予約より前に開始して予約開始時刻をまたぐスロットは不可にしない。
+   */
   function isSlotConflict(slotTime, slotDuration, bookedRanges) {
     const [h, m] = slotTime.split(':').map(Number);
     const slotStart = h * 60 + m;
-    const slotEnd   = slotStart + slotDuration;
-    return bookedRanges.some(r => slotStart < r.end && slotEnd > r.start);
+    return bookedRanges.some(r => slotStart >= r.start && slotStart < r.end);
   }
 
   /** 時間帯グリッドを描画 */
