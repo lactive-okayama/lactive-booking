@@ -2935,7 +2935,8 @@
       let customHoursLabel = '';
       if (isCustomHours) {
         const ranges = hdEntry.time_ranges || [{ open: hdEntry.open_time, close: hdEntry.close_time }];
-        customHoursLabel = ranges.map(r => `${r.open}〜${r.close}`).join('<br>');
+        const fmtT = t => t && t.endsWith(':00') ? t.replace(':00', '') : (t || '');
+        customHoursLabel = ranges.map(r => `${fmtT(r.open)}〜${fmtT(r.close)}`).join('<br>');
       }
       const info = isFullHoliday && hdEntry.reason
         ? `<span class="holiday-day-reason">${esc(hdEntry.reason)}</span>`
