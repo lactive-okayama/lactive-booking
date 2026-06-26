@@ -1802,6 +1802,12 @@
         <div class="publish-box-desc" id="publish-desc"></div>
         <button class="btn" id="publish-toggle-btn" type="button" onclick="toggleNextMonthPublish()">―</button>
       </div>
+      <div id="close-current-box" class="publish-box">
+        <div class="publish-box-head">📕 今月の予約受付（締め切り）</div>
+        <div class="publish-box-status" id="close-status">確認中...</div>
+        <div class="publish-box-desc" id="close-desc"></div>
+        <button class="btn" id="close-toggle-btn" type="button" onclick="toggleCurrentMonthClose()">―</button>
+      </div>
       <div class="holiday-cal-header">
         <button class="holiday-nav-btn" onclick="changeHolidayMonth(-1)">‹ 前月</button>
         <span class="holiday-month-label" id="holiday-month-label">-</span>
@@ -2319,11 +2325,13 @@
     }
     document.getElementById('booking-btn').disabled = false;
     // 予約用カレンダーを今月で初期化
-    const now = new Date();
-    bookingViewYear  = now.getFullYear();
-    bookingViewMonth = now.getMonth();
     try { _publishedNextMonth = await fetchPublishedNextMonth(); }
     catch (e) { console.warn('公開設定の取得に失敗:', e); _publishedNextMonth = null; }
+    try { _closedCurrentMonth = await fetchClosedCurrentMonth(); }
+    catch (e) { console.warn('締切設定の取得に失敗:', e); _closedCurrentMonth = null; }
+    const _b = bookingMonthBounds();
+    bookingViewYear  = _b.minY;
+    bookingViewMonth = _b.minM;
     renderBookingCalendar();
   }
 
@@ -2333,6 +2341,7 @@
   let bookingViewYear  = null;
   let bookingViewMonth = null;
   let _publishedNextMonth = null; // 翌月公開のYYYY-MM（未公開は null/空文字）
+  let _closedCurrentMonth = null; // 今月締切のYYYY-MM（締切なしは null/空文字）
 
   // 翌月のYYYY-MM文字列
   function nextMonthStr() {
@@ -2342,16 +2351,26 @@
     return `${nY}-${String(nM + 1).padStart(2, '0')}`;
   }
 
-  // 顧客が予約できる月の範囲：基本は今月のみ。翌月が「公開済み」のときだけ翌月まで。
+  // 今月のYYYY-MM文字列
+  function currentMonthStr() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  // 顧客が予約できる月の範囲。
+  //  - 今月：締め切られていなければ予約可
+  //  - 翌月：公開済みのときだけ予約可
+  //  - none=true は「予約可能な月がない（今月締切かつ翌月未公開）」
   function bookingMonthBounds() {
     const now = new Date();
-    const minY = now.getFullYear(), minM = now.getMonth();
-    let maxY = minY, maxM = minM;
-    if (_publishedNextMonth && _publishedNextMonth === nextMonthStr()) {
-      maxM = minM + 1;
-      if (maxM > 11) { maxM = 0; maxY++; }
-    }
-    return { minY, minM, maxY, maxM };
+    const curY = now.getFullYear(), curM = now.getMonth();
+    let nY = curY, nM = curM + 1; if (nM > 11) { nM = 0; nY++; }
+    const currentClosed = _closedCurrentMonth && _closedCurrentMonth === currentMonthStr();
+    const nextPublished = _publishedNextMonth && _publishedNextMonth === nextMonthStr();
+    if (currentClosed && nextPublished) return { minY: nY, minM: nM, maxY: nY, maxM: nM, none: false };
+    if (currentClosed && !nextPublished) return { minY: curY, minM: curM, maxY: curY, maxM: curM, none: true };
+    if (!currentClosed && nextPublished) return { minY: curY, minM: curM, maxY: nY, maxM: nM, none: false };
+    return { minY: curY, minM: curM, maxY: curY, maxM: curM, none: false };
   }
 
   async function fetchPublishedNextMonth() {
@@ -2365,6 +2384,19 @@
       .from('app_settings')
       .upsert({ key: 'published_next_month', value: val, updated_at: new Date().toISOString() }, { onConflict: 'key' });
     if (error) throwSupabaseError('公開設定の保存', error);
+  }
+
+  async function fetchClosedCurrentMonth() {
+    const { data, error } = await sbClient
+      .from('app_settings').select('value').eq('key', 'closed_current_month').maybeSingle();
+    if (error) throwSupabaseError('締切設定の取得', error);
+    return data ? data.value : null;
+  }
+  async function saveClosedCurrentMonth(val) {
+    const { error } = await sbClient
+      .from('app_settings')
+      .upsert({ key: 'closed_current_month', value: val, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    if (error) throwSupabaseError('締切設定の保存', error);
   }
 
   function changeBookingMonth(delta) {
@@ -2381,25 +2413,33 @@
   }
 
   async function renderBookingCalendar() {
+    const b = bookingMonthBounds();
+    const grid    = document.getElementById('booking-cal-grid');
+    const prevBtn = document.getElementById('booking-prev-btn');
+    const nextBtn = document.getElementById('booking-next-btn');
+    const noteEl  = document.getElementById('booking-range-note');
     document.getElementById('booking-month-label').textContent =
       `${bookingViewYear}年${bookingViewMonth + 1}月`;
-    // 予約可能範囲（今月〜翌月）に応じて前月／次月ボタンを制御
-    {
-      const b = bookingMonthBounds();
-      const curIdx  = bookingViewYear * 12 + bookingViewMonth;
-      const prevBtn = document.getElementById('booking-prev-btn');
-      const nextBtn = document.getElementById('booking-next-btn');
-      if (prevBtn) prevBtn.disabled = curIdx <= (b.minY * 12 + b.minM);
-      if (nextBtn) nextBtn.disabled = curIdx >= (b.maxY * 12 + b.maxM);
+
+    // 受付停止（今月を締切＋翌月が未公開）の場合は予約不可メッセージ
+    if (b.none) {
+      if (prevBtn) prevBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = true;
+      if (noteEl)  noteEl.textContent = '';
+      grid.innerHTML = '<div style="grid-column:1/-1; padding:24px 12px; text-align:center; color:var(--text-light); font-size:.9rem; line-height:1.8;">現在、オンラインでのご予約受付を停止しております。<br>お手数ですが、お電話にてお問い合わせください。</div>';
+      return;
     }
-    const noteEl = document.getElementById('booking-range-note');
+
+    // 予約可能範囲に応じて前月／次月ボタンを制御
+    const curIdx = bookingViewYear * 12 + bookingViewMonth;
+    if (prevBtn) prevBtn.disabled = curIdx <= (b.minY * 12 + b.minM);
+    if (nextBtn) nextBtn.disabled = curIdx >= (b.maxY * 12 + b.maxM);
     if (noteEl) {
       const published = _publishedNextMonth && _publishedNextMonth === nextMonthStr();
       noteEl.textContent = published
         ? '※ご予約は翌月末まで承っております'
         : '※翌月以降のご予約は、受付開始までもうしばらくお待ちください';
     }
-    const grid = document.getElementById('booking-cal-grid');
 
     let holidays = {};
     let fetchFailed = false;
@@ -3456,6 +3496,7 @@
     }
     renderHolidayCalendar();
     renderPublishControl();
+    renderCloseControl();
   }
 
   function changeHolidayMonth(delta) {
@@ -3515,6 +3556,60 @@
     } catch (e) {
       console.error('❌ [toggleNextMonthPublish] エラー:', e);
       showAlert('admin-holiday-error', `公開設定の更新に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
+    } finally {
+      hideLoading();
+      if (btnEl) btnEl.disabled = false;
+    }
+  }
+
+  // ── 今月締切コントロール（管理画面・休業日設定タブ） ──
+  async function renderCloseControl() {
+    const now = new Date();
+    const curStr = currentMonthStr();
+    const labelMonth = `${now.getFullYear()}年${now.getMonth() + 1}月`;
+    const statusEl = document.getElementById('close-status');
+    const descEl   = document.getElementById('close-desc');
+    const btnEl    = document.getElementById('close-toggle-btn');
+    if (!statusEl || !btnEl) return;
+    let cur = null;
+    try { cur = await fetchClosedCurrentMonth(); }
+    catch (e) {
+      statusEl.textContent = '取得に失敗しました';
+      statusEl.className = 'publish-box-status unpublished';
+      if (descEl) descEl.textContent = '';
+      btnEl.textContent = '再読み込み';
+      btnEl.className = 'to-publish';
+      return;
+    }
+    const isClosed = cur === curStr;
+    if (isClosed) {
+      statusEl.textContent = `🛑 ${labelMonth}：受付終了`;
+      statusEl.className = 'publish-box-status unpublished';
+      if (descEl) descEl.textContent = `お客様は ${labelMonth} のご予約はできません。再開する場合は下のボタンを押してください。`;
+      btnEl.textContent = `${labelMonth}の受付を再開する`;
+      btnEl.className = 'to-publish';
+    } else {
+      statusEl.textContent = `🟢 ${labelMonth}：受付中`;
+      statusEl.className = 'publish-box-status published';
+      if (descEl) descEl.textContent = `お客様は ${labelMonth} のご予約ができます。月末などで締め切る場合は下のボタンを押してください。`;
+      btnEl.textContent = `${labelMonth}の受付を締め切る`;
+      btnEl.className = 'to-unpublish';
+    }
+  }
+
+  async function toggleCurrentMonthClose() {
+    const curStr = currentMonthStr();
+    const btnEl = document.getElementById('close-toggle-btn');
+    if (btnEl) btnEl.disabled = true;
+    showLoading('設定を更新中...');
+    try {
+      const cur = await fetchClosedCurrentMonth();
+      const isClosed = cur === curStr;
+      await saveClosedCurrentMonth(isClosed ? '' : curStr);
+      await renderCloseControl();
+    } catch (e) {
+      console.error('❌ [toggleCurrentMonthClose] エラー:', e);
+      showAlert('admin-holiday-error', `受付設定の更新に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
     } finally {
       hideLoading();
       if (btnEl) btnEl.disabled = false;
