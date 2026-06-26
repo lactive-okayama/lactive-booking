@@ -1887,8 +1887,8 @@
           <input type="text" id="mb-name" placeholder="例：山田 花子" autocomplete="off">
         </div>
         <div class="wk-form-field">
-          <label>電話番号<span class="req">※必須</span></label>
-          <input type="tel" id="mb-phone" placeholder="例：090-1234-5678" inputmode="tel">
+          <label>電話番号<span class="opt">（任意）</span></label>
+          <input type="tel" id="mb-phone" placeholder="例：090-1234-5678（任意）" inputmode="tel">
         </div>
         <div class="wk-form-field">
           <label>メニュー<span class="req">※必須</span></label>
@@ -3159,6 +3159,7 @@
   }
 
   async function renderWeekView(){
+    if (!weekStartDate) weekStartDate = wkStartOfWeek(new Date());
     const wkStart = weekStartDate;
     const wkEnd = new Date(wkStart); wkEnd.setDate(wkEnd.getDate()+6);
     const startStr = wkDateStr(wkStart), endStr = wkDateStr(wkEnd);
@@ -3330,7 +3331,6 @@
     const memo =document.getElementById('mb-memo').value.trim();
     hideAlert('mb-alert');
     if(!name){  showAlert('mb-alert','お名前を入力してください。'); return; }
-    if(!phone){ showAlert('mb-alert','電話番号を入力してください。'); return; }
     if(!menu){  showAlert('mb-alert','メニューを選択してください。'); return; }
     if(!date||!time){ showAlert('mb-alert','日付と時間を選択してください。'); return; }
     const duration=getMenuDuration(menu);
@@ -3355,7 +3355,7 @@
         showAlert('mb-alert','この時間帯はすでに予約が入っています。別の時間をお選びください。'); return;
       }
       await saveBooking({
-        customer_number:null, name, phone, email: email||null, menu, date, time, duration,
+        customer_number:null, name, phone: phone||'', email: email||'', menu, date, time, duration,
         memo: memo||null, symptom:null, treatment_history:null, symptom_start:null,
         exercise_ok:null, daily_impact:null, line_user_id:null
       });
