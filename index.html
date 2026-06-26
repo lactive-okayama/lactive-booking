@@ -513,6 +513,8 @@
       font-size: .88rem;
     }
     .holiday-nav-btn:hover { background: var(--orange-light); }
+    .holiday-nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .holiday-nav-btn:disabled:hover { background: var(--orange-pale); }
     .holiday-month-label { font-size: 1.05rem; font-weight: 700; color: var(--text); min-width: 110px; text-align: center; }
 
     .holiday-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -1531,16 +1533,16 @@
         <label>希望日<span class="req">*</span></label>
         <input type="hidden" id="dt-date" value="">
         <div class="holiday-cal-header">
-          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(-1)">‹ 前月</button>
+          <button type="button" class="holiday-nav-btn" id="booking-prev-btn" onclick="changeBookingMonth(-1)">‹ 前月</button>
           <span class="holiday-month-label" id="booking-month-label">-</span>
-          <button type="button" class="holiday-nav-btn" onclick="changeBookingMonth(1)">次月 ›</button>
+          <button type="button" class="holiday-nav-btn" id="booking-next-btn" onclick="changeBookingMonth(1)">次月 ›</button>
         </div>
         <div class="holiday-cal-grid" id="booking-cal-grid"></div>
         <div class="holiday-legend">
           <span><span class="holiday-legend-swatch" style="background:#F0F0F0;border:1px solid #DDD;"></span>休業日・選択不可</span>
           <span><span class="holiday-legend-swatch" style="background:var(--orange-pale);border:1.5px solid var(--orange);"></span>選択中</span>
         </div>
-        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日は選択できません</div>
+        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日は選択できません<br>※ご予約は翌月末まで承っております</div>
       </div>
       <div class="form-group">
         <label>希望時間<span class="req">*</span></label>
@@ -2310,16 +2312,40 @@
   let bookingViewYear  = null;
   let bookingViewMonth = null;
 
+  // 顧客が予約できる月の範囲：今月〜翌月（翌月末まで）
+  function bookingMonthBounds() {
+    const now = new Date();
+    const minY = now.getFullYear(), minM = now.getMonth();
+    let maxY = minY, maxM = minM + 1;
+    if (maxM > 11) { maxM = 0; maxY++; }
+    return { minY, minM, maxY, maxM };
+  }
+
   function changeBookingMonth(delta) {
-    bookingViewMonth += delta;
-    if (bookingViewMonth < 0)  { bookingViewMonth = 11; bookingViewYear--; }
-    if (bookingViewMonth > 11) { bookingViewMonth = 0;  bookingViewYear++; }
+    let y = bookingViewYear, m = bookingViewMonth + delta;
+    if (m < 0)  { m = 11; y--; }
+    if (m > 11) { m = 0;  y++; }
+    const b = bookingMonthBounds();
+    const targetIdx = y * 12 + m;
+    const minIdx = b.minY * 12 + b.minM;
+    const maxIdx = b.maxY * 12 + b.maxM;
+    if (targetIdx < minIdx || targetIdx > maxIdx) return; // 予約可能範囲外は移動しない
+    bookingViewYear = y; bookingViewMonth = m;
     renderBookingCalendar();
   }
 
   async function renderBookingCalendar() {
     document.getElementById('booking-month-label').textContent =
       `${bookingViewYear}年${bookingViewMonth + 1}月`;
+    // 予約可能範囲（今月〜翌月）に応じて前月／次月ボタンを制御
+    {
+      const b = bookingMonthBounds();
+      const curIdx  = bookingViewYear * 12 + bookingViewMonth;
+      const prevBtn = document.getElementById('booking-prev-btn');
+      const nextBtn = document.getElementById('booking-next-btn');
+      if (prevBtn) prevBtn.disabled = curIdx <= (b.minY * 12 + b.minM);
+      if (nextBtn) nextBtn.disabled = curIdx >= (b.maxY * 12 + b.maxM);
+    }
     const grid = document.getElementById('booking-cal-grid');
 
     let holidays = {};
