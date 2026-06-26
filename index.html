@@ -516,6 +516,19 @@
     .holiday-nav-btn:disabled { opacity: .35; cursor: not-allowed; }
     .holiday-nav-btn:disabled:hover { background: var(--orange-pale); }
     .holiday-month-label { font-size: 1.05rem; font-weight: 700; color: var(--text); min-width: 110px; text-align: center; }
+    .publish-box {
+      background: var(--orange-pale); border: 1.5px solid var(--orange-light);
+      border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px;
+    }
+    .publish-box-head { font-weight: 700; color: var(--orange-deep); font-size: .95rem; margin-bottom: 8px; }
+    .publish-box-status { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .publish-box-status.published { color: var(--success); }
+    .publish-box-status.unpublished { color: var(--text-light); }
+    .publish-box-desc { font-size: .8rem; color: var(--text-light); margin-bottom: 8px; line-height: 1.6; }
+    #publish-toggle-btn { font-weight: 700; border: none; color: #fff; padding: 9px 18px; }
+    #publish-toggle-btn.to-publish { background: var(--success); }
+    #publish-toggle-btn.to-unpublish { background: var(--text-light); }
+    #publish-toggle-btn:disabled { opacity: .5; cursor: not-allowed; }
 
     .holiday-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
     .holiday-cal-dow {
@@ -1542,7 +1555,7 @@
           <span><span class="holiday-legend-swatch" style="background:#F0F0F0;border:1px solid #DDD;"></span>休業日・選択不可</span>
           <span><span class="holiday-legend-swatch" style="background:var(--orange-pale);border:1.5px solid var(--orange);"></span>選択中</span>
         </div>
-        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日は選択できません<br>※ご予約は翌月末まで承っております</div>
+        <div style="font-size:.78rem; color:var(--text-light); margin-top:8px;">※休業日は選択できません<br><span id="booking-range-note"></span></div>
       </div>
       <div class="form-group">
         <label>希望時間<span class="req">*</span></label>
@@ -1783,6 +1796,12 @@
     </div>
 
     <div id="tab-holidays" class="tab-panel">
+      <div id="publish-next-box" class="publish-box">
+        <div class="publish-box-head">📣 翌月の予約受付（お客様への公開）</div>
+        <div class="publish-box-status" id="publish-status">確認中...</div>
+        <div class="publish-box-desc" id="publish-desc"></div>
+        <button class="btn" id="publish-toggle-btn" type="button" onclick="toggleNextMonthPublish()">―</button>
+      </div>
       <div class="holiday-cal-header">
         <button class="holiday-nav-btn" onclick="changeHolidayMonth(-1)">‹ 前月</button>
         <span class="holiday-month-label" id="holiday-month-label">-</span>
@@ -2279,7 +2298,7 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 日時選択
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  function setupDatetime() {
+  async function setupDatetime() {
     document.getElementById('dt-date').value = '';
     document.getElementById('dt-time').value = '';
     document.getElementById('dt-memo').value = '';
@@ -2303,6 +2322,8 @@
     const now = new Date();
     bookingViewYear  = now.getFullYear();
     bookingViewMonth = now.getMonth();
+    try { _publishedNextMonth = await fetchPublishedNextMonth(); }
+    catch (e) { console.warn('公開設定の取得に失敗:', e); _publishedNextMonth = null; }
     renderBookingCalendar();
   }
 
@@ -2311,14 +2332,39 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   let bookingViewYear  = null;
   let bookingViewMonth = null;
+  let _publishedNextMonth = null; // 翌月公開のYYYY-MM（未公開は null/空文字）
 
-  // 顧客が予約できる月の範囲：今月〜翌月（翌月末まで）
+  // 翌月のYYYY-MM文字列
+  function nextMonthStr() {
+    const now = new Date();
+    let nY = now.getFullYear(), nM = now.getMonth() + 1;
+    if (nM > 11) { nM = 0; nY++; }
+    return `${nY}-${String(nM + 1).padStart(2, '0')}`;
+  }
+
+  // 顧客が予約できる月の範囲：基本は今月のみ。翌月が「公開済み」のときだけ翌月まで。
   function bookingMonthBounds() {
     const now = new Date();
     const minY = now.getFullYear(), minM = now.getMonth();
-    let maxY = minY, maxM = minM + 1;
-    if (maxM > 11) { maxM = 0; maxY++; }
+    let maxY = minY, maxM = minM;
+    if (_publishedNextMonth && _publishedNextMonth === nextMonthStr()) {
+      maxM = minM + 1;
+      if (maxM > 11) { maxM = 0; maxY++; }
+    }
     return { minY, minM, maxY, maxM };
+  }
+
+  async function fetchPublishedNextMonth() {
+    const { data, error } = await sbClient
+      .from('app_settings').select('value').eq('key', 'published_next_month').maybeSingle();
+    if (error) throwSupabaseError('公開設定の取得', error);
+    return data ? data.value : null;
+  }
+  async function savePublishedNextMonth(val) {
+    const { error } = await sbClient
+      .from('app_settings')
+      .upsert({ key: 'published_next_month', value: val, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    if (error) throwSupabaseError('公開設定の保存', error);
   }
 
   function changeBookingMonth(delta) {
@@ -2345,6 +2391,13 @@
       const nextBtn = document.getElementById('booking-next-btn');
       if (prevBtn) prevBtn.disabled = curIdx <= (b.minY * 12 + b.minM);
       if (nextBtn) nextBtn.disabled = curIdx >= (b.maxY * 12 + b.maxM);
+    }
+    const noteEl = document.getElementById('booking-range-note');
+    if (noteEl) {
+      const published = _publishedNextMonth && _publishedNextMonth === nextMonthStr();
+      noteEl.textContent = published
+        ? '※ご予約は翌月末まで承っております'
+        : '※翌月以降のご予約は、受付開始までもうしばらくお待ちください';
     }
     const grid = document.getElementById('booking-cal-grid');
 
@@ -3402,6 +3455,7 @@
       holidayViewMonth = now.getMonth();
     }
     renderHolidayCalendar();
+    renderPublishControl();
   }
 
   function changeHolidayMonth(delta) {
@@ -3409,6 +3463,62 @@
     if (holidayViewMonth < 0)  { holidayViewMonth = 11; holidayViewYear--; }
     if (holidayViewMonth > 11) { holidayViewMonth = 0;  holidayViewYear++; }
     renderHolidayCalendar();
+  }
+
+  // ── 翌月公開コントロール（管理画面・休業日設定タブ） ──
+  async function renderPublishControl() {
+    const now = new Date();
+    let nY = now.getFullYear(), nM = now.getMonth() + 1;
+    if (nM > 11) { nM = 0; nY++; }
+    const nextStr = nextMonthStr();
+    const labelMonth = `${nY}年${nM + 1}月`;
+    const statusEl = document.getElementById('publish-status');
+    const descEl   = document.getElementById('publish-desc');
+    const btnEl    = document.getElementById('publish-toggle-btn');
+    if (!statusEl || !btnEl) return;
+    let cur = null;
+    try { cur = await fetchPublishedNextMonth(); }
+    catch (e) {
+      statusEl.textContent = '取得に失敗しました';
+      statusEl.className = 'publish-box-status unpublished';
+      if (descEl) descEl.textContent = '';
+      btnEl.textContent = '再読み込み';
+      btnEl.className = 'to-publish';
+      return;
+    }
+    const isPublished = cur === nextStr;
+    if (isPublished) {
+      statusEl.textContent = `✅ ${labelMonth}：公開中`;
+      statusEl.className = 'publish-box-status published';
+      if (descEl) descEl.textContent = `お客様は ${labelMonth} までご予約できます。`;
+      btnEl.textContent = `${labelMonth}の公開を取り消す`;
+      btnEl.className = 'to-unpublish';
+    } else {
+      statusEl.textContent = `🔒 ${labelMonth}：非公開`;
+      statusEl.className = 'publish-box-status unpublished';
+      if (descEl) descEl.textContent = `いまお客様は今月分のみご予約できます。${labelMonth}の休業日を設定し終えたら、下のボタンで公開してください。`;
+      btnEl.textContent = `${labelMonth}を公開する`;
+      btnEl.className = 'to-publish';
+    }
+  }
+
+  async function toggleNextMonthPublish() {
+    const nextStr = nextMonthStr();
+    const btnEl = document.getElementById('publish-toggle-btn');
+    if (btnEl) btnEl.disabled = true;
+    showLoading('設定を更新中...');
+    try {
+      const cur = await fetchPublishedNextMonth();
+      const isPublished = cur === nextStr;
+      await savePublishedNextMonth(isPublished ? '' : nextStr);
+      await renderPublishControl();
+    } catch (e) {
+      console.error('❌ [toggleNextMonthPublish] エラー:', e);
+      showAlert('admin-holiday-error', `公開設定の更新に失敗しました。${e.supabaseError ? '（' + e.supabaseError.code + '）' : ''}`);
+    } finally {
+      hideLoading();
+      if (btnEl) btnEl.disabled = false;
+    }
   }
 
   /** 指定月の営業日設定を取得（map: dateStr -> { reason, open_time, close_time, time_ranges }） */
