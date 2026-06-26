@@ -691,6 +691,145 @@
       .cal-count-badge { font-size: .62rem; padding: 1px 4px; }
     }
 
+    /* ───────────────────────────────
+       週ビュー（タイムグリッド）
+    ─────────────────────────────── */
+    .cal-viewmode-toggle {
+      display: inline-flex; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 14px;
+    }
+    .cal-viewmode-toggle button {
+      background: var(--white); border: none; padding: 7px 22px;
+      font-family: inherit; font-size: .86rem; font-weight: 700;
+      color: var(--text-light); cursor: pointer; transition: all .15s;
+    }
+    .cal-viewmode-toggle button + button { border-left: 1.5px solid var(--border); }
+    .cal-viewmode-toggle button.active { background: var(--orange); color: #fff; }
+
+    .week-view-header {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .week-range-label { font-size: 1rem; font-weight: 700; color: var(--orange-deep); }
+    .week-nav-group { display: flex; gap: 6px; align-items: center; }
+    .week-today-btn {
+      background: var(--orange-pale); border: 1.5px solid var(--orange-light);
+      border-radius: var(--radius-sm); padding: 6px 12px;
+      font-size: .82rem; font-family: inherit; font-weight: 600;
+      color: var(--orange-deep); cursor: pointer; transition: all .15s;
+    }
+    .week-today-btn:hover { background: var(--orange-light); }
+
+    .week-scroll {
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--white);
+    }
+    .week-head-row {
+      display: grid; grid-template-columns: 46px repeat(7, minmax(94px, 1fr));
+      min-width: 700px;
+    }
+    .week-corner {
+      position: sticky; left: 0; z-index: 5;
+      background: var(--bg); border-bottom: 1.5px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+    .week-dayhead {
+      text-align: center; padding: 6px 2px;
+      border-bottom: 1.5px solid var(--border); border-right: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .week-dayhead:last-child { border-right: none; }
+    .week-dayhead .wd-dow  { font-size: .7rem; font-weight: 700; color: var(--text-light); }
+    .week-dayhead .wd-date { font-size: .9rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .week-dayhead.sun .wd-dow, .week-dayhead.sun .wd-date { color: var(--danger); }
+    .week-dayhead.sat .wd-dow, .week-dayhead.sat .wd-date { color: var(--blue); }
+    .week-dayhead.today { background: var(--orange-pale); box-shadow: inset 0 -3px 0 var(--orange-deep); }
+    .week-dayhead.holiday-head { background: #F0F0F0; }
+    .week-dayhead.holiday-head .wd-date { color: #999; }
+    .week-dayhead .wd-holiday-tag { font-size: .58rem; color: #999; display: block; line-height: 1.2; }
+
+    .week-body {
+      display: grid; grid-template-columns: 46px repeat(7, minmax(94px, 1fr));
+      min-width: 700px;
+    }
+    .week-axis {
+      position: sticky; left: 0; z-index: 3;
+      background: var(--bg); border-right: 1px solid var(--border);
+    }
+    .week-axis .wk-hr {
+      position: absolute; right: 4px; font-size: .64rem; color: var(--text-light);
+      transform: translateY(-50%); white-space: nowrap;
+    }
+    .week-daycol { position: relative; border-right: 1px solid var(--border); overflow: hidden; }
+    .week-daycol:last-child { border-right: none; }
+    .week-daycol.today-col { background: #FFFBF6; }
+    .wk-hourline { position: absolute; left: 0; right: 0; border-top: 1px solid #F3E8D8; pointer-events: none; }
+    .wk-offhours {
+      position: absolute; left: 0; right: 0;
+      background: repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 6px, #ededed 6px, #ededed 12px);
+      pointer-events: none;
+    }
+    .wk-holiday-fill {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(45deg, #eeeeee, #eeeeee 7px, #e3e3e3 7px, #e3e3e3 14px);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .wk-holiday-fill span {
+      font-size: .72rem; color: #999; font-weight: 700;
+      writing-mode: vertical-rl; letter-spacing: 3px;
+    }
+    .wk-slot-free {
+      position: absolute; left: 2px; right: 2px;
+      background: #E8F8EF; border: 1px dashed #06C755; border-radius: 5px;
+      cursor: pointer; transition: background .12s;
+      display: flex; align-items: center; justify-content: center;
+      color: #06A048; font-size: .9rem; font-weight: 700; line-height: 1;
+    }
+    .wk-slot-free:hover { background: #D4F2E1; }
+    .wk-slot-free .wk-plus { opacity: .65; }
+    .wk-slot-past {
+      position: absolute; left: 2px; right: 2px;
+      background: #F2F2F2; border-radius: 5px; pointer-events: none;
+    }
+    .wk-block {
+      position: absolute; left: 2px; right: 2px;
+      background: var(--orange); color: #fff; border-left: 3px solid var(--orange-deep);
+      border-radius: 6px; padding: 2px 5px; box-sizing: border-box;
+      cursor: pointer; overflow: hidden; z-index: 2;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .wk-block:hover { filter: brightness(1.06); }
+    .wk-block .wb-time { font-size: .62rem; font-weight: 700; line-height: 1.15; opacity: .95; }
+    .wk-block .wb-name { font-size: .72rem; font-weight: 700; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wk-block .wb-menu { font-size: .6rem; line-height: 1.15; opacity: .92;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .detail-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: .9rem; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { flex: 0 0 84px; color: var(--text-light); font-weight: 600; }
+    .detail-val { flex: 1; min-width: 0; color: var(--text); word-break: break-word; }
+    .wk-form-field { margin-bottom: 12px; }
+    .wk-form-field label { display: block; font-size: .82rem; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+    .wk-form-field label .req { color: var(--danger); font-size: .72rem; margin-left: 4px; }
+    .wk-form-field label .opt { color: var(--text-light); font-size: .72rem; margin-left: 4px; font-weight: 400; }
+    .wk-form-field input, .wk-form-field select, .wk-form-field textarea {
+      width: 100%; padding: 9px 10px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-size: .9rem; font-family: inherit;
+      box-sizing: border-box; background: var(--white); color: var(--text);
+    }
+    .wk-form-field input:focus, .wk-form-field select:focus, .wk-form-field textarea:focus {
+      border-color: var(--orange); outline: none;
+    }
+    .wk-form-row { display: flex; gap: 10px; }
+    .wk-form-row .wk-form-field { flex: 1; }
+
+    @media (max-width: 480px) {
+      .week-range-label { font-size: .9rem; }
+      .week-today-btn, .cal-nav-btn { padding: 5px 9px; font-size: .78rem; }
+    }
+
     /* 日別予約一覧モーダル */
     .day-modal {
       position: fixed; inset: 0;
@@ -1601,17 +1740,50 @@
     </div>
 
     <div id="tab-calendar" class="tab-panel">
-      <div class="cal-view-header">
-        <button class="cal-nav-btn" onclick="changeCalendarMonth(-1)">‹ 前月</button>
-        <span class="cal-month-label" id="cal-month-label">-</span>
-        <button class="cal-nav-btn" onclick="changeCalendarMonth(1)">次月 ›</button>
+      <div class="cal-viewmode-toggle">
+        <button class="active" id="cal-mode-month" onclick="setCalMode('month', this)">月</button>
+        <button id="cal-mode-week" onclick="setCalMode('week', this)">週</button>
       </div>
-      <div id="admin-calendar-error" class="alert alert-error"></div>
-      <div class="cal-view-grid" id="cal-view-grid"></div>
-      <div class="cal-legend">
-        <span><span class="cal-legend-dot orange"></span>予約あり（件数表示）</span>
-        <span><span class="cal-legend-dot gray"></span>休業日（×印）</span>
-        <span><span class="cal-legend-dot today-mark"></span>今日</span>
+
+      <div id="cal-month-view">
+        <div class="cal-view-header">
+          <button class="cal-nav-btn" onclick="changeCalendarMonth(-1)">‹ 前月</button>
+          <span class="cal-month-label" id="cal-month-label">-</span>
+          <button class="cal-nav-btn" onclick="changeCalendarMonth(1)">次月 ›</button>
+        </div>
+        <div id="admin-calendar-error" class="alert alert-error"></div>
+        <div class="cal-view-grid" id="cal-view-grid"></div>
+        <div class="cal-legend">
+          <span><span class="cal-legend-dot orange"></span>予約あり（件数表示）</span>
+          <span><span class="cal-legend-dot gray"></span>休業日（×印）</span>
+          <span><span class="cal-legend-dot today-mark"></span>今日</span>
+        </div>
+      </div>
+
+      <div id="cal-week-view" style="display:none;">
+        <div class="week-view-header">
+          <span class="week-range-label" id="week-range-label">-</span>
+          <div class="week-nav-group">
+            <button class="cal-nav-btn" onclick="changeWeek(-1)">‹ 前週</button>
+            <button class="week-today-btn" onclick="goToThisWeek()">今週</button>
+            <button class="cal-nav-btn" onclick="changeWeek(1)">次週 ›</button>
+          </div>
+        </div>
+        <div id="admin-week-error" class="alert alert-error"></div>
+        <div class="week-scroll">
+          <div class="week-head-row" id="week-head-row"></div>
+          <div class="week-body" id="week-body"></div>
+        </div>
+        <div class="cal-legend">
+          <span><span class="cal-legend-dot" style="background:var(--orange)"></span>予約あり</span>
+          <span><span class="cal-legend-dot" style="background:#06C755"></span>空き（クリックで追加）</span>
+          <span><span class="cal-legend-dot" style="background:#e3e3e3"></span>休業・営業時間外</span>
+          <span><span class="cal-legend-dot today-mark"></span>今日</span>
+        </div>
+        <div class="holiday-help" style="margin-top:10px;">
+          💡 <b>緑の枠（空き）</b>をクリックすると、電話・口頭予約をその場で追加できます。<br>
+          予約ブロックをクリックすると詳細（電話番号・メール・メモ等）を表示します。
+        </div>
       </div>
     </div>
 
@@ -1687,6 +1859,64 @@
         <button class="day-modal-close" onclick="closeDayBookingsModal()" aria-label="閉じる">×</button>
       </div>
       <div class="day-modal-body" id="day-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ▼ 予約詳細モーダル（週ビュー用） -->
+  <div id="booking-detail-modal" class="day-modal" style="display:none;" onclick="if(event.target===this)closeBookingDetail()">
+    <div class="day-modal-card" style="max-width:420px;">
+      <div class="day-modal-header">
+        <h3 id="booking-detail-title">予約の詳細</h3>
+        <button class="day-modal-close" onclick="closeBookingDetail()" aria-label="閉じる">×</button>
+      </div>
+      <div class="day-modal-body" id="booking-detail-body"></div>
+    </div>
+  </div>
+
+  <!-- ▼ 手動予約追加モーダル（電話・口頭予約用） -->
+  <div id="manual-booking-modal" class="day-modal" style="display:none;" onclick="if(event.target===this)closeManualBooking()">
+    <div class="day-modal-card" style="max-width:420px;">
+      <div class="day-modal-header">
+        <h3>予約を追加（電話・口頭）</h3>
+        <button class="day-modal-close" onclick="closeManualBooking()" aria-label="閉じる">×</button>
+      </div>
+      <div class="day-modal-body" style="padding:16px 20px 20px;">
+        <div id="mb-alert" class="alert alert-error"></div>
+        <div class="wk-form-field">
+          <label>お名前<span class="req">※必須</span></label>
+          <input type="text" id="mb-name" placeholder="例：山田 花子" autocomplete="off">
+        </div>
+        <div class="wk-form-field">
+          <label>電話番号<span class="req">※必須</span></label>
+          <input type="tel" id="mb-phone" placeholder="例：090-1234-5678" inputmode="tel">
+        </div>
+        <div class="wk-form-field">
+          <label>メニュー<span class="req">※必須</span></label>
+          <select id="mb-menu"></select>
+        </div>
+        <div class="wk-form-row">
+          <div class="wk-form-field">
+            <label>日付<span class="req">※必須</span></label>
+            <input type="date" id="mb-date">
+          </div>
+          <div class="wk-form-field">
+            <label>時間<span class="req">※必須</span></label>
+            <select id="mb-time"></select>
+          </div>
+        </div>
+        <div class="wk-form-field">
+          <label>メールアドレス<span class="opt">（任意）</span></label>
+          <input type="email" id="mb-email" placeholder="お持ちの場合のみ" autocomplete="off">
+        </div>
+        <div class="wk-form-field">
+          <label>メモ<span class="opt">（任意）</span></label>
+          <textarea id="mb-memo" rows="2" placeholder="備考があれば"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+          <button class="btn btn-secondary" onclick="closeManualBooking()">キャンセル</button>
+          <button class="btn" id="mb-save-btn" onclick="submitManualBooking()" style="background:var(--orange);color:#fff;border:none;">予約を登録</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2837,6 +3067,307 @@
 
   function closeDayBookingsModal() {
     document.getElementById('day-bookings-modal').style.display = 'none';
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 週ビュー（タイムグリッド）
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const WEEK_START_MIN  = 9 * 60;    // 9:00
+  const WEEK_END_MIN    = 21 * 60;   // 21:00（最終枠19:00＋最長100分=20:40を内包）
+  const WEEK_HOUR_H     = 52;        // 1時間の高さ(px)
+  const WEEK_PX_PER_MIN = WEEK_HOUR_H / 60;
+  const WK_DOWS = ['日','月','火','水','木','金','土'];
+  let calMode = 'month';
+  let weekStartDate = null;          // その週の日曜
+  let _weekBookings = {};            // id -> booking
+
+  function wkPad2(n){ return String(n).padStart(2,'0'); }
+  function wkDateStr(d){ return d.getFullYear()+'-'+wkPad2(d.getMonth()+1)+'-'+wkPad2(d.getDate()); }
+  function wkMinLabel(min){ const h=Math.floor(min/60), m=min%60; return h+':'+wkPad2(m); }
+  function wkStartOfWeek(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-x.getDay()); return x; }
+  function wkShortMenu(menu){ return (menu||'').replace(/\s*\d+分$/,''); }
+
+  function setCalMode(mode, btn){
+    calMode = mode;
+    document.querySelectorAll('.cal-viewmode-toggle button').forEach(b=>b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    document.getElementById('cal-month-view').style.display = (mode==='month') ? '' : 'none';
+    document.getElementById('cal-week-view').style.display  = (mode==='week')  ? '' : 'none';
+    if (mode==='week') initWeekView();
+    else renderCalendarView();
+  }
+
+  function initWeekView(){
+    if (!weekStartDate) weekStartDate = wkStartOfWeek(new Date());
+    renderWeekView();
+  }
+  function changeWeek(delta){
+    weekStartDate = new Date(weekStartDate);
+    weekStartDate.setDate(weekStartDate.getDate() + delta*7);
+    renderWeekView();
+  }
+  function goToThisWeek(){ weekStartDate = wkStartOfWeek(new Date()); renderWeekView(); }
+
+  async function fetchBookingsForRange(startStr, endStr){
+    const { data, error } = await sbClient.from('bookings')
+      .select('id, name, menu, date, time, duration, customer_number, phone, email, memo')
+      .gte('date', startStr).lte('date', endStr).order('date').order('time');
+    if (error) throwSupabaseError('予約一覧の取得', error);
+    return data || [];
+  }
+  async function fetchHolidaysForRange(startStr, endStr){
+    const { data, error } = await sbClient.from('holidays')
+      .select('date, reason, open_time, close_time, time_ranges')
+      .gte('date', startStr).lte('date', endStr);
+    if (error) throwSupabaseError('休業日一覧の取得', error);
+    const map = {};
+    (data||[]).forEach(h=>{ map[h.date] = {
+      reason:h.reason||'', open_time:h.open_time||null,
+      close_time:h.close_time||null, time_ranges:h.time_ranges||null }; });
+    return map;
+  }
+
+  // その日の営業時間帯 [{openMin,closeMin}] を返す。休業日なら null。
+  function wkBusinessRanges(hdEntry){
+    const isCustom = hdEntry && (hdEntry.open_time || hdEntry.time_ranges);
+    const isFullHoliday = hdEntry && !isCustom;
+    if (isFullHoliday) return null;
+    if (isCustom){
+      const ranges = hdEntry.time_ranges || [{ open: hdEntry.open_time, close: hdEntry.close_time }];
+      return ranges.map(r=>{
+        const [oh,om]=r.open.split(':').map(Number);
+        const [ch,cm]=r.close.split(':').map(Number);
+        return { openMin: oh*60+om, closeMin: ch*60+cm };
+      });
+    }
+    const first = ALL_TIMES[0].split(':').map(Number);
+    const last  = ALL_TIMES[ALL_TIMES.length-1].split(':').map(Number);
+    return [{ openMin: first[0]*60+first[1], closeMin: last[0]*60+last[1] }];
+  }
+
+  // WEEK_START〜WEEK_END のうち営業時間に含まれない区間
+  function wkOffHourSegments(ranges){
+    const sorted=[...ranges].sort((a,b)=>a.openMin-b.openMin);
+    const segs=[]; let cur=WEEK_START_MIN;
+    sorted.forEach(r=>{
+      const o=Math.max(r.openMin,WEEK_START_MIN), c=Math.min(r.closeMin,WEEK_END_MIN);
+      if(o>cur) segs.push({startMin:cur,endMin:o});
+      cur=Math.max(cur,c);
+    });
+    if(cur<WEEK_END_MIN) segs.push({startMin:cur,endMin:WEEK_END_MIN});
+    return segs;
+  }
+
+  async function renderWeekView(){
+    const wkStart = weekStartDate;
+    const wkEnd = new Date(wkStart); wkEnd.setDate(wkEnd.getDate()+6);
+    const startStr = wkDateStr(wkStart), endStr = wkDateStr(wkEnd);
+    document.getElementById('week-range-label').textContent =
+      `${wkStart.getFullYear()}年${wkStart.getMonth()+1}月${wkStart.getDate()}日 〜 ${wkEnd.getMonth()+1}月${wkEnd.getDate()}日`;
+    hideAlert('admin-week-error');
+
+    let bookings = [], holidays = {};
+    try {
+      [bookings, holidays] = await Promise.all([
+        fetchBookingsForRange(startStr, endStr),
+        fetchHolidaysForRange(startStr, endStr),
+      ]);
+    } catch(e){
+      console.error('❌ [renderWeekView] エラー:', e);
+      showAlert('admin-week-error', `週ビューのデータ取得に失敗しました。${e.supabaseError?'（'+e.supabaseError.code+'）':''}`);
+    }
+    _weekBookings = {};
+    bookings.forEach(b=> _weekBookings[b.id]=b);
+    const byDate = {};
+    bookings.forEach(b=>{ (byDate[b.date]=byDate[b.date]||[]).push(b); });
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const now = new Date();
+    const nowMin = now.getHours()*60 + now.getMinutes();
+    const todayStr = wkDateStr(now);
+
+    const days = [];
+    for (let i=0;i<7;i++){ const d=new Date(wkStart); d.setDate(d.getDate()+i); days.push(d); }
+
+    // ── ヘッダー行 ──
+    let headHtml = '<div class="week-corner"></div>';
+    days.forEach(d=>{
+      const ds = wkDateStr(d); const dow=d.getDay();
+      const hd = holidays[ds]; const ranges = wkBusinessRanges(hd);
+      const isHoliday = !!hd && ranges===null;
+      const isCustom  = !!hd && !isHoliday;
+      const cls=['week-dayhead'];
+      if(dow===0)cls.push('sun'); if(dow===6)cls.push('sat');
+      if(ds===todayStr)cls.push('today'); if(isHoliday)cls.push('holiday-head');
+      const tag = isHoliday ? `<span class="wd-holiday-tag">休</span>`
+                : (isCustom ? `<span class="wd-holiday-tag">時間変更</span>` : '');
+      headHtml += `<div class="${cls.join(' ')}"><div class="wd-dow">${WK_DOWS[dow]}</div><div class="wd-date">${d.getDate()}</div>${tag}</div>`;
+    });
+    document.getElementById('week-head-row').innerHTML = headHtml;
+
+    // ── ボディ ──
+    const totalMin = WEEK_END_MIN - WEEK_START_MIN;
+    const bodyH = totalMin * WEEK_PX_PER_MIN;
+
+    let axis = `<div class="week-axis" style="height:${bodyH}px">`;
+    for (let h=Math.ceil(WEEK_START_MIN/60); h<=Math.floor(WEEK_END_MIN/60); h++){
+      const top = (h*60 - WEEK_START_MIN)*WEEK_PX_PER_MIN;
+      axis += `<div class="wk-hr" style="top:${top}px">${h}:00</div>`;
+    }
+    axis += '</div>';
+
+    let cols = '';
+    days.forEach(d=>{
+      const ds = wkDateStr(d); const hd=holidays[ds]; const ranges=wkBusinessRanges(hd);
+      const isPastDay = d < today;
+      const isToday = ds===todayStr;
+      const colCls = ['week-daycol']; if(isToday)colCls.push('today-col');
+      let inner = '';
+      for (let h=Math.ceil(WEEK_START_MIN/60); h<=Math.floor(WEEK_END_MIN/60); h++){
+        const top=(h*60-WEEK_START_MIN)*WEEK_PX_PER_MIN;
+        inner += `<div class="wk-hourline" style="top:${top}px"></div>`;
+      }
+      if (ranges===null){
+        inner += `<div class="wk-holiday-fill"><span>休業日${hd&&hd.reason?'：'+esc(hd.reason):''}</span></div>`;
+      } else {
+        wkOffHourSegments(ranges).forEach(seg=>{
+          const top=(seg.startMin-WEEK_START_MIN)*WEEK_PX_PER_MIN;
+          const hgt=(seg.endMin-seg.startMin)*WEEK_PX_PER_MIN;
+          inner += `<div class="wk-offhours" style="top:${top}px;height:${hgt}px"></div>`;
+        });
+        const dayBookings = byDate[ds]||[];
+        const bookedRanges = dayBookings.map(b=>{
+          const [h,m]=b.time.split(':').map(Number); const st=h*60+m;
+          return {start:st, end:st+(b.duration||DEFAULT_DURATION)};
+        });
+        const slotH = Math.max(16, 40*WEEK_PX_PER_MIN - 2);
+        ALL_TIMES.forEach(t=>{
+          const [th,tm]=t.split(':').map(Number); const st=th*60+tm;
+          const inHours = ranges.some(r=> st>=r.openMin && st<=r.closeMin);
+          if(!inHours) return;
+          const conflict = bookedRanges.some(r=> st>=r.start && st<r.end);
+          if(conflict) return;
+          const isPast = isPastDay || (isToday && st<=nowMin);
+          const top=(st-WEEK_START_MIN)*WEEK_PX_PER_MIN;
+          if(isPast){
+            inner += `<div class="wk-slot-past" style="top:${top}px;height:${slotH}px"></div>`;
+          } else {
+            inner += `<div class="wk-slot-free" style="top:${top}px;height:${slotH}px" title="${t} 空き枠（クリックで予約追加）" onclick="openManualBooking('${ds}','${t}')"><span class="wk-plus">＋</span></div>`;
+          }
+        });
+        dayBookings.forEach(b=>{
+          const [h,m]=b.time.split(':').map(Number); const st=h*60+m;
+          const dur=b.duration||DEFAULT_DURATION;
+          const top=(st-WEEK_START_MIN)*WEEK_PX_PER_MIN;
+          const hgt=Math.max(20, dur*WEEK_PX_PER_MIN - 2);
+          inner += `<div class="wk-block" style="top:${top}px;height:${hgt}px" onclick="showBookingDetail(${b.id})">`
+                 + `<div class="wb-time">${b.time}〜${wkMinLabel(st+dur)}</div>`
+                 + `<div class="wb-name">${esc(b.name||'')}</div>`
+                 + `<div class="wb-menu">${esc(wkShortMenu(b.menu))}</div></div>`;
+        });
+      }
+      cols += `<div class="${colCls.join(' ')}" style="height:${bodyH}px">${inner}</div>`;
+    });
+
+    document.getElementById('week-body').innerHTML = axis + cols;
+  }
+
+  // 予約詳細
+  function showBookingDetail(id){
+    const b=_weekBookings[id]; if(!b) return;
+    const [h,m]=b.time.split(':').map(Number);
+    const dur=b.duration||DEFAULT_DURATION;
+    const end=wkMinLabel(h*60+m+dur);
+    const [y,mo,da]=b.date.split('-');
+    const dash='<span style="color:var(--text-light)">—</span>';
+    const rows=[
+      ['日時', `${y}年${parseInt(mo)}月${parseInt(da)}日 ${b.time}〜${end}`],
+      ['お名前', esc(b.name||'')],
+      ['メニュー', esc(b.menu||'')],
+      ['電話番号', b.phone?esc(b.phone):dash],
+      ['メール', b.email?esc(b.email):'<span style="color:var(--text-light)">（なし）</span>'],
+      ['顧客番号', b.customer_number?('No.'+esc(b.customer_number)):dash],
+      ['メモ', b.memo?esc(b.memo):dash],
+    ];
+    document.getElementById('booking-detail-body').innerHTML =
+      rows.map(r=>`<div class="detail-row"><div class="detail-label">${r[0]}</div><div class="detail-val">${r[1]}</div></div>`).join('');
+    document.getElementById('booking-detail-modal').style.display='flex';
+  }
+  function closeBookingDetail(){ document.getElementById('booking-detail-modal').style.display='none'; }
+
+  // 手動予約（電話・口頭）
+  function openManualBooking(dateStr, time){
+    const sel=document.getElementById('mb-menu');
+    if(sel.options.length===0){
+      Object.keys(MENU_DURATIONS).forEach(k=>{
+        const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o);
+      });
+    }
+    const tsel=document.getElementById('mb-time');
+    if(tsel.options.length===0){
+      ALL_TIMES.forEach(t=>{ const o=document.createElement('option'); o.value=t; o.textContent=t; tsel.appendChild(o); });
+    }
+    document.getElementById('mb-name').value='';
+    document.getElementById('mb-phone').value='';
+    document.getElementById('mb-email').value='';
+    document.getElementById('mb-memo').value='';
+    sel.selectedIndex=0;
+    document.getElementById('mb-date').value=dateStr;
+    tsel.value=time;
+    hideAlert('mb-alert');
+    document.getElementById('mb-save-btn').disabled=false;
+    document.getElementById('manual-booking-modal').style.display='flex';
+  }
+  function closeManualBooking(){ document.getElementById('manual-booking-modal').style.display='none'; }
+
+  async function submitManualBooking(){
+    const name =document.getElementById('mb-name').value.trim();
+    const phone=document.getElementById('mb-phone').value.trim();
+    const menu =document.getElementById('mb-menu').value;
+    const date =document.getElementById('mb-date').value;
+    const time =document.getElementById('mb-time').value;
+    const email=document.getElementById('mb-email').value.trim();
+    const memo =document.getElementById('mb-memo').value.trim();
+    hideAlert('mb-alert');
+    if(!name){  showAlert('mb-alert','お名前を入力してください。'); return; }
+    if(!phone){ showAlert('mb-alert','電話番号を入力してください。'); return; }
+    if(!menu){  showAlert('mb-alert','メニューを選択してください。'); return; }
+    if(!date||!time){ showAlert('mb-alert','日付と時間を選択してください。'); return; }
+    const duration=getMenuDuration(menu);
+    const [th,tm]=time.split(':').map(Number); const st=th*60+tm;
+    const today=new Date(); today.setHours(0,0,0,0);
+    const sel=new Date(date+'T00:00:00');
+    const now=new Date(); const nowMin=now.getHours()*60+now.getMinutes();
+    const todayStr=wkDateStr(now);
+    if(sel<today || (date===todayStr && st<=nowMin)){
+      showAlert('mb-alert','過去の日時には登録できません。'); return;
+    }
+    const btn=document.getElementById('mb-save-btn'); btn.disabled=true;
+    showLoading('予約を登録中...');
+    try {
+      const hd=await checkIsHoliday(date).catch(()=>null);
+      const ranges=wkBusinessRanges(hd);
+      if(ranges===null){ showAlert('mb-alert','この日は休業日です。別の日付をお選びください。'); return; }
+      const inHours=ranges.some(r=> st>=r.openMin && st<=r.closeMin);
+      if(!inHours){ showAlert('mb-alert','選択した時間は営業時間外です。別の時間をお選びください。'); return; }
+      const booked=await fetchBookedRanges(date).catch(()=>[]);
+      if(isSlotConflict(time, duration, booked)){
+        showAlert('mb-alert','この時間帯はすでに予約が入っています。別の時間をお選びください。'); return;
+      }
+      await saveBooking({
+        customer_number:null, name, phone, email: email||null, menu, date, time, duration,
+        memo: memo||null, symptom:null, treatment_history:null, symptom_start:null,
+        exercise_ok:null, daily_impact:null, line_user_id:null
+      });
+      closeManualBooking();
+      await renderWeekView();
+    } catch(e){
+      console.error('❌ [submitManualBooking] エラー:', e);
+      showAlert('mb-alert', `登録に失敗しました。${e.supabaseError?'（'+e.supabaseError.code+' / '+e.supabaseError.message+'）':''}`);
+    } finally {
+      hideLoading();
+      const b=document.getElementById('mb-save-btn'); if(b) b.disabled=false;
+    }
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
