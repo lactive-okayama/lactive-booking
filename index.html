@@ -73,8 +73,10 @@
     @media (max-width: 400px) { .header-nav-btn { font-size: .75rem; padding: 6px 10px; } }
 
     .visit-count-wrap {
-      display: flex; align-items: center; gap: 7px; margin-top: 9px; flex-wrap: wrap;
+      display: flex; flex-direction: column; gap: 6px; margin-top: 9px;
     }
+    .vc-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .vc-total { font-weight: 700; color: var(--orange-deep); }
     .visit-count-label { font-size: .78rem; color: var(--text-light); }
     .visit-count-input {
       width: 64px; text-align: center; padding: 5px 6px;
@@ -3956,15 +3958,26 @@
               <span>✉️ ${esc(c.email)}</span>
             </div>
             <div class="visit-count-wrap">
-              <span class="visit-count-label">整体：</span>
-              <input class="visit-count-input" type="number" min="0"
-                id="vc-seitai-${esc(c.id)}" value="${c.seitai_count ?? 0}">
-              <span class="visit-count-label">回　ピラティス：</span>
-              <input class="visit-count-input" type="number" min="0"
-                id="vc-pilates-${esc(c.id)}" value="${c.pilates_count ?? 0}">
-              <span class="visit-count-label">回</span>
-              <button class="btn-visit-update"
-                onclick="updateVisitCount('${esc(c.id)}')">更新</button>
+              <div class="vc-row">
+                <span class="visit-count-label">整体：自動 ${Math.max(0,(c.seitai_count ?? 0)-(c.manual_seitai ?? 0))} ＋ 手動</span>
+                <input class="visit-count-input" type="number" min="0"
+                  data-auto="${Math.max(0,(c.seitai_count ?? 0)-(c.manual_seitai ?? 0))}"
+                  data-autovisit="${Math.max(0,(c.visit_count ?? 0)-(c.manual_seitai ?? 0)-(c.manual_pilates ?? 0))}"
+                  id="vc-seitai-${esc(c.id)}" value="${c.manual_seitai ?? 0}">
+                <span class="visit-count-label">回 ＝ <span class="vc-total">計 ${c.seitai_count ?? 0}回</span></span>
+              </div>
+              <div class="vc-row">
+                <span class="visit-count-label">ピラティス：自動 ${Math.max(0,(c.pilates_count ?? 0)-(c.manual_pilates ?? 0))} ＋ 手動</span>
+                <input class="visit-count-input" type="number" min="0"
+                  data-auto="${Math.max(0,(c.pilates_count ?? 0)-(c.manual_pilates ?? 0))}"
+                  id="vc-pilates-${esc(c.id)}" value="${c.manual_pilates ?? 0}">
+                <span class="visit-count-label">回 ＝ <span class="vc-total">計 ${c.pilates_count ?? 0}回</span></span>
+              </div>
+              <div class="vc-row">
+                <button class="btn-visit-update"
+                  onclick="updateVisitCount('${esc(c.id)}')">手動分を更新</button>
+                <span class="visit-count-label" style="font-size:.72rem;">※「手動」＝過去やシステム外の来院数。自動分は来院済み予約から毎日集計</span>
+              </div>
             </div>
           </div>
           <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
@@ -3978,19 +3991,25 @@
   async function updateVisitCount(customerId) {
     const seitaiInput  = document.getElementById(`vc-seitai-${customerId}`);
     const pilatesInput = document.getElementById(`vc-pilates-${customerId}`);
-    const seitaiCount  = parseInt(seitaiInput.value, 10);
-    const pilatesCount = parseInt(pilatesInput.value, 10);
-    if (isNaN(seitaiCount) || seitaiCount < 0 || isNaN(pilatesCount) || pilatesCount < 0) {
+    const manualSeitai  = parseInt(seitaiInput.value, 10);
+    const manualPilates = parseInt(pilatesInput.value, 10);
+    if (isNaN(manualSeitai) || manualSeitai < 0 || isNaN(manualPilates) || manualPilates < 0) {
       showAlert('admin-customer-error', '正しい回数（0以上の整数）を入力してください。');
       return;
     }
-    const visitCount = seitaiCount + pilatesCount;
-    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, seitaiCount, pilatesCount, visitCount });
+    // 自動分（来院済み予約から集計）を加味して合計を再計算
+    const autoSeitai  = parseInt(seitaiInput.dataset.auto, 10) || 0;
+    const autoPilates = parseInt(pilatesInput.dataset.auto, 10) || 0;
+    const autoVisit   = parseInt(seitaiInput.dataset.autovisit, 10) || 0;
+    const seitaiCount  = autoSeitai + manualSeitai;
+    const pilatesCount = autoPilates + manualPilates;
+    const visitCount   = autoVisit + manualSeitai + manualPilates;
+    console.log('🔵 [updateVisitCount] UPDATE開始:', { customerId, manualSeitai, manualPilates, seitaiCount, pilatesCount, visitCount });
     try {
       // .select() を付けることで RLS で UPDATE が拒否された場合（0行更新）を検知できる
       const { data, error } = await sbClient
         .from('customers')
-        .update({ visit_count: visitCount, seitai_count: seitaiCount, pilates_count: pilatesCount })
+        .update({ manual_seitai: manualSeitai, manual_pilates: manualPilates, visit_count: visitCount, seitai_count: seitaiCount, pilates_count: pilatesCount })
         .eq('id', customerId)
         .select();
 
@@ -4020,13 +4039,8 @@
       }
 
       console.log('✅ [updateVisitCount] UPDATE成功 保存行:', data);
-      seitaiInput.style.borderColor  = 'var(--success)';
-      pilatesInput.style.borderColor = 'var(--success)';
-      setTimeout(() => {
-        seitaiInput.style.borderColor  = '';
-        pilatesInput.style.borderColor = '';
-      }, 1500);
       hideAlert('admin-customer-error');
+      await renderCustomers(); // 合計表示を最新化
     } catch (e) {
       console.error('❌ [updateVisitCount] 予期せぬエラー:', e);
       showAlert('admin-customer-error', `来院回数の更新に失敗しました。（${e.message || '不明なエラー'}）`);
