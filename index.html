@@ -2787,6 +2787,9 @@
       });
       ST.bookingId = savedBooking?.[0]?.id || null;
 
+      // Googleカレンダーに予定を作成（失敗しても予約完了は継続）
+      gcalCreateForBooking(savedBooking?.[0]).catch(e => console.warn('カレンダー連携エラー（無視）:', e));
+
       // LINE通知を送信（失敗しても予約完了は継続）
       // ※ ペイロードには customerNumber を一切含めない
       const isFirstVisit = ST.flow !== 'member';
@@ -2970,8 +2973,12 @@
     if (!confirm(`以下の予約をキャンセルしますか？\n\n${formatDate(date)} ${time}\n${menu}\n\nこの操作は取り消せません。`)) return;
     showLoading('キャンセル処理中...');
     try {
+      // 先にGoogleカレンダーの予定IDを取得（削除すると読めなくなるため）
+      let _gcalId = null;
+      try { const { data: _gd } = await sbClient.from('bookings').select('gcal_event_id').eq('id', id).maybeSingle(); _gcalId = _gd?.gcal_event_id || null; } catch (_) {}
       const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
+      gcalDeleteEvent(_gcalId);
       await renderMypage();
       const el = document.getElementById('mypage-success');
       el.textContent = 'キャンセルが完了しました。またのご利用をお待ちしております。';
@@ -3468,11 +3475,12 @@
       if(isSlotConflict(time, duration, booked)){
         showAlert('mb-alert','この時間帯はすでに予約が入っています。別の時間をお選びください。'); return;
       }
-      await saveBooking({
+      const savedManual = await saveBooking({
         customer_number:null, name, phone: phone||'', email: email||'', menu, date, time, duration,
         memo: memo||null, symptom:null, treatment_history:null, symptom_start:null,
         exercise_ok:null, daily_impact:null, line_user_id:null
       });
+      gcalCreateForBooking(savedManual?.[0]).catch(e => console.warn('カレンダー連携エラー（無視）:', e));
       closeManualBooking();
       await renderWeekView();
     } catch(e){
@@ -4051,8 +4059,11 @@
     if (!confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) return;
     showLoading('削除中...');
     try {
+      let _gcalId = null;
+      try { const { data: _gd } = await sbClient.from('bookings').select('gcal_event_id').eq('id', id).maybeSingle(); _gcalId = _gd?.gcal_event_id || null; } catch (_) {}
       const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
+      gcalDeleteEvent(_gcalId);
       await renderBookings();
     } catch (e) {
       showAlert('admin-booking-error', '予約の削除に失敗しました。しばらくしてからお試しください。');
@@ -4275,6 +4286,43 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // LINE通知
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Googleカレンダー連携
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  const GCAL_FN_URL = 'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/gcal-sync';
+  const GCAL_AUTH   = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY';
+
+  async function gcalSync(payload) {
+    try {
+      const res = await fetch(GCAL_FN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': GCAL_AUTH },
+        body: JSON.stringify(payload)
+      });
+      return await res.json().catch(() => ({}));
+    } catch (e) { console.warn('gcalSync error:', e); return {}; }
+  }
+
+  // 予約行から Google カレンダーに予定を作成し、event_id を予約に保存
+  async function gcalCreateForBooking(b) {
+    try {
+      if (!b || !b.id) return;
+      const r = await gcalSync({
+        action: 'create', name: b.name, menu: b.menu, date: b.date, time: b.time,
+        duration: b.duration, phone: b.phone, memo: b.memo, customer_number: b.customer_number
+      });
+      if (r && r.ok && r.eventId) {
+        await sbClient.from('bookings').update({ gcal_event_id: r.eventId }).eq('id', b.id);
+      }
+    } catch (e) { console.warn('gcalCreateForBooking error:', e); }
+  }
+
+  // 予約に紐づく Google カレンダーの予定を削除（削除前に呼ぶ用の eventId 取得込み）
+  async function gcalDeleteEvent(eventId) {
+    if (!eventId) return;
+    gcalSync({ action: 'delete', eventId }).catch(() => {});
+  }
+
   async function sendLineNotify({ name, menu, date, time, phone, memo }) {
     await fetch(
       'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/send-line-notify',
