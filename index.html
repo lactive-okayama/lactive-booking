@@ -2974,10 +2974,11 @@
     showLoading('キャンセル処理中...');
     try {
       // 先にGoogleカレンダーの予定IDを取得（削除すると読めなくなるため）
-      let _gcalId = null;
-      try { const { data: _gd } = await sbClient.from('bookings').select('gcal_event_id').eq('id', id).maybeSingle(); _gcalId = _gd?.gcal_event_id || null; } catch (_) {}
+      let _gcalId = null; let _bk = null;
+      try { const { data: _gd } = await sbClient.from('bookings').select('gcal_event_id, visited, customer_number, menu').eq('id', id).maybeSingle(); _bk = _gd; _gcalId = _gd?.gcal_event_id || null; } catch (_) {}
       const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
+      await preserveVisitOnDelete(_bk); // 来院済みなら来院回数を保持
       gcalDeleteEvent(_gcalId);
       await renderMypage();
       const el = document.getElementById('mypage-success');
@@ -4059,10 +4060,11 @@
     if (!confirm(`「${name}」さんの予約を削除しますか？\nこの操作は取り消せません。`)) return;
     showLoading('削除中...');
     try {
-      let _gcalId = null;
-      try { const { data: _gd } = await sbClient.from('bookings').select('gcal_event_id').eq('id', id).maybeSingle(); _gcalId = _gd?.gcal_event_id || null; } catch (_) {}
+      let _gcalId = null; let _bk = null;
+      try { const { data: _gd } = await sbClient.from('bookings').select('gcal_event_id, visited, customer_number, menu').eq('id', id).maybeSingle(); _bk = _gd; _gcalId = _gd?.gcal_event_id || null; } catch (_) {}
       const { error } = await sbClient.from('bookings').delete().eq('id', id);
       if (error) throw error;
+      await preserveVisitOnDelete(_bk); // 来院済みなら来院回数を保持
       gcalDeleteEvent(_gcalId);
       await renderBookings();
     } catch (e) {
@@ -4321,6 +4323,27 @@
   async function gcalDeleteEvent(eventId) {
     if (!eventId) return;
     gcalSync({ action: 'delete', eventId }).catch(() => {});
+  }
+
+  // 来院済みの予約を削除するとき、その1回分を「手動加算分」へ移して来院回数を保持する
+  // （夜間の再集計は「残っている来院済み予約の件数＋手動分」で計算するため、削除しても消えなくなる）
+  async function preserveVisitOnDelete(booking) {
+    try {
+      if (!booking || !booking.visited || !booking.customer_number) return;
+      const menu = booking.menu || '';
+      const addS = menu.includes('整体')     ? 1 : 0;
+      const addP = menu.includes('ピラティス') ? 1 : 0;
+      if (!addS && !addP) return;
+      const { data: cust } = await sbClient.from('customers')
+        .select('id, manual_seitai, manual_pilates')
+        .eq('customer_number', booking.customer_number).maybeSingle();
+      if (!cust) return;
+      await sbClient.from('customers').update({
+        manual_seitai:  (cust.manual_seitai  ?? 0) + addS,
+        manual_pilates: (cust.manual_pilates ?? 0) + addP
+      }).eq('id', cust.id);
+      console.log('🟢 [preserveVisitOnDelete] 来院済み予約の削除に伴い手動分へ移行:', { customer_number: booking.customer_number, addS, addP });
+    } catch (e) { console.warn('preserveVisitOnDelete error:', e); }
   }
 
   async function sendLineNotify({ name, menu, date, time, phone, memo }) {
