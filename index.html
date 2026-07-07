@@ -3885,7 +3885,7 @@
     container.innerHTML = '<div class="empty-state"><div class="ei">⏳</div><p>読み込み中...</p></div>';
     hideAlert('admin-booking-error');
     try {
-      let query = sbClient.from('bookings').select('*').order('date').order('time');
+      let query = sbClient.from('bookings').select('*').gte('date', (d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'))(new Date())).order('date').order('time'); // 今日以降の予約のみ表示（顧客マイページの来院履歴には影響しない）
       if (fMenu) query = query.eq('menu', fMenu);
       const { data, error } = await query;
       if (error) throw error;
