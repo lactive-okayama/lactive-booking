@@ -1682,10 +1682,15 @@
     <div style="max-width:380px;margin:0 auto;">
       <div class="page-title">
         <h2>管理画面ログイン</h2>
-        <p>管理者パスワードを入力してください</p>
+        <p>院長アカウントのメールアドレスとパスワードを入力してください</p>
       </div>
       <div class="card">
         <div id="admin-login-alert" class="alert alert-error">パスワードが正しくありません。</div>
+        <div class="form-group">
+          <label>メールアドレス</label>
+          <input type="email" id="admin-email" value="info@lactive-care.com" autocomplete="username"
+                 onkeydown="if(event.key==='Enter') document.getElementById('admin-pw').focus()">
+        </div>
         <div class="form-group">
           <label>パスワード</label>
           <input type="password" id="admin-pw" placeholder="パスワードを入力"
@@ -2245,16 +2250,15 @@
     btn.disabled = true;
     showLoading('顧客情報を確認中...');
     try {
-      const customer = await findCustomer(id);
       // 顧客番号 or 名前が不一致の場合は同じエラーメッセージ（情報漏洩を防ぐ）
-      const storedName    = (customer?.name || '').replace(/[\s　]/g, '');
-      const normalizedEntry = enteredName.replace(/[\s　]/g, '');
-      if (!customer || !storedName.startsWith(normalizedEntry)) {
+      const customer = await customerLogin(id, enteredName);
+      if (!customer) {
         showAlert('login-alert', '顧客番号またはお名前が正しくありません。');
         return;
       }
       hideAlert('login-alert');
-      ST.customer = customer;
+      ST.customer  = customer;
+      ST.loginName = enteredName;
       document.getElementById('lc-id').textContent    = customer.customer_number;
       document.getElementById('lc-name').textContent  = customer.name;
       document.getElementById('lc-phone').textContent = customer.phone;
@@ -2311,16 +2315,14 @@
     showLoading('顧客番号を発行中...');
     console.log('🔵 [新規登録] 開始:', { name, phone, email });
     try {
-      console.log('🔵 [新規登録] 顧客番号を生成中...');
-      const newId = await generateCustomerId();
-      console.log('🔵 [新規登録] 生成された顧客番号:', newId);
-
-      console.log('🔵 [新規登録] customersテーブルにINSERT中...');
-      const savedCustomer = await saveCustomer({ customer_number: newId, name, phone, email });
-      console.log('✅ [新規登録] INSERT成功:', savedCustomer);
+      // 顧客番号はデータベース側で重複しないように発行
+      const savedCustomer = await registerCustomer({ name, phone, email });
+      const newId = savedCustomer.customer_number;
+      console.log('✅ [新規登録] 登録成功 No.' + newId);
 
       ST.isNewCustomer = true;
       ST.newCustomerId = newId;
+      ST.loginName     = name;
       ST.personal = { name, phone, email };
       document.getElementById('issued-id').textContent = newId;
       document.getElementById('register-form-section').style.display = 'none';
@@ -2633,22 +2635,9 @@
     }
   }
 
-  /** Supabase から指定日の予約済み時間帯を取得（後方互換のため残す） */
-  async function fetchBookedTimes(date) {
-    const { data, error } = await sbClient
-      .from('bookings')
-      .select('time')
-      .eq('date', date);
-    if (error) throwSupabaseError('予約済み時間帯の取得', error);
-    return (data || []).map(b => b.time);
-  }
-
-  /** Supabase から指定日の予約済み時間範囲を取得（所要時間ベース） */
+  /** Supabase から指定日の予約済み時間範囲を取得（所要時間ベース。時間以外の情報は返らない） */
   async function fetchBookedRanges(date) {
-    const { data, error } = await sbClient
-      .from('bookings')
-      .select('time, duration')
-      .eq('date', date);
+    const { data, error } = await sbClient.rpc('get_booked_ranges', { p_date: date });
     if (error) throwSupabaseError('予約済み時間帯の取得', error);
     return (data || []).map(b => {
       const [h, m] = b.time.split(':').map(Number);
@@ -2807,6 +2796,7 @@
       const q = ST.questionnaire;
       const savedBooking = await saveBooking({
         customer_number:   ST.customer?.customer_number || (ST.isNewCustomer ? ST.newCustomerId : null),
+        login_name:        ST.loginName || null,
         name:              ST.personal.name,
         phone:             ST.personal.phone,
         email:             ST.personal.email,
@@ -2855,7 +2845,13 @@
 
       navigateTo('page-done');
     } catch (e) {
-      showAlert('datetime-alert', '予約の送信に失敗しました。しばらくしてからお試しください。');
+      if (isSlotConflictError(e)) {
+        showAlert('datetime-alert', '選択した時間帯はすでに予約済みになりました。別の時間帯をお選びください。');
+        _dateChangeLast = '';
+        onDateChange();
+      } else {
+        showAlert('datetime-alert', '予約の送信に失敗しました。しばらくしてからお試しください。');
+      }
       btn.disabled = false;
     } finally {
       hideLoading();
@@ -2894,15 +2890,14 @@
     btn.disabled = true;
     showLoading('予約を確認中...');
     try {
-      const customer = await findCustomer(raw);
-      const storedName      = (customer?.name || '').replace(/[\s　]/g, '');
-      const normalizedEntry = enteredName.replace(/[\s　]/g, '');
-      if (!customer || !storedName.startsWith(normalizedEntry)) {
+      const customer = await customerLogin(raw, enteredName);
+      if (!customer) {
         showAlert('cancel-login-alert', '顧客番号またはお名前が正しくありません。');
         return;
       }
       hideAlert('cancel-login-alert');
-      cancelCustomer = customer;
+      // 以降の操作（予約一覧・キャンセル・連絡先変更）も同じ顧客番号＋お名前で本人確認する
+      cancelCustomer = { ...customer, _loginName: enteredName };
       document.getElementById('mypage-customer-name').textContent = `${customer.name} 様`;
       document.getElementById('mypage-customer-num').textContent  = `顧客番号：${customer.customer_number}`;
       hideAlert('mypage-success');
@@ -2923,12 +2918,10 @@
     document.getElementById('mypage-past-list').innerHTML = '';
 
     try {
-      const { data, error } = await sbClient
-        .from('bookings')
-        .select('*')
-        .eq('customer_number', cancelCustomer.customer_number)
-        .order('date')
-        .order('time');
+      const { data, error } = await sbClient.rpc('get_my_bookings', {
+        p_number: cancelCustomer.customer_number,
+        p_name:   cancelCustomer._loginName
+      });
       if (error) throw error;
 
       const all      = data || [];
@@ -3010,12 +3003,13 @@
     if (!confirm(`以下の予約をキャンセルしますか？\n\n${formatDate(date)} ${time}\n${menu}\n\nこの操作は取り消せません。`)) return;
     showLoading('キャンセル処理中...');
     try {
-      // 先にGoogleカレンダーの予定IDを取得（削除すると読めなくなるため）
-      let _gcalId = null; let _bk = null;
-      try { const { data: _gd } = await sbClient.from('bookings').select('gcal_event_id, visited, customer_number, menu').eq('id', id).maybeSingle(); _bk = _gd; _gcalId = _gd?.gcal_event_id || null; } catch (_) {}
-      const { error } = await sbClient.from('bookings').delete().eq('id', id);
+      // 本人確認・来院回数の保持・削除はデータベース側で行い、Googleカレンダーの予定IDが返る
+      const { data: _gcalId, error } = await sbClient.rpc('cancel_my_booking', {
+        p_number:     cancelCustomer.customer_number,
+        p_name:       cancelCustomer._loginName,
+        p_booking_id: Number(id)
+      });
       if (error) throw error;
-      await preserveVisitOnDelete(_bk); // 来院済みなら来院回数を保持
       gcalDeleteEvent(_gcalId);
       await renderMypage();
       const el = document.getElementById('mypage-success');
@@ -3032,39 +3026,34 @@
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // 管理画面
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 管理者は Supabase Auth（院長アカウント）でログインする。
+  // データベース側でこのアカウントだけに顧客・予約データの読み書きを許可している（is_admin()）
   async function adminLogin() {
-    const pwInput = document.getElementById('admin-pw');
-    const pw = pwInput.value;
-    if (!pw) {
-      showAlert('admin-login-alert', 'パスワードを入力してください。');
-      pwInput.focus();
+    const emailInput = document.getElementById('admin-email');
+    const pwInput    = document.getElementById('admin-pw');
+    const email = emailInput.value.trim();
+    const pw    = pwInput.value;
+    if (!email || !pw) {
+      showAlert('admin-login-alert', 'メールアドレスとパスワードを入力してください。');
+      (email ? pwInput : emailInput).focus();
       return;
     }
     showLoading('認証中...');
     try {
-      const res = await fetch(
-        'https://wuthbgxzmvjeosugzfbs.supabase.co/functions/v1/verify-admin',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1dGhiZ3h6bXZqZW9zdWd6ZmJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTIyNjUsImV4cCI6MjA5MjQyODI2NX0.auAsEpJN1yPiBtX79TKzDX-xBFiC1-fDl25z3F-eSrY'
-          },
-          body: JSON.stringify({ password: pw })
-        }
-      );
-      const result = await res.json().catch(() => ({}));
-      if (res.ok && result.isValid === true) {
-        pwInput.value = '';
-        hideAlert('admin-login-alert');
-        navigateTo('page-admin');
-        renderBookings();
-        renderCustomers();
-      } else {
-        showAlert('admin-login-alert', 'パスワードが正しくありません。');
+      const { error } = await sbClient.auth.signInWithPassword({ email, password: pw });
+      if (error) {
+        console.error('管理者認証エラー:', error);
+        const isNetwork = !error.status || error.status >= 500;
+        showAlert('admin-login-alert', isNetwork
+          ? '通信エラーが発生しました。しばらくしてからお試しください。'
+          : 'メールアドレスまたはパスワードが正しくありません。');
         pwInput.value = '';
         pwInput.focus();
+        return;
       }
+      pwInput.value = '';
+      hideAlert('admin-login-alert');
+      openAdminDashboard();
     } catch (e) {
       console.error('管理者認証エラー:', e);
       showAlert('admin-login-alert', '通信エラーが発生しました。しばらくしてからお試しください。');
@@ -3074,7 +3063,25 @@
     }
   }
 
-  function adminLogout() { navigateTo('page-top'); }
+  function openAdminDashboard() {
+    navigateTo('page-admin');
+    renderBookings();
+    renderCustomers();
+  }
+
+  /** 管理画面URLを開いたとき、ログイン済みならそのまま管理画面へ */
+  async function openAdminEntry() {
+    try {
+      const { data } = await sbClient.auth.getSession();
+      if (data?.session) { openAdminDashboard(); return; }
+    } catch (_) {}
+    navigateTo('page-admin-login');
+  }
+
+  async function adminLogout() {
+    try { await sbClient.auth.signOut(); } catch (e) { console.warn('ログアウトエラー:', e); }
+    navigateTo('page-top');
+  }
 
   function switchTab(tabId, btn) {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -3524,6 +3531,7 @@
       await renderWeekView();
     } catch(e){
       console.error('❌ [submitManualBooking] エラー:', e);
+      if (isSlotConflictError(e)) { showAlert('mb-alert','この時間帯はすでに予約が入っています。別の時間をお選びください。'); return; }
       showAlert('mb-alert', `登録に失敗しました。${e.supabaseError?'（'+e.supabaseError.code+' / '+e.supabaseError.message+'）':''}`);
     } finally {
       hideLoading();
@@ -4090,31 +4098,46 @@
     btn.disabled = true;
     showLoading('保存中...');
     try {
-      const { data, error } = await sbClient
-        .from('customers')
-        .update({ name, phone, email })
-        .eq('id', customer.id)
-        .select();
-      if (error) throw error;
-      if (!data || data.length === 0) throw new Error('更新対象の顧客が見つかりませんでした');
+      let data;
+      if (isAdmin) {
+        const res = await sbClient
+          .from('customers')
+          .update({ name, phone, email })
+          .eq('id', customer.id)
+          .select();
+        if (res.error) throw res.error;
+        data = res.data;
+        if (!data || data.length === 0) throw new Error('更新対象の顧客が見つかりませんでした');
 
-      // 今後の予約にも反映（リマインドは予約に保存された連絡先へ送られるため）
-      const now = new Date();
-      const todayStr = now.getFullYear() + '-' +
-        String(now.getMonth() + 1).padStart(2, '0') + '-' +
-        String(now.getDate()).padStart(2, '0');
-      const { error: bErr } = await sbClient
-        .from('bookings')
-        .update({ name, phone, email })
-        .eq('customer_number', customer.customer_number)
-        .gte('date', todayStr);
-      if (bErr) console.error('❌ [submitCustomerEdit] 今後の予約への反映に失敗:', bErr);
+        // 今後の予約にも反映（リマインドは予約に保存された連絡先へ送られるため）
+        const now = new Date();
+        const todayStr = now.getFullYear() + '-' +
+          String(now.getMonth() + 1).padStart(2, '0') + '-' +
+          String(now.getDate()).padStart(2, '0');
+        const { error: bErr } = await sbClient
+          .from('bookings')
+          .update({ name, phone, email })
+          .eq('customer_number', customer.customer_number)
+          .gte('date', todayStr);
+        if (bErr) console.error('❌ [submitCustomerEdit] 今後の予約への反映に失敗:', bErr);
+      } else {
+        // お客様側：本人確認と今後の予約への反映はデータベース側で行う
+        const res = await sbClient.rpc('update_my_profile', {
+          p_number: customer.customer_number,
+          p_name:   customer._loginName,
+          p_phone:  phone,
+          p_email:  email
+        });
+        if (res.error) throw res.error;
+        data = res.data;
+        if (!data || data.length === 0) throw new Error('更新対象の顧客が見つかりませんでした');
+      }
 
       closeCustomerEdit();
       if (isAdmin) {
         await renderCustomers();
       } else {
-        cancelCustomer = data[0];
+        cancelCustomer = { ...data[0], _loginName: customer._loginName };
         document.getElementById('mypage-customer-name').textContent = `${cancelCustomer.name} 様`;
         await renderMypage();
         const el = document.getElementById('mypage-success');
@@ -4337,73 +4360,43 @@
     throw err;
   }
 
-  /** 顧客を customer_number で検索 */
-  async function findCustomer(customerNumber) {
-    console.log('🔵 [findCustomer] 検索中 customer_number:', customerNumber);
-    const { data, error } = await sbClient
-      .from('customers')
-      .select('*')
-      .eq('customer_number', customerNumber)
-      .maybeSingle();
+  // お客様のデータはテーブルを直接読み書きせず、本人確認つきの窓口（RPC）経由で扱う
+  // （supabase/sql/protect-customer-data-1-functions.sql）
+
+  /** 顧客番号＋お名前（姓）で本人確認し、顧客情報を返す（不一致なら null） */
+  async function customerLogin(customerNumber, enteredName) {
+    const { data, error } = await sbClient.rpc('customer_login', {
+      p_number: customerNumber,
+      p_name:   enteredName
+    });
     if (error) throwSupabaseError('顧客情報の取得', error);
-    console.log('🔵 [findCustomer] 結果:', data);
-    return data; // null if not found
+    return (data && data[0]) || null;
   }
 
-  /** 既存の customer_number 一覧を取得して重複しない6桁番号を生成 */
-  async function generateCustomerId() {
-    console.log('🔵 [generateCustomerId] 既存顧客番号を取得中...');
-    const { data, error } = await sbClient.from('customers').select('customer_number');
-    if (error) throwSupabaseError('顧客番号一覧の取得', error);
-
-    const existing = (data || []).map(c => c.customer_number);
-    console.log('🔵 [generateCustomerId] 既存番号一覧:', existing);
-
-    if (existing.length >= 900000) throw new Error('顧客番号が上限に達しています。');
-
-    // 重複しない番号が確定するまでループ（100000〜999999 の範囲で生成）
-    let id;
-    let tries = 0;
-    do {
-      id = String(Math.floor(Math.random() * 900000) + 100000);
-      tries++;
-      if (tries > 5000) throw new Error('顧客番号の生成に失敗しました（試行上限）。');
-    } while (existing.includes(id)); // ← 重複する限り必ず再生成
-    console.log(`🔵 [generateCustomerId] 決定番号: ${id}（${tries}回試行）`);
-    return id;
-  }
-
-  /** 顧客を保存（INSERT 後に保存行を返す） */
-  async function saveCustomer(c) {
-    console.log('🔵 [saveCustomer] INSERT開始:', c);
-    const { data, error } = await sbClient
-      .from('customers')
-      .insert({
-        customer_number: c.customer_number,
-        name:            c.name,
-        phone:           c.phone,
-        email:           c.email
-      })
-      .select(); // 保存された行を返してもらい確認
+  /** 新規登録（顧客番号はデータベース側で重複しないように発行） */
+  async function registerCustomer(c) {
+    const { data, error } = await sbClient.rpc('register_customer', {
+      p_name:  c.name,
+      p_phone: c.phone,
+      p_email: c.email
+    });
     if (error) throwSupabaseError('顧客登録', error);
-    console.log('✅ [saveCustomer] INSERT完了 保存行:', data);
-    return data;
+    return data[0];
   }
 
-  /** 予約を保存 */
+  /** 予約を保存（重なりはデータベース側でも確認し、重なれば SLOT_CONFLICT エラー） */
   async function saveBooking(b) {
-    console.log('🔵 [saveBooking] INSERT開始:', b);
-    const { data, error } = await sbClient
-      .from('bookings')
-      .insert({
+    console.log('🔵 [saveBooking] 登録開始:', { menu: b.menu, date: b.date, time: b.time });
+    const { data, error } = await sbClient.rpc('create_booking', {
+      p: {
         customer_number:   b.customer_number   || null,
+        login_name:        b.login_name        || null,
         name:              b.name,
         phone:             b.phone,
         email:             b.email,
         menu:              b.menu,
         date:              b.date,
         time:              b.time,
-        duration:          b.duration          || DEFAULT_DURATION,
         memo:              b.memo              || null,
         symptom:           b.symptom           || null,
         treatment_history: b.treatment_history || null,
@@ -4411,11 +4404,15 @@
         exercise_ok:       b.exercise_ok       || null,
         daily_impact:      b.daily_impact      || null,
         line_user_id:      b.line_user_id      || null
-      })
-      .select();
+      }
+    });
     if (error) throwSupabaseError('予約の保存', error);
-    console.log('✅ [saveBooking] INSERT完了 保存行:', data);
+    console.log('✅ [saveBooking] 登録完了 id:', data?.[0]?.id);
     return data;
+  }
+
+  function isSlotConflictError(e) {
+    return (e?.supabaseError?.message || e?.message || '').includes('SLOT_CONFLICT');
   }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -4447,7 +4444,7 @@
         duration: b.duration, phone: b.phone, memo: b.memo, customer_number: b.customer_number
       });
       if (r && r.ok && r.eventId) {
-        await sbClient.from('bookings').update({ gcal_event_id: r.eventId }).eq('id', b.id);
+        await sbClient.rpc('set_booking_gcal_event', { p_booking_id: b.id, p_event_id: r.eventId });
       }
     } catch (e) { console.warn('gcalCreateForBooking error:', e); }
   }
@@ -4538,7 +4535,7 @@
   /** 起動時に Supabase 接続を疎通確認 */
   async function checkConnection() {
     try {
-      const { error } = await sbClient.from('customers').select('id').limit(1);
+      const { error } = await sbClient.from('holidays').select('id').limit(1);
       if (error) {
         console.error('❌ [接続確認] Supabase疎通エラー:', {
           message: error.message,
@@ -4548,7 +4545,7 @@
         });
         console.warn('⚠️ 考えられる原因: APIキーの誤り / RLSポリシーによるアクセス拒否 / テーブル名の不一致');
       } else {
-        console.log('✅ [接続確認] Supabase接続OK（customersテーブル到達確認）');
+        console.log('✅ [接続確認] Supabase接続OK（holidaysテーブル到達確認）');
       }
     } catch (e) {
       console.error('❌ [接続確認] 予期せぬエラー:', e);
@@ -4676,9 +4673,7 @@
         }
         // page-doneからの場合、予約レコードをLINE IDで更新
         if (isFromDone && saved.bookingId) {
-          sbClient.from('bookings')
-            .update({ line_user_id: data.line_user_id })
-            .eq('id', saved.bookingId)
+          sbClient.rpc('set_booking_line_user', { p_booking_id: saved.bookingId, p_line_user_id: data.line_user_id })
             .then(({ error }) => {
               if (error) console.warn('⚠️ booking LINE ID更新エラー:', error);
               else console.log('✅ booking LINE ID更新完了');
@@ -4709,7 +4704,7 @@
     if (isLineCallback) {
       handleLineCallback(); // LINE OAuth コールバック処理（内部でnavigateTo呼び出し）
     } else if (window.location.search.includes('admin')) {
-      navigateTo('page-admin-login');
+      openAdminEntry();
     } else {
       navigateTo('page-top');
     }
