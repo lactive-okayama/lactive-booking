@@ -1641,6 +1641,7 @@
       <div class="mypage-customer-bar">
         <span class="mypage-customer-name" id="mypage-customer-name"></span>
         <span class="mypage-customer-num"  id="mypage-customer-num"></span>
+        <button type="button" class="btn-visit-update" onclick="openCustomerEdit('customer', cancelCustomer)">登録情報の変更</button>
       </div>
       <div class="mypage-stats">
         <div class="stat-card">
@@ -1896,6 +1897,40 @@
   </div>
 
   <!-- ▼ 手動予約追加モーダル（電話・口頭予約用） -->
+  <div id="customer-edit-modal" class="day-modal" style="display:none;" onclick="if(event.target===this)closeCustomerEdit()">
+    <div class="day-modal-card" style="max-width:420px;">
+      <div class="day-modal-header">
+        <h3 id="ce-title">登録情報の変更</h3>
+        <button class="day-modal-close" onclick="closeCustomerEdit()" aria-label="閉じる">×</button>
+      </div>
+      <div class="day-modal-body" style="padding:16px 20px 20px;">
+        <div id="ce-alert" class="alert alert-error"></div>
+        <div class="wk-form-field" id="ce-name-field">
+          <label>お名前<span class="req">※必須</span></label>
+          <input type="text" id="ce-name" placeholder="例：山田 花子" autocomplete="off">
+        </div>
+        <div class="wk-form-field" id="ce-name-readonly" style="display:none;">
+          <label>お名前</label>
+          <div id="ce-name-text" style="padding:6px 0;font-weight:600;"></div>
+          <div style="font-size:.75rem;color:var(--text-light);">お名前の変更は院までご連絡ください（ログインに使用するため）</div>
+        </div>
+        <div class="wk-form-field">
+          <label>電話番号<span class="req" id="ce-phone-req">※必須</span></label>
+          <input type="tel" id="ce-phone" placeholder="例：090-1234-5678" inputmode="tel" autocomplete="off">
+        </div>
+        <div class="wk-form-field">
+          <label>メールアドレス<span class="req" id="ce-email-req">※必須</span></label>
+          <input type="email" id="ce-email" placeholder="例：example@mail.com" autocomplete="off">
+        </div>
+        <div style="font-size:.75rem;color:var(--text-light);margin-bottom:10px;">※ 今後のご予約のリマインドも、変更後の連絡先に届きます</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+          <button class="btn btn-secondary" onclick="closeCustomerEdit()">キャンセル</button>
+          <button class="btn" id="ce-save-btn" onclick="submitCustomerEdit()" style="background:var(--orange);color:#fff;border:none;">変更を保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="manual-booking-modal" class="day-modal" style="display:none;" onclick="if(event.target===this)closeManualBooking()">
     <div class="day-modal-card" style="max-width:420px;">
       <div class="day-modal-header">
@@ -2265,6 +2300,7 @@
     if (!name)  { showAlert('register-alert', 'お名前を入力してください。'); return; }
     if (!phone) { showAlert('register-alert', '電話番号を入力してください。'); return; }
     if (!email) { showAlert('register-alert', 'メールアドレスを入力してください。'); return; }
+    if (!EMAIL_RE.test(email)) { showAlert('register-alert', 'メールアドレスの形式が正しくありません（例：example@mail.com）。'); return; }
     if (!document.getElementById('register-consent').checked) {
       showAlert('register-alert', 'プライバシーポリシーへの同意が必要です。'); return;
     }
@@ -3954,6 +3990,8 @@
       if (error) throw error;
 
       let list = data || [];
+      _adminCustomers = {};
+      list.forEach(c => { _adminCustomers[c.id] = c; });
       if (fName) list = list.filter(c =>
         (c.name || '').toLowerCase().includes(fName) ||
         (c.phone || '').includes(fName) ||
@@ -3994,11 +4032,101 @@
               </div>
             </div>
           </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+          <button class="btn-visit-update" onclick="openCustomerEdit('admin', _adminCustomers['${esc(c.id)}'])">編集</button>
           <button class="btn-danger" onclick="deleteCustomerConfirm('${esc(c.id)}', '${esc(c.customer_number)}', '${esc(c.name).replace(/'/g,'\\u0027')}')">削除</button>
+          </div>
         </div>`).join('');
     } catch (e) {
       showAlert('admin-customer-error', '顧客データの取得に失敗しました。ページを再読み込みしてください。');
       container.innerHTML = '';
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // 顧客情報の変更（管理画面・マイページ共通）
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  let _adminCustomers = {};
+  let _customerEdit = null; // { mode: 'admin' | 'customer', customer }
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function openCustomerEdit(mode, customer) {
+    if (!customer) return;
+    _customerEdit = { mode, customer };
+    const isAdmin = mode === 'admin';
+    document.getElementById('ce-title').textContent = isAdmin
+      ? `顧客情報の編集（No.${customer.customer_number}）`
+      : '登録情報の変更';
+    document.getElementById('ce-name-field').style.display    = isAdmin ? '' : 'none';
+    document.getElementById('ce-name-readonly').style.display = isAdmin ? 'none' : '';
+    document.getElementById('ce-name').value = customer.name || '';
+    document.getElementById('ce-name-text').textContent = `${customer.name || ''} 様`;
+    document.getElementById('ce-phone').value = customer.phone || '';
+    document.getElementById('ce-email').value = customer.email || '';
+    // 管理画面では電話・口頭で受けた顧客もいるため連絡先は任意
+    document.getElementById('ce-phone-req').textContent = isAdmin ? '（任意）' : '※必須';
+    document.getElementById('ce-email-req').textContent = isAdmin ? '（任意）' : '※必須';
+    hideAlert('ce-alert');
+    document.getElementById('ce-save-btn').disabled = false;
+    document.getElementById('customer-edit-modal').style.display = 'flex';
+  }
+  function closeCustomerEdit() { document.getElementById('customer-edit-modal').style.display = 'none'; }
+
+  async function submitCustomerEdit() {
+    if (!_customerEdit) return;
+    const { mode, customer } = _customerEdit;
+    const isAdmin = mode === 'admin';
+    const name  = isAdmin ? document.getElementById('ce-name').value.trim() : customer.name;
+    const phone = document.getElementById('ce-phone').value.trim();
+    const email = document.getElementById('ce-email').value.trim();
+    if (!name) { showAlert('ce-alert', 'お名前を入力してください。'); return; }
+    if (!isAdmin && !phone) { showAlert('ce-alert', '電話番号を入力してください。'); return; }
+    if (!isAdmin && !email) { showAlert('ce-alert', 'メールアドレスを入力してください。'); return; }
+    if (email && !EMAIL_RE.test(email)) {
+      showAlert('ce-alert', 'メールアドレスの形式が正しくありません（例：example@mail.com）。'); return;
+    }
+    hideAlert('ce-alert');
+    const btn = document.getElementById('ce-save-btn');
+    btn.disabled = true;
+    showLoading('保存中...');
+    try {
+      const { data, error } = await sbClient
+        .from('customers')
+        .update({ name, phone, email })
+        .eq('id', customer.id)
+        .select();
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('更新対象の顧客が見つかりませんでした');
+
+      // 今後の予約にも反映（リマインドは予約に保存された連絡先へ送られるため）
+      const now = new Date();
+      const todayStr = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
+      const { error: bErr } = await sbClient
+        .from('bookings')
+        .update({ name, phone, email })
+        .eq('customer_number', customer.customer_number)
+        .gte('date', todayStr);
+      if (bErr) console.error('❌ [submitCustomerEdit] 今後の予約への反映に失敗:', bErr);
+
+      closeCustomerEdit();
+      if (isAdmin) {
+        await renderCustomers();
+      } else {
+        cancelCustomer = data[0];
+        document.getElementById('mypage-customer-name').textContent = `${cancelCustomer.name} 様`;
+        await renderMypage();
+        const el = document.getElementById('mypage-success');
+        el.textContent = '登録情報を変更しました。';
+        el.classList.add('show');
+      }
+    } catch (e) {
+      console.error('❌ [submitCustomerEdit] エラー:', e);
+      showAlert('ce-alert', `保存に失敗しました。しばらくしてからお試しください。（${e.message || '不明なエラー'}）`);
+      btn.disabled = false;
+    } finally {
+      hideLoading();
     }
   }
 
