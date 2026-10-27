@@ -281,3 +281,9 @@ begin
       'create policy admin_all on public.%I for all to authenticated using (public.is_admin()) with check (public.is_admin())', t);
   end loop;
 end $$;
+
+-- ── 追加（2026-10-27 本番適用済み）：ログイン済みロールにテーブル操作の権限を付与 ──
+-- authenticated ロールに SELECT 等が付いておらず、院長ログイン後に顧客一覧が読めなかったため。
+-- 実際に操作できるのは RLS の admin_all（is_admin()）を満たす院長アカウントのみ。
+grant select, insert, update, delete on public.customers, public.bookings, public.holidays, public.app_settings, public.blocked_times to authenticated;
+grant usage, select on all sequences in schema public to authenticated;

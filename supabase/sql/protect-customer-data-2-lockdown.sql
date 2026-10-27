@@ -30,5 +30,10 @@ drop policy if exists allow_insert_app_settings on public.app_settings;
 drop policy if exists allow_update_app_settings on public.app_settings;
 drop policy if exists allow_delete_app_settings on public.app_settings;
 
+-- 公開キー（anon）からテーブルを直接操作する権限も外す（RLS に加えた二重の守り）
+revoke all on public.customers, public.bookings, public.blocked_times from anon;
+revoke insert, update, delete, truncate, references, trigger on public.holidays, public.app_settings from anon;
+revoke truncate, references, trigger on public.customers, public.bookings, public.holidays, public.app_settings, public.blocked_times from authenticated;
+
 -- 確認：残っているポリシー一覧（admin_all と holidays/app_settings の select のみになっていればOK）
 select tablename, policyname, cmd, roles from pg_policies where schemaname = 'public' order by tablename, policyname;
